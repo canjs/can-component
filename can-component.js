@@ -14,14 +14,11 @@ var ComponentControl = require("./control/control");
 var Construct = require("can-construct");
 var CanMap = require("can-map");
 
-
 var stache = require("can-stache");
 var stacheBindings = require("can-stache-bindings");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
-var canViewModel = require("can-view-model");
 var nodeLists = require('can-view-nodelist');
-
 
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
@@ -35,8 +32,7 @@ var dev = require('can-util/js/dev/dev');
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
-
-
+require("can-view-model");
 
 
 /**
@@ -256,9 +252,11 @@ var Component = Construct.extend(
 			// ## Rendering
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
-			var nodeList = nodeLists.register([], function(){
+			var nodeList = nodeLists.register([], function() {
 				domDispatch.call(el, "beforeremove", [], false);
-				teardownBindings && teardownBindings();
+				if(teardownBindings) {
+					teardownBindings();
+				}
 			}, componentTagData.parentNodeList || true, false);
 			nodeList.expression = "<" + this.tag + ">";
 			teardownFunctions.push(function() {
