@@ -1,4 +1,6 @@
 /* jshint -W003 */
+require("./component-define-test");
+
 var Component = require("can-component");
 var stache = require("can-stache");
 var QUnit = require("steal-qunit");

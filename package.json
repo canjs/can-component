@@ -66,17 +66,18 @@
     "can-view-scope": "^3.0.0-pre.1"
   },
   "devDependencies": {
-    "can-list": "^3.0.0-pre.1",
+    "can-define": "^0.3.0",
     "can-event": "^3.0.0-pre.1",
-    "documentjs": "^0.4.2",
-    "jshint": "^2.9.1",
+    "can-list": "^3.0.0-pre.1",
     "cssify": "^0.6.0",
+    "documentjs": "^0.4.2",
+    "done-serve": "^0.2.0",
+    "donejs-cli": "^0.8.0",
+    "generator-donejs": "^0.9.0",
+    "jshint": "^2.9.1",
     "steal": "^0.16.0",
     "steal-qunit": "^0.1.1",
     "steal-tools": "^0.16.0",
-    "testee": "^0.2.4",
-    "generator-donejs": "^0.9.0",
-    "donejs-cli": "^0.8.0",
-    "done-serve": "^0.2.0"
+    "testee": "^0.2.4"
   }
 }

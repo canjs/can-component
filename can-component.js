@@ -61,13 +61,18 @@ var Component = Construct.extend(
 			// which ensures that the following code is ran only in constructors that extend `Component`.
 			if (Component) {
 				var self = this,
-					protoViewModel = this.prototype.scope || this.prototype.viewModel;
+					protoViewModel = this.prototype.scope || this.prototype.viewModel,
+					ViewModel = this.prototype.ViewModel;
 
 				// Define a control using the `events` prototype property.
 				this.Control = ComponentControl.extend(this.prototype.events);
 
+				if(ViewModel) {
+					// Do nothing, assume constructor
+					this.ViewModel = ViewModel;
+				}
 				// Look to convert `protoViewModel` to a Map constructor function.
-				if (!protoViewModel || (typeof protoViewModel === "object" && !(protoViewModel instanceof CanMap))) {
+				else if (!protoViewModel || (typeof protoViewModel === "object" && !(protoViewModel instanceof CanMap))) {
 					// If protoViewModel is an object, use that object as the prototype of an extended
 					// Map constructor function.
 					// A new instance of that Map constructor function will be created and
@@ -77,6 +82,7 @@ var Component = Construct.extend(
 					// If viewModel is a CanMap constructor function, just use that.
 					this.Map = protoViewModel;
 				}
+
 
 				// Look for default `@` values. If a `@` is found, these
 				// attributes string values will be set and 2-way bound on the
@@ -148,13 +154,14 @@ var Component = Construct.extend(
 			var teardownBindings;
 			if (setupBindings) {
 				teardownBindings = stacheBindings.behaviors.viewModel(el, componentTagData, function(initialViewModelData) {
-
 					// Make %root available on the viewModel.
 					initialViewModelData["%root"] = componentTagData.scope.attr("%root");
 
 					// Create the component's viewModel.
 					var protoViewModel = component.scope || component.viewModel;
-					if (component.constructor.Map) {
+					if (component.constructor.ViewModel) {
+						viewModel = new component.constructor.ViewModel(initialViewModelData);
+					} else if (component.constructor.Map) {
 						// If `Map` property is set on the constructor use it to wrap the `initialViewModelData`
 						viewModel = new component.constructor.Map(initialViewModelData);
 					} else if (protoViewModel instanceof CanMap) {
@@ -175,13 +182,6 @@ var Component = Construct.extend(
 							viewModel = new(CanMap.extend(scopeResult))(initialViewModelData);
 						}
 					}
-
-					var oldSerialize = viewModel.serialize;
-					viewModel.serialize = function() {
-						var result = oldSerialize.apply(this, arguments);
-						delete result["%root"];
-						return result;
-					};
 
 					return viewModel;
 				}, initialViewModelData);
