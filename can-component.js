@@ -12,9 +12,6 @@
 var ComponentControl = require("./control/control");
 
 var Construct = require("can-construct");
-var CanMap = require("can-map");
-
-var stache = require("can-stache");
 var stacheBindings = require("can-stache-bindings");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
@@ -28,7 +25,6 @@ var domDispatch = require('can-util/dom/dispatch/dispatch');
 var canEach = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
 var isFunction = require('can-util/js/is-function/is-function');
-var dev = require('can-util/js/dev/dev');
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
@@ -56,9 +52,8 @@ var Component = Construct.extend(
 			// When `Component.setup` function is ran for the first time, `Component` doesn't exist yet
 			// which ensures that the following code is ran only in constructors that extend `Component`.
 			if (Component) {
-				var self = this,
-					protoViewModel = this.prototype.scope || this.prototype.viewModel,
-					ViewModel = this.prototype.ViewModel;
+				var self = this;
+				var ViewModel = this.prototype.ViewModel;
 
 				// Define a control using the `events` prototype property.
 				this.Control = ComponentControl.extend(this.prototype.events);
@@ -67,18 +62,6 @@ var Component = Construct.extend(
 					// Do nothing, assume constructor
 					this.ViewModel = ViewModel;
 				}
-				// Look to convert `protoViewModel` to a Map constructor function.
-				else if (!protoViewModel || (typeof protoViewModel === "object" && !(protoViewModel instanceof CanMap))) {
-					// If protoViewModel is an object, use that object as the prototype of an extended
-					// Map constructor function.
-					// A new instance of that Map constructor function will be created and
-					// set a the constructor instance's viewModel.
-					this.Map = CanMap.extend(protoViewModel || {});
-				} else if (protoViewModel.prototype instanceof CanMap) {
-					// If viewModel is a CanMap constructor function, just use that.
-					this.Map = protoViewModel;
-				}
-
 
 				// Look for default `@` values. If a `@` is found, these
 				// attributes string values will be set and 2-way bound on the
@@ -92,14 +75,7 @@ var Component = Construct.extend(
 
 				// Convert the template into a renderer function.
 				if (this.prototype.template) {
-					// If `this.prototype.template` is a function create renderer from it by
-					// wrapping it with the anonymous function that will pass it the arguments,
-					// otherwise create the render from the string
-					if (typeof this.prototype.template === "function") {
-						this.renderer = this.prototype.template;
-					} else {
-						this.renderer = stache(this.prototype.template);
-					}
+					this.renderer = this.prototype.template;
 				}
 
 				// Register this component to be created when its `tag` is found.
@@ -157,26 +133,14 @@ var Component = Construct.extend(
 					var protoViewModel = component.scope || component.viewModel;
 					if (component.constructor.ViewModel) {
 						viewModel = new component.constructor.ViewModel(initialViewModelData);
-					} else if (component.constructor.Map) {
-						// If `Map` property is set on the constructor use it to wrap the `initialViewModelData`
-						viewModel = new component.constructor.Map(initialViewModelData);
-					} else if (protoViewModel instanceof CanMap) {
-						// If `component.viewModel` is instance of `CanMap` assign it to the `viewModel`
-						viewModel = protoViewModel;
 					} else if (typeof protoViewModel === "function") {
 						// If `component.viewModel` is a function, call the function and
 						var scopeResult = protoViewModel.call(component, initialViewModelData, componentTagData.scope, el);
 
-						if (scopeResult instanceof CanMap) {
-							// If the function returns a CanMap, use that as the viewModel
-							viewModel = scopeResult;
-						} else if (scopeResult.prototype instanceof CanMap) {
-							// If `scopeResult` is of a `CanMap` type, use it to wrap the `initialViewModelData`
-							viewModel = new scopeResult(initialViewModelData);
-						} else {
-							// Otherwise extend `CanMap` with the `scopeResult` and initialize it with the `initialViewModelData`
-							viewModel = new(CanMap.extend(scopeResult))(initialViewModelData);
-						}
+						// If the function returns a CanMap, use that as the viewModel
+						viewModel = scopeResult;
+					} else {
+						viewModel = protoViewModel;
 					}
 
 					return viewModel;
@@ -224,19 +188,6 @@ var Component = Construct.extend(
 				if (isFunction(val)) {
 					addHelper(prop, val);
 				}
-			});
-
-			// Setup simple helpers
-			canEach(this.simpleHelpers || {}, function(val, prop) {
-				//!steal-remove-start
-				if (options.helpers[prop]) {
-					dev.warn('Component ' + component.tag +
-						' already has a helper called ' + prop);
-				}
-				//!steal-remove-end
-
-				// Convert the helper
-				addHelper(prop, stache.simpleHelper(val));
 			});
 
 			// ## `events` control
