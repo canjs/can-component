@@ -6,7 +6,7 @@ var define = require("can-define");
 
 var viewModel = require("can-view-model");
 
-QUnit.module('can-define');
+QUnit.module("can-component with can-define");
 
 QUnit.test('Works with can-define', function () {
 
