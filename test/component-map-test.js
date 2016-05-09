@@ -24,8 +24,6 @@ var types = require("can-util/js/types/types");
 
 var isPromise = require('can-util/js/is-promise/is-promise');
 
-types.DefaultMap = CanMap;
-
 var innerHTML = function(node){
 	if("innerHTML" in node) {
 		return node.innerHTML;
@@ -46,11 +44,14 @@ var runTasks = function(tasks){
 };
 
 function makeTest(name, doc) {
-	var oldDoc;
+	var oldDoc, oldDefaultMap;
 	QUnit.module(name, {
 		setup: function () {
 			oldDoc = DOCUMENT();
+			oldDefaultMap = types.DefaulMap;
 			DOCUMENT(doc);
+
+			types.DefaultMap = CanMap;
 
 			if(doc) {
 				this.fixture = doc.createElement("div");
@@ -61,6 +62,7 @@ function makeTest(name, doc) {
 		},
 		teardown: function(){
 			DOCUMENT(oldDoc);
+			types.DefaultMap = oldDefaultMap;
 
 			if(doc) {
 				doc.body.removeChild(this.fixture);
@@ -1150,11 +1152,11 @@ function makeTest(name, doc) {
 	test("id and class should work now (#694)", function () {
 		Component.extend({
 			tag: "stay-classy",
-			viewModel: {
+			ViewModel: CanMap.extend({
 				notid: "foo",
 				notclass: 5,
 				notdataviewid: {}
-			}
+			})
 		});
 
 		var data = {
@@ -1171,7 +1173,6 @@ function makeTest(name, doc) {
 		domMutate.appendChild.call(this.fixture, frag);
 
 		var viewModel = canViewModel(stayClassy);
-		console.log(viewModel);
 
 		equal(viewModel.attr("id"), "id-success");
 		equal(viewModel.attr("class"), "class-success");

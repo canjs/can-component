@@ -15,13 +15,14 @@ var Construct = require("can-construct");
 var stacheBindings = require("can-stache-bindings");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
-var nodeLists = require('can-view-nodelist');
+var nodeLists = require("can-view-nodelist");
 
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
 var types = require("can-util/js/types/types");
+var assign = require("can-util/js/assign/assign");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
@@ -112,8 +113,12 @@ var Component = Construct.extend(
 
 						// If the function returns a CanMap, use that as the viewModel
 						viewModel = scopeResult;
+					} else if(protoViewModel instanceof types.DefaultMap) {
+							viewModel = protoViewModel;
 					} else {
-						viewModel = new component.constructor.ViewModel(protoViewModel || initialViewModelData);
+						var scopeData = assign(assign({}, initialViewModelData), protoViewModel);
+
+						viewModel = new component.constructor.ViewModel(scopeData);
 					}
 
 					return viewModel;
