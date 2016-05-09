@@ -15,21 +15,21 @@ var Construct = require("can-construct");
 var stacheBindings = require("can-stache-bindings");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
-var nodeLists = require('can-view-nodelist');
+var nodeLists = require("can-view-nodelist");
 
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
+var types = require("can-util/js/types/types");
+var assign = require("can-util/js/assign/assign");
 
 var canEach = require('can-util/js/each/each');
-var string = require('can-util/js/string/string');
 var isFunction = require('can-util/js/is-function/is-function');
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
-require("can-view-model");
-
+require('can-view-model');
 
 /**
  * @add Component
@@ -53,29 +53,15 @@ var Component = Construct.extend(
 			// which ensures that the following code is ran only in constructors that extend `Component`.
 			if (Component) {
 				var self = this;
-				var ViewModel = this.prototype.ViewModel;
 
 				// Define a control using the `events` prototype property.
 				this.Control = ComponentControl.extend(this.prototype.events);
-
-				if(ViewModel) {
-					// Do nothing, assume constructor
-					this.ViewModel = ViewModel;
-				}
-
-				// Look for default `@` values. If a `@` is found, these
-				// attributes string values will be set and 2-way bound on the
-				// component instance's viewModel.
-				this.attributeScopeMappings = {};
-				canEach(this.Map ? this.Map.defaults : {}, function(val, prop) {
-					if (val === "@") {
-						self.attributeScopeMappings[prop] = prop;
-					}
-				});
+				// Do nothing, assume constructor
+				this.ViewModel = this.prototype.ViewModel || types.DefaultMap;
 
 				// Convert the template into a renderer function.
-				if (this.prototype.template) {
-					this.renderer = this.prototype.template;
+				if (this.prototype.template || this.prototype.view) {
+					this.renderer = this.prototype.view || this.prototype.template;
 				}
 
 				// Register this component to be created when its `tag` is found.
@@ -93,36 +79,25 @@ var Component = Construct.extend(
 		// ### setup
 		// When a new component instance is created, setup bindings, render the template, etc.
 		setup: function(el, componentTagData) {
-
-			// Setup values passed to component
-			var initialViewModelData = {},
-				component = this,
-				// If a template is not provided, we fall back to
-				// dynamic scoping regardless of settings.
-				lexicalContent = ((typeof this.leakScope === "undefined" ?
-						false :
-						!this.leakScope) &&
-					!!this.template),
-
-				// the object added to the scope
-				viewModel,
-				frag,
-				// an array of teardown stuff that should happen when the element is removed
-				teardownFunctions = [],
-				callTeardownFunctions = function() {
+			var component = this;
+			// If a template is not provided, we fall back to
+			// dynamic scoping regardless of settings.
+			var lexicalContent = (
+					(typeof this.leakScope === "undefined" ? false : !this.leakScope) &&
+					!!(this.template || this.view)
+				);
+			// an array of teardown stuff that should happen when the element is removed
+			var teardownFunctions = [];
+			var initialViewModelData = {};
+			var callTeardownFunctions = function() {
 					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
 						teardownFunctions[i]();
 					}
-				},
-
-				setupBindings = !domData.get.call(el, "preventDataBindings");
+				};
+			var setupBindings = !domData.get.call(el, "preventDataBindings");
+			var viewModel, frag;
 
 			// ## Scope
-
-			// Add viewModel prototype properties marked with an "@" to the `initialViewModelData` object
-			canEach(this.constructor.attributeScopeMappings, function(val, prop) {
-				initialViewModelData[prop] = el.getAttribute(string.hyphenate(val));
-			});
 			var teardownBindings;
 			if (setupBindings) {
 				teardownBindings = stacheBindings.behaviors.viewModel(el, componentTagData, function(initialViewModelData) {
@@ -131,16 +106,19 @@ var Component = Construct.extend(
 
 					// Create the component's viewModel.
 					var protoViewModel = component.scope || component.viewModel;
-					if (component.constructor.ViewModel) {
-						viewModel = new component.constructor.ViewModel(initialViewModelData);
-					} else if (typeof protoViewModel === "function") {
+
+					if (typeof protoViewModel === "function") {
 						// If `component.viewModel` is a function, call the function and
 						var scopeResult = protoViewModel.call(component, initialViewModelData, componentTagData.scope, el);
 
 						// If the function returns a CanMap, use that as the viewModel
 						viewModel = scopeResult;
+					} else if(protoViewModel instanceof types.DefaultMap) {
+							viewModel = protoViewModel;
 					} else {
-						viewModel = protoViewModel;
+						var scopeData = assign(assign({}, initialViewModelData), protoViewModel);
+
+						viewModel = new component.constructor.ViewModel(scopeData);
 					}
 
 					return viewModel;
