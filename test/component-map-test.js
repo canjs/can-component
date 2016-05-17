@@ -48,7 +48,7 @@ function makeTest(name, doc) {
 	QUnit.module(name, {
 		setup: function () {
 			oldDoc = DOCUMENT();
-			oldDefaultMap = types.DefaulMap;
+			oldDefaultMap = types.DefaultMap;
 			DOCUMENT(doc);
 
 			types.DefaultMap = CanMap;
