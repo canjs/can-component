@@ -1127,7 +1127,7 @@ function makeTest(name, doc, mutObs) {
 			equal(inited, 1, "inited");
 			equal(inserted, 1, "inserted");
 			start();
-		},10);
+		},30);
 	});
 
 
@@ -1308,7 +1308,6 @@ function makeTest(name, doc, mutObs) {
 			tag: "can-child",
 			events: {
 				inserted: function(){
-					console.log("inserted");
 					ok(true, "called inserted once");
 				}
 			}
