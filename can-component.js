@@ -10,6 +10,7 @@
 // `Component.setup` prepares everything needed by the `Component.prototype.setup`
 // to hookup the component.
 var ComponentControl = require("./control/control");
+var namespace = require('can-util/namespace');
 
 var Construct = require("can-construct");
 var stacheBindings = require("can-stache-bindings");
@@ -280,4 +281,4 @@ viewCallbacks.tag("content", function(el, tagData) {
 });
 
 
-module.exports = Component;
+module.exports = namespace.Component = Component;
