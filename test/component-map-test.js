@@ -11,11 +11,10 @@ var CanMap = require("can-map");
 var CanList = require("can-list");
 var canEvent = require('can-event');
 
-
 var canViewModel = require('can-view-model');
 
 var canBatch = require("can-event/batch/batch");
-var DOCUMENT = require("can-util/dom/document/document");
+
 var attr = require("can-util/dom/attr/attr");
 var className = require("can-util/dom/class-name/class-name");
 var domMutate = require('can-util/dom/mutate/mutate');
@@ -23,6 +22,16 @@ var domData = require('can-util/dom/data/data');
 var types = require("can-util/js/types/types");
 
 var isPromise = require('can-util/js/is-promise/is-promise');
+
+var makeDocument = require('can-vdom/make-document/make-document');
+var MUTATION_OBSERVER = require('can-util/dom/mutation-observer/mutation-observer');
+var DOCUMENT = require("can-util/dom/document/document");
+
+
+var DOC = DOCUMENT();
+var MUT_OBS = MUTATION_OBSERVER();
+makeTest("can-component - map - dom", document, MUT_OBS);
+makeTest("can-component - map - vdom", makeDocument(), null);
 
 var innerHTML = function(node){
 	if("innerHTML" in node) {
@@ -43,14 +52,14 @@ var runTasks = function(tasks){
 	setTimeout(nextTask,10);
 };
 
-function makeTest(name, doc) {
+function makeTest(name, doc, mutObs) {
 	var oldDoc, oldDefaultMap;
 	QUnit.module(name, {
 		setup: function () {
-			oldDoc = DOCUMENT();
-			oldDefaultMap = types.DefaultMap;
 			DOCUMENT(doc);
+			MUTATION_OBSERVER(mutObs);
 
+			oldDefaultMap = types.DefaultMap;
 			types.DefaultMap = CanMap;
 
 			if(doc) {
@@ -61,12 +70,16 @@ function makeTest(name, doc) {
 			}
 		},
 		teardown: function(){
-			DOCUMENT(oldDoc);
-			types.DefaultMap = oldDefaultMap;
+			doc.body.removeChild(this.fixture);
+			stop();
+			setTimeout(function(){
+				types.DefaultMap = oldDefaultMap;
+				start();
+				DOCUMENT(DOC);
+				MUTATION_OBSERVER(MUT_OBS);
+			},1);
 
-			if(doc) {
-				doc.body.removeChild(this.fixture);
-			}
+
 		}
 	});
 
@@ -1295,7 +1308,7 @@ function makeTest(name, doc) {
 			tag: "can-child",
 			events: {
 				inserted: function(){
-					this.viewModel.attr('bar', 'foo');
+					console.log("inserted");
 					ok(true, "called inserted once");
 				}
 			}
@@ -1816,5 +1829,3 @@ function makeTest(name, doc) {
 		equal(two.firstChild.nodeValue, "OTHER-EXPORT", "external content, external export");*/
 	});
 }
-
-makeTest("can/component new bindings dom", document);
