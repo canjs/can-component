@@ -927,6 +927,44 @@ function makeTest(name, doc, mutObs) {
 
 	});
 
+	test("a CanMap constructor as viewModel", function() {
+		var MyMap = CanMap.extend({
+			name: "Matthew"
+		});
+
+		Component.extend({
+			tag: "can-map-viewmodel",
+			template: stache("{{name}}"),
+			viewModel: MyMap
+		});
+
+		var template = stache("<can-map-viewmodel></can-map-viewmodel>");
+		equal(template().firstChild.firstChild.nodeValue, "Matthew");
+	});
+
+	test("an object is turned into a CanMap as viewModel", function() {
+		Component.extend({
+			tag: "can-map-viewmodel",
+			template: stache("{{name}}"),
+			viewModel: {
+				name: "Matthew"
+			}
+		});
+
+		var template = stache("<can-map-viewmodel></can-map-viewmodel>");
+
+		var fragOne = template();
+		var vmOne = canViewModel(fragOne.firstChild);
+
+		var fragTwo = template();
+		var vmTwo = canViewModel(fragTwo.firstChild);
+
+		vmOne.attr("name", "Wilbur");
+
+		equal(fragOne.firstChild.firstChild.nodeValue, "Wilbur", "The first map changed values");
+		equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
+	});
+
 	test("content in a list", function () {
 		var template = stache('<my-list>{{name}}</my-list>');
 
