@@ -942,6 +942,21 @@ function makeTest(name, doc, mutObs) {
 		equal(template().firstChild.firstChild.nodeValue, "Matthew");
 	});
 
+	test("a CanMap constructor as scope", function() {
+		var MyMap = CanMap.extend({
+			name: "Matthew"
+		});
+
+		Component.extend({
+			tag: "can-map-viewmodel",
+			template: stache("{{name}}"),
+			scope: MyMap
+		});
+
+		var template = stache("<can-map-viewmodel></can-map-viewmodel>");
+		equal(template().firstChild.firstChild.nodeValue, "Matthew");
+	});
+
 	test("an object is turned into a CanMap as viewModel", function() {
 		Component.extend({
 			tag: "can-map-viewmodel",
