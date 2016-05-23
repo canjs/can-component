@@ -965,6 +965,21 @@ function makeTest(name, doc, mutObs) {
 		equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
 	});
 
+	test("Providing viewModel and ViewModel throws", function() {
+		try {
+			Component.extend({
+				tag: "viewmodel-test",
+				template: stache("<div></div>"),
+				viewModel: {},
+				ViewModel: CanMap.extend({})
+			});
+
+			ok(false, "Should have thrown because we provided both");
+		} catch(er) {
+			ok(true, "It threw because we provided both viewModel and ViewModel");
+		}
+	});
+
 	test("content in a list", function () {
 		var template = stache('<my-list>{{name}}</my-list>');
 

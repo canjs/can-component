@@ -57,8 +57,23 @@ var Component = Construct.extend(
 
 				// Define a control using the `events` prototype property.
 				this.Control = ComponentControl.extend(this.prototype.events);
-				// Do nothing, assume constructor
-				this.ViewModel = this.prototype.ViewModel || types.DefaultMap;
+
+				// Backwards compatible with viewModel: Map
+				// If this a CanMap constructor, use that as the ViewModel property.
+				var protoViewModel = this.prototype.viewModel;
+
+				if(protoViewModel && this.prototype.ViewModel) {
+					throw new Error("Cannot provide both a ViewModel and a viewModel property");
+				}
+
+				if(protoViewModel && types.isMapLike(protoViewModel.prototype)) {
+					this.prototype.viewModel = undefined;
+				} else {
+					protoViewModel = undefined;
+				}
+
+				this.ViewModel = this.prototype.ViewModel ||
+					protoViewModel || types.DefaultMap;
 
 				// Convert the template into a renderer function.
 				if (this.prototype.template || this.prototype.view) {
