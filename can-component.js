@@ -60,14 +60,14 @@ var Component = Construct.extend(
 
 				// Backwards compatible with viewModel: Map
 				// If this a CanMap constructor, use that as the ViewModel property.
-				var protoViewModel = this.prototype.viewModel;
+				var protoViewModel = this.prototype.viewModel || this.prototype.scope;
 
 				if(protoViewModel && this.prototype.ViewModel) {
 					throw new Error("Cannot provide both a ViewModel and a viewModel property");
 				}
 
 				if(protoViewModel && types.isMapLike(protoViewModel.prototype)) {
-					this.prototype.viewModel = undefined;
+					this.prototype.viewModel = this.prototype.scope = undefined;
 				} else {
 					protoViewModel = undefined;
 				}
