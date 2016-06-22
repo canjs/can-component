@@ -62,7 +62,7 @@
     "can-view-scope": "^3.0.0-pre.1"
   },
   "devDependencies": {
-    "can-define": "^0.7.4",
+    "can-define": "^0.7.7",
     "can-event": "^3.0.0-pre.1",
     "can-list": "^3.0.0-pre.1",
     "can-map": "^3.0.0-pre.2",
@@ -87,12 +87,12 @@
       "bit-docs-generate-readme": "^0.0.8"
     },
     "glob": {
-      "pattern": "**\/*.{js,md}",
-      "ignore": "node_modules\/**\/*"
+      "pattern": "**/*.{js,md}",
+      "ignore": "node_modules/**/*"
     },
-		"readme": {
-			"apis": "./docs/apis.json"
-		},
+    "readme": {
+      "apis": "./docs/apis.json"
+    },
     "parent": "can-component"
   }
 }
