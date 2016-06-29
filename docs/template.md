@@ -1,22 +1,21 @@
-@property {can.view.renderer|String} [can-component.prototype.template] template
+@property {can-stache.renderer|String} [can-component.prototype.template] template
 @parent can-component.prototype
 
 Provides a template to render directly within the component's tag. The template is rendered with the
-component's [can.Component::viewModel viewModel].  `<content>` elements within the template are replaced by
+component's [can-component::viewModel viewModel].  `<content>` elements within the template are replaced by
 the source elements within the component's tag.
 
-@option {can.view.renderer} A [can.view.renderer] returned by [can.stache] or 
-[can.view]. For example:
+@option {can-stache.renderer} A [can-stache.renderer] returned by [can-stache]. For example:
 
-    can.Component({
+    Component({
       tag: "my-tabs",
       template: can.stache("<ul>{{#panels}}<li>{{title}}</li> ...")
     })
 
 
-@option {String} The string contents of a [can.mustache] template.  For example:
+@option {String} The string contents of a [can-stache] template.  For example:
 
-    can.Component({
+    Component({
       tag: "my-tabs",
       template: "<ul>{{#panels}}<li>{{title}}</li> ..."
     })
@@ -34,7 +33,7 @@ the [http://www.w3.org/TR/shadow-dom/ W3C Shadow DOM proposal]. It represents th
 of a custom element, while being able to reposition the user provided __source__ elements
 with the `<content>` tag.
 
-There are three things to understand about a [can.Component]'s template:
+There are three things to understand about a [can-component]'s template:
 
  - It is inserted into the component's tag.
  - It is rendered with access to the component instance's viewModel.
@@ -46,9 +45,9 @@ The following example demonstrates all three features:
 
 The following explains how each part works:
 
-__can.Component:__
+__Component:__
 
-    can.Component({
+    Component({
       tag: "my-greeting",
       template: can.stache("<h1><content/></h1>"),
       viewModel: {
@@ -84,7 +83,7 @@ __Source data:__
       site: "CanJS"
     })
 
-This is how we render the source template that uses `<my-greeting>`. The template is rendered with `site` in its [can.view.viewModel].
+This is how we render the source template that uses `<my-greeting>`. The template is rendered with `site` in its [can-component::viewModel].
 
 __HTML Result:__
 
@@ -108,9 +107,9 @@ The template specified by template is rendered directly withing the custom tag.
 
 For example the following component:
 
-    can.Component({
+    Component({
       tag: "my-greeting",
-      template: can.stache("<h1>Hello There</h1>")
+      template: stache("<h1>Hello There</h1>")
     });
 
 With the following source html:
@@ -143,9 +142,9 @@ Use the `<content>` element to place the source content in the
 component's element within the component's 
 template. For example, if we change the component to look like:
 
-    can.Component({
+    Component({
       tag: "my-greeting",
-      template: can.stache("<h1><content/></h1>")
+      template: stache("<h1><content/></h1>")
     });
 
 and rendered with source html, like:
@@ -162,9 +161,9 @@ If the user does not provide source content, the html
 between the `<content>` tags will be used. For example, if we 
 change the component to look like:
 
-    can.Component({
+    Component({
       tag: "my-greeting",
-      template: can.stache("<h1><content>Hello World</content></h1>")
+      template: stache("<h1><content>Hello World</content></h1>")
     });
 
 and rendered with source html like:

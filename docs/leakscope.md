@@ -11,7 +11,7 @@ a component's viewModel values in the user content.
 
 `true` adds the ability to read:
 
-- the outer [can.view.Scope scope] values from the component's template, and
+- the outer [can-view-scope scope] values from the component's template, and
 - the component's [can-component.prototype.viewModel viewModel] values from the user content. 
  
 The default value is `true`.  This may reverse in 3.0.
@@ -20,7 +20,7 @@ The default value is `true`.  This may reverse in 3.0.
 
 ## Use
 
-A component's [can.Component::leakScope leakScope] option controls if a 
+A component's [can-component::leakScope leakScope] option controls if a 
 component's template can access the component's outer scope and the 
 user content can read the component's view model.
 
@@ -41,7 +41,7 @@ is `{{subject}}`.
 Finally, if `<hello-world>` is defined like:
 
 ```
-can.Component.extend({
+Component.extend({
   tag: "hello-world",
   template: can.stache("{{greeting}} <content/>{{exclamation}}")
 })
@@ -53,7 +53,7 @@ can.Component.extend({
 
 If the following component is defined:
 
-    can.Component.extend({
+    Component.extend({
         tag: "hello-world",
         leakScope: true, // the default value
         template: can.stache("{{greeting}} <content/>{{exclamation}}"),
@@ -81,5 +81,5 @@ does not see `exclamation`. The __user content__ does not see the
 viewModel's `subject` and uses the outer scope's `subject` which is `"World"`.
 
 Using the `leakScope: false` option is useful for hiding and protecting
-internal details of `can.Component`, potentially preventing accidental
+internal details of `Component`, potentially preventing accidental
 clashes.
