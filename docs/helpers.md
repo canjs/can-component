@@ -1,20 +1,20 @@
-@property {Object.<String,can.mustache.helper>} can-component.prototype.helpers helpers
+@property {Object.<String,can-stache.helper>} can-component.prototype.helpers helpers
 @parent can-component.prototype
 
 Helper functions used with the component's template.
 
-@option {Object.<String,can.mustache.helper>}
+@option {Object.<String,can-stache.helper>}
 
-An object of [can.mustache] helper names and methods. The helpers are only
+An object of [can-stache] helper names and methods. The helpers are only
 available within the component's template and source html. Helpers
-are always called back with `this` as the [can.Component::viewModel viewModel].
+are always called back with `this` as the [can-component::viewModel viewModel].
 
 @body
 
 ## Use
 
-[can.Component]'s helper object lets you provide helper functions that are localized to
-the component's [can.Component::template template].  The following example
+[can-component]'s helper object lets you provide helper functions that are localized to
+the component's [can-component::template template].  The following example
 uses an `isSelected` helper to render content for selected items. Click
 one of the following libraries to toggle them within the `selected` array. 
 
