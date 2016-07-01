@@ -9,7 +9,7 @@ the source elements within the component's tag.
 
     Component({
       tag: "my-tabs",
-      template: can.stache("<ul>{{#panels}}<li>{{title}}</li> ...")
+      template: stache("<ul>{{#panels}}<li>{{title}}</li> ...")
     })
 
 
@@ -20,7 +20,7 @@ the source elements within the component's tag.
       template: "<ul>{{#panels}}<li>{{title}}</li> ..."
     })
 
-Note: Using mustache is deprecated.  Please switch to [can.stache].
+Note: Using mustache is deprecated.  Please switch to [can-stache].
 
 
 @body
@@ -49,16 +49,16 @@ __Component:__
 
     Component({
       tag: "my-greeting",
-      template: can.stache("<h1><content/></h1>"),
+      template: stache("<h1><content/></h1>"),
       viewModel: {
-        title: "can.Component"
+        title: "can-component"
       }
     })
 
 This registers a component for elements like `<my-greeting>`. Its template
 will place an `<h1>` element directly within `<my-greeting>` and put
 the original contents of `<my-greeting>` within the `<h1>`. The component's
-[can.Component::viewModel viewModel] adds a title value.
+[can-component::viewModel viewModel] adds a title value.
 
 __Source template:__
 
@@ -79,9 +79,9 @@ Notice:
 
 __Source data:__
 
-    can.view("source-template",{
-      site: "CanJS"
-    })
+		stache("...")({
+			site: "CanJS"
+		})
 
 This is how we render the source template that uses `<my-greeting>`. The template is rendered with `site` in its [can-component::viewModel].
 
@@ -89,7 +89,7 @@ __HTML Result:__
 
     <header>
       <my-greeting>
-        <h1>CanJS - can.Component</h1>
+        <h1>CanJS - can-component</h1>
       </my-greeting>
     </header>
 

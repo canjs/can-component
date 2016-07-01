@@ -45,7 +45,7 @@ with the methods and properties of how your component behaves:
 
     Component.extend({
       tag: "hello-world",
-      template: can.stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
+      template: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
       viewModel: {
         visible: false,
         message: "Hello There!"
@@ -116,7 +116,7 @@ The following component:
 
     Component.extend({
       tag: "hello-world",
-      template: can.stache("<h1>Hello World</h1>")
+      template: stache("<h1>Hello World</h1>")
     });
 
 Changes `<hello-world></hello-world>` elements into:
@@ -129,7 +129,7 @@ The following component:
 
     Component.extend({
       tag: "hello-world",
-      template: can.stache("<h1><content/></h1>")
+      template: stache("<h1><content/></h1>")
     });
 
 Changes `<hello-world>Hi There</hello-world>` into:
@@ -138,7 +138,7 @@ Changes `<hello-world>Hi There</hello-world>` into:
 
 ### viewModel
 
-A component's [can-component::viewModel viewModel] defines a can.Map that
+A component's [can-component::viewModel viewModel] defines a Map that
 is used to render the component's template. The maps properties 
 are typically set by attribute [can-stache-bindings bindings] on the custom element. 
 By default, every attribute's value is looked up in the parent viewModel
@@ -148,7 +148,7 @@ The following component:
 
     Component.extend({
       tag: "hello-world",
-      template: can.stache("<h1>{{message}}</h1>")
+      template: stache("<h1>{{message}}</h1>")
     });
 
 Changes the following rendered template:
@@ -166,7 +166,7 @@ Default values can be provided. The following component:
 
     Component.extend({
       tag: "hello-world",
-      template: can.stache("<h1>{{message}}</h1>"),
+      template: stache("<h1>{{message}}</h1>"),
       viewModel: {
         message: "Hi"
       }
@@ -201,7 +201,7 @@ adds "!" to the message every time `<hello-world>` is clicked:
 
     Component.extend({
       tag: "hello-world",
-      template: can.stache("<h1>{{message}}</h1>"),
+      template: stache("<h1>{{message}}</h1>"),
       events: {
         "click" : function(){
           var currentMessage = this.viewModel.attr("message");
@@ -221,7 +221,7 @@ only renders friendly messages:
 
     Component.extend({
       tag: "hello-world",
-      template: can.stache("{{#isFriendly message}}"+
+      template: stache("{{#isFriendly message}}"+
                   "<h1>{{message}}</h1>"+
                 "{{/isFriendly}}"),
       helpers: {
@@ -237,7 +237,7 @@ only renders friendly messages:
 
 ## Differences between components in can-stache
 
-A [can.mustache] template passes values from the viewModel to a `Component`
+A [can-mustache] template passes values from the viewModel to a `Component`
 by specifying the key of the value in the attribute directly.  For example:
 
     Component.extend({
@@ -257,7 +257,7 @@ With [can-stache], you wrap the attribute name with `{}` for parent to child bin
 
     Component.extend({
       tag: "my-tag",
-      template: can.stache("<h1>{{greeting}}</h1>")
+      template: stache("<h1>{{greeting}}</h1>")
     });
     var template = stache("<my-tag {greeting}='message'></my-tag>");
     
@@ -347,7 +347,7 @@ widget-like components: a grid, next / prev buttons, and a page count indicator.
 
 @demo can/component/examples/paginate.html
 
-This demo uses a `Paginate` can.Map to assist with maintaining a paginated state:
+This demo uses a `Paginate` [can-map] to assist with maintaining a paginated state:
 
     var Paginate = Map.extend({
     ...
@@ -416,7 +416,7 @@ Watch this video for an overview of [can-component], why you should use it, and 
 
 <iframe width="662" height="372" src="https://www.youtube.com/embed/BM1Jc3lVUrk" frameborder="0" allowfullscreen></iframe>
 
-This video provides a more in depth overview of the API and goes over several examples of can.Components:
+This video provides a more in depth overview of the API and goes over several examples of Components:
 
 <iframe width="662" height="372" src="https://www.youtube.com/embed/ogX765S4iuc" frameborder="0" allowfullscreen></iframe>
 

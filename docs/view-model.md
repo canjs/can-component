@@ -55,11 +55,11 @@ a template rendered like:
 
 Creates an instance of following control:
 
-    can.Component.extend({
+    Component.extend({
     	tag: "my-element",
     	viewModel: function(attrs){
     	  attrs.title //-> "Justin";
-    	  return new can.Map(attrs);
+    	  return new Map(attrs);
     	}
     })
 
@@ -71,10 +71,10 @@ The viewModel the custom tag was found within.  By default, any attribute's valu
 be looked up within the current viewModel, but if you want to add values without needing
 the user to provide an attribute, you can set this up here.  For example:
 
-    can.Component.extend({
+    Component.extend({
     	tag: "my-element",
     	viewModel: function(attrs, parentScope){
-    	  return new can.Map({title: parentScope.attr('name')});
+    	  return new Map({title: parentScope.attr('name')});
     	}
     });
 
@@ -149,11 +149,11 @@ Next, a new instance of CustomMap is created with the attribute data within `<my
 
     componentData = new CustomMap(attrs);
     
-And finally, that data is added to the [can.view.Scope parentScope] of the component, used to 
+And finally, that data is added to the [can-view-scope parentScope] of the component, used to 
 render the component's template, and inserted into the element:
 
     var newviewModel = parentScope.add(componentData),
-        result = can.stache("Page {{page}}.")(newviewModel);
+        result = stache("Page {{page}}.")(newviewModel);
     $(element).html(result);
 
 ## Values passed from attributes
@@ -261,7 +261,7 @@ dispatches a `"close"` event when it's close method is called:
 ```
 Component.extend({
   tag: "player-edit",
-  template: can.view('player-edit-stache'),
+  template: template,
   viewModel: {
     close: function(){
       this.dispatch("close");
@@ -282,9 +282,3 @@ The following demo uses this ability to create a close button that
 hides the player editor:
 
 @demo can/component/examples/paginate_next_event.html
-
-
-
-
-
-
