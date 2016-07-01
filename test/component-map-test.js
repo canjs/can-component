@@ -288,7 +288,6 @@ function makeTest(name, doc, mutObs) {
 	test("lexical scoping", function() {
 		Component.extend({
 			tag: "hello-world",
-			leakScope: false,
 			template: stache("{{greeting}} <content>World</content>{{exclamation}}"),
 			viewModel: {
 				greeting: "Hello"
@@ -577,6 +576,7 @@ function makeTest(name, doc, mutObs) {
 			tag: "grid",
 			ViewModel: GridViewModel,
 			template: stache("<table><tbody><content></content></tbody></table>"),
+			leakScope: true,
 			events: {
 				init: function () {
 					this.update();
@@ -822,6 +822,7 @@ function makeTest(name, doc, mutObs) {
 		Component.extend({
 			tag: "my-toggler",
 			template: stache("{{#if visible}}<content/>{{/if}}"),
+			leakScope: true,
 			viewModel: {
 				visible: true,
 				show: function () {
@@ -1001,6 +1002,7 @@ function makeTest(name, doc, mutObs) {
 		Component.extend({
 			tag: "my-list",
 			template: stache("{{#each items}}<li><content/></li>{{/each}}"),
+			leakScope: true,
 			viewModel: {
 				items: new CanList([{
 					name: "one"
@@ -1596,12 +1598,14 @@ function makeTest(name, doc, mutObs) {
 				removed: function() {
 					removeCount++;
 				}
-			}
+			},
+			leakScope: true
 		});
 
 		Component.extend({
 			tag: 'my-outside',
-			template: stache('{{#if state.inner}}<my-inside></my-inside>{{/if}}')
+			template: stache('{{#if state.inner}}<my-inside></my-inside>{{/if}}'),
+			leakScope: true
 		});
 
 		domMutate.appendChild.call(this.fixture, baseTemplate({
@@ -1817,7 +1821,8 @@ function makeTest(name, doc, mutObs) {
 					"{{/if}}"+
 					"{{/items}}"+
 				"</ul>"),
-			viewModel: mapInstance
+			viewModel: mapInstance,
+			leakScope: true
 		});
 
 		Component.extend({

@@ -99,7 +99,7 @@ var Component = Construct.extend(
 			// If a template is not provided, we fall back to
 			// dynamic scoping regardless of settings.
 			var lexicalContent = (
-					(typeof this.leakScope === "undefined" ? false : !this.leakScope) &&
+					(typeof this.leakScope === "undefined" ? true : !this.leakScope) &&
 					!!(this.template || this.view)
 				);
 			// an array of teardown stuff that should happen when the element is removed
