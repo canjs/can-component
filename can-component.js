@@ -116,7 +116,12 @@ var Component = Construct.extend(
 			// ## Scope
 			var teardownBindings;
 			if (setupBindings) {
-				teardownBindings = stacheBindings.behaviors.viewModel(el, componentTagData, function(initialViewModelData) {
+				var setupFn = componentTagData.setupBindings ||
+					function(el, callback, data){
+						return stacheBindings.behaviors.viewModel(el, componentTagData,
+																											callback, data);
+					};
+				teardownBindings = setupFn(el, function(initialViewModelData) {
 					// Make %root available on the viewModel.
 					initialViewModelData["%root"] = componentTagData.scope.attr("%root");
 
