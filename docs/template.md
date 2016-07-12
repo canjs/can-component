@@ -41,19 +41,24 @@ There are three things to understand about a [can-component]'s template:
 
 The following example demonstrates all three features:
 
-@demo can/component/examples/my_greeting_full.html
+@demo demos/can-component/my_greeting_full.html
 
 The following explains how each part works:
 
 __Component:__
 
-    Component({
-      tag: "my-greeting",
-      template: stache("<h1><content/></h1>"),
-      viewModel: {
-        title: "can-component"
-      }
-    })
+```js
+Component({
+	tag: "my-greeting",
+	template: stache("<h1><content/></h1>"),
+	ViewModel: DefineMap.extend({
+		title: {
+			value: "can-component"
+		}
+	}),
+	leakScope: true
+});
+```
 
 This registers a component for elements like `<my-greeting>`. Its template
 will place an `<h1>` element directly within `<my-greeting>` and put

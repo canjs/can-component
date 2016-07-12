@@ -218,15 +218,20 @@ The above will create a title property in the component's viewModel, which has a
 If the tag's `title` attribute is changed, it updates the viewModel property 
 automatically.  This can be seen in the following example:
 
-@demo can/component/examples/accordion.html
+@demo demos/can-component/accordion.html
 
 Clicking the __Change title__ button sets a `<panel>` element's `title` attribute like:
 
-    $("#out").on("click", "button", function(){
-      $("panel:first").attr("title", "Users")
-      $(this).remove();
-    });
-
+```js
+out.addEventListener("click", function(ev){
+	var el = ev.target;
+	var parent = el.parentNode;
+	if(el.nodeName === "BUTTON") {
+		parent.setAttribute("title", "Users");
+		parent.removeChild(el);
+	}
+});
+```
 
 ## Calling methods on viewModel from events within the template
 
@@ -234,24 +239,32 @@ Using html attributes like `can-EVENT-METHOD`, you can directly call a viewModel
 from a template. For example, we can make `<my-paginate>` elements include a next
 button that calls the viewModel's `next` method like:
 
-    Component.extend({
-      tag: "my-paginate",
-      viewModel: {
-        offset: 0,
-        limit: 20,
-        next: function(context, el, ev){
-          this.attr("offset", this.offset + this.limit);
-        },
-        page: function(){
-          return Math.floor(this.attr('offset') / this.attr('limit')) + 1;
-        }
-      },
-      template: stache("Page {{page}} <button ($click)='next()'>Next</button>")
-    })
+```js
+var ViewModel = DefineMap.extend({
+	offset: {
+		value: 0
+	},
+	limit: {
+		value: 20
+	},
+	next: function(){
+		this.offset = this.offset + this.limit;
+	},
+	page: function(){
+		return Math.floor(this.offset / this.limit) + 1;
+	}
+});
+
+Component.extend({
+	tag: "my-paginate",
+	ViewModel: ViewModel,
+	template: stache("Page {{page}} <button ($click)='next()'>Next</button>")
+});
+```
 
 viewModel methods get called back with the current context, the element that you are listening to and the event that triggered the callback.
 
-@demo can/component/examples/paginate_next.html
+@demo demos/can-component/paginate_next.html
 
 ## Publishing events on viewModels
 
@@ -260,13 +273,15 @@ dispatches a `"close"` event when it's close method is called:
 
 ```
 Component.extend({
-  tag: "player-edit",
-  template: template,
-  viewModel: {
-    close: function(){
-      this.dispatch("close");
-    }
-  }
+	tag: "player-edit",
+	template: stache($('#player-edit-stache').html()),
+	ViewModel: DefineMap.extend({
+		player: Player,
+		close: function(){
+			this.dispatch("close");
+		}
+	}),
+	leakScope: true
 });
 ```
 
@@ -281,4 +296,4 @@ These can be listened to with [can-stache-bindings.event] bindings like:
 The following demo uses this ability to create a close button that 
 hides the player editor:
 
-@demo can/component/examples/paginate_next_event.html
+@demo demos/can-component/paginate_next_event.html
