@@ -67,7 +67,7 @@ the template and insert the result in the page like:
 
 Check this out here:
 
-@demo can/component/examples/click_me.html
+@demo demos/can-component/click_me.html
 
 
 Typically, you do not append a single component at a time.  Instead, 
@@ -282,7 +282,7 @@ Check out the following examples built with `Component`.
 The following demos a tabs widget.  Click "Add Vegetables"
 to add a new tab.
 
-@demo can/component/examples/tabs.html
+@demo demos/can-component/tabs.html
 
 An instance of the tabs widget is created by creating `<tabs>` and `<panel>`
 elements like:
@@ -303,7 +303,9 @@ To add another panel, all we have to do is add data to `foodTypes` like:
 The secret is that the `<panel>` element listens to when it is inserted
 and adds its data to the tabs' list of panels with:
 
-    this.element.parent().viewModel().addPanel( this.viewModel );
+    var vm = this.parentViewModel = canViewModel(this.element.parentNode);
+    vm.addPanel(this.viewModel);
+
 
 ### TreeCombo
 
@@ -335,7 +337,7 @@ last item in the breadcrub.  These are defined on the viewModel like:
 When the "+" icon is clicked next to each item, the viewModel's `showChildren` method is called, which
 adds that item to the breadcrumb like:
 
-    showChildren: function( item, ev ) {
+    showChildren: function(item, ev) {
       ev.stopPropagation();
       this.attr('breadcrumb').push(item)
     },
@@ -345,45 +347,45 @@ adds that item to the breadcrumb like:
 The following example shows 3 
 widget-like components: a grid, next / prev buttons, and a page count indicator. And, it shows an application component that puts them all together.
 
-@demo can/component/examples/paginate.html
+@demo demos/can-component/paginate.html
 
-This demo uses a `Paginate` [can-map] to assist with maintaining a paginated state:
+This demo uses a `Paginate` [can-define/map/map] to assist with maintaining a paginated state:
 
-    var Paginate = Map.extend({
+    var Paginate = DefineMap.extend({
     ...
     });
     
-The `app` component, using the [can-map-define define plugin], creates an instance of the `Paginate` model
+The `app` component, using the [can-define can-define], creates an instance of the `Paginate` model
 and a `websitesPromise` that represents a request for the Websites
 that should be displayed.
 
-    viewModel: {
-      define: {
-        paginate: {
-          value: function() {
-            return new Paginate({
-              limit: 5
-            });
-          }
-        },
-        websitesPromise: {
-          get: function() {
-            var params = {
-                  limit: this.attr('paginate.limit'),
-                  offset: this.attr('paginate.offset')
-              },
-              websitesPromise = Website.findAll(params),
-              self = this;
-  
-            websitesPromise.then(function(websites) {
-              self.attr('paginate.count', websites.count);
-            });
-    
-            return websitesPromise;
-          }
-        }
-      }
-    }
+```js
+var AppViewModel = DefineMap.extend({
+	paginate: {
+		value: function() {
+			return new Paginate({
+				limit: 5
+			});
+		}
+	},
+	websitesPromise: {
+		get: function() {
+			var params = {
+					limit: this.paginate.limit,
+					offset: this.paginate.offset
+				},
+				websitesPromise = Website.getList(params),
+				self = this;
+
+			websitesPromise.then(function(websites) {
+				self.paginate.count = websites.length;
+			});
+
+			return websitesPromise;
+		}
+	}
+});
+```
 
 The `app` control passes paginate, paginate's values, and websitesPromise to
 its sub-components:
@@ -400,15 +402,6 @@ its sub-components:
       <next-prev {paginate}='paginate'></next-prev>
       <page-count {page}='paginate.page' {count}='paginate.pageCount'/>
     </app>
-
-## IE 8 Support
-
-While CanJS does support Internet Explorer 8 out of the box, if you decide
-to use `Component` then you will need to include [HTML5 Shiv](https://github.com/aFarkas/html5shiv)
-in order for your custom tags to work properly.
-
-For namespaced tag names (e.g. `<can:example>`) and hyphenated tag names (e.g. `<can-example>`) to work properly, you will 
-need to use version 3.7.2 or later.
 
 ## Videos
 
