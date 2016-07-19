@@ -4,13 +4,13 @@
 @description
 
 Provides or describes a [can-map] constructor function or `Map` instance that will be
-used to retrieve values found in the component's [can-component::template template]. The map 
+used to retrieve values found in the component's [can-component::template template]. The map
 instance is initialized with values specified by the component element's attributes.
 
 __Note:__ This page documents behavior of components in [can-stache]. [can-mustache] behaves
-slightly differently. If you want the behavior of components with [can-mustache], 
-please look at versions of this page prior to 2.3. In 2.3, use [can-stache-bindings] [can-stache-bindings.toChild], 
-[can-stache-bindings.toParent] and [can-stache-bindings.twoWay] to setup viewModel 
+slightly differently. If you want the behavior of components with [can-mustache],
+please look at versions of this page prior to 2.3. In 2.3, use [can-stache-bindings] [can-stache-bindings.toChild],
+[can-stache-bindings.toParent] and [can-stache-bindings.twoWay] to setup viewModel
 bindings.
 
 @option {Object} A plain JavaScript object that is used to define the prototype methods and properties of
@@ -41,7 +41,7 @@ bindings.
       tag: "my-paginate",
       viewModel: Paginate
     })
-    
+
 
 @option {function} Returns the instance or constructor function of the object that will be added
 to the viewModel.
@@ -65,7 +65,7 @@ Creates an instance of following control:
 
 And calls the viewModel function with `attrs` like `{title: "Justin"}`.
 
-@param {can-component::viewModel} parentScope
+@param {can-component.prototype.viewModel} parentScope
 
 The viewModel the custom tag was found within.  By default, any attribute's values will
 be looked up within the current viewModel, but if you want to add values without needing
@@ -94,7 +94,7 @@ to add custom attribute handling, you can do that here.  For example:
 
  - The data used to render the component's template.
  - The prototype of a `Map` that will be used to render the component's template.
- 
+
 @option {can-map} If an instance of `Map` is returned, that instance is placed
 on top of the viewModel and used to render the component's template.
 
@@ -106,7 +106,7 @@ definition used to extend `Map`.  A new instance of the extended Map is created.
 ## Use
 
 [can-component]'s viewModel property is used to define an __object__, typically an instance
-of a [can-map], that will be used to render the component's 
+of a [can-map], that will be used to render the component's
 template. This is most easily understood with an example.  The following
 component shows the current page number based off a `limit` and `offset` value:
 
@@ -130,7 +130,7 @@ If this component HTML was inserted into the page like:
 It would result in:
 
     <my-paginate>Page 1</my-paginate>
-    
+
 This is because the provided viewModel object is used to extend a [can-map] like:
 
     CustomMap = Map.extend({
@@ -148,8 +148,8 @@ Next, a new instance of CustomMap is created with the attribute data within `<my
 (in this case there is none) like:
 
     componentData = new CustomMap(attrs);
-    
-And finally, that data is added to the [can-view-scope parentScope] of the component, used to 
+
+And finally, that data is added to the [can-view-scope parentScope] of the component, used to
 render the component's template, and inserted into the element:
 
     var newviewModel = parentScope.add(componentData),
@@ -169,7 +169,7 @@ As mentioned in the deprecation warning above, using [can-stache], values are pa
 
     <my-paginate {offset}='index' {limit}='size'></my-paginate>
 
-The above would create an offset and limit property on the component that are initialized to whatever index and size are, NOT two-way bind (between component and parent viewModels) 
+The above would create an offset and limit property on the component that are initialized to whatever index and size are, NOT two-way bind (between component and parent viewModels)
 the offset and limit properties to the index and size.
 
 The following component requires an `offset` and `limit`:
@@ -187,16 +187,16 @@ The following component requires an `offset` and `limit`:
 If `<my-paginate>`'s source html is rendered like:
 
     var template = stache("<my-paginate {offset}='index' {limit}='size'></my-paginate>");
-    
+
     var pageInfo = new Map({
       index: 0,
       size: 20
     });
-    
+
     $("body").append( template( pageInfo ) );
 
-... `pageInfo`'s index and size are set as the component's offset and 
-limit attributes. If we were to change the value of `pageInfo`'s 
+... `pageInfo`'s index and size are set as the component's offset and
+limit attributes. If we were to change the value of `pageInfo`'s
 index like:
 
     pageInfo.attr("index",20)
@@ -207,7 +207,7 @@ index like:
 
 ### Using attribute values
 
-You can also pass a literal string value of the attribute. To do this in [can-stache], 
+You can also pass a literal string value of the attribute. To do this in [can-stache],
 simply pass any value not wrapped in single brackets, and the viewModel property will
 be initialized to this string value:
 
@@ -215,7 +215,7 @@ be initialized to this string value:
 
 The above will create a title property in the component's viewModel, which has a string `hello`.  
 
-If the tag's `title` attribute is changed, it updates the viewModel property 
+If the tag's `title` attribute is changed, it updates the viewModel property
 automatically.  This can be seen in the following example:
 
 @demo can/component/examples/accordion.html
@@ -273,12 +273,12 @@ Component.extend({
 These can be listened to with [can-stache-bindings.event] bindings like:
 
 ```
-<player-edit 
-  	(close)="removeEdit()" 
+<player-edit
+  	(close)="removeEdit()"
   	{player}="editingPlayer"/>
 ```
 
-The following demo uses this ability to create a close button that 
+The following demo uses this ability to create a close button that
 hides the player editor:
 
 @demo can/component/examples/paginate_next_event.html
