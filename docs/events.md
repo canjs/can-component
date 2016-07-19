@@ -32,12 +32,12 @@ element. The component's viewModel is available within event handlers as `this.v
 while still accessing `Component`'s objects and methods like [can-component::viewModel viewModel].  The following
 example listens to clicks on elements with `className="next"` and calls `.next()` on the component's viewModel.
 
-@demo can/component/examples/paginate_events_next.html
+@demo demos/can-component/paginate_events_next.html
 
 The events object can also listen to objects or properties on the component's [can-component::viewModel viewModel]. For instance, instead
 of using live-binding, we could listen to when offset changes and update the page manually:
 
-@demo can/component/examples/paginate_events_next_update_page.html 
+@demo demos/can-component/paginate_events_next_update_page.html
 
 Components have the ability to bind to special inserted and removed events that are called when a component's tag has been inserted into or removed from the page:
 
