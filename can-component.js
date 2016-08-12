@@ -123,7 +123,7 @@ var Component = Construct.extend(
 					};
 				teardownBindings = setupFn(el, function(initialViewModelData) {
 					// Make %root available on the viewModel.
-					initialViewModelData["%root"] = componentTagData.scope.attr("%root");
+					initialViewModelData["%root"] = componentTagData.scope.get("%root");
 
 					// Create the component's viewModel.
 					var protoViewModel = component.scope || component.viewModel;
