@@ -1908,6 +1908,7 @@ function makeTest(name, doc, mutObs) {
 		var renderer = function(tmpl){
 			var frag = getFragment(tmpl);
 			return function(scope, options){
+				scope = scope || new Scope();
 				options = options || new Scope.Options({});
 
 				if(frag.firstChild.nodeName === "CUSTOM-RENDERER") {
@@ -1937,7 +1938,7 @@ function makeTest(name, doc, mutObs) {
 		});
 
 		var template = renderer("<custom-renderer foo='bar'></custom-renderer>");
-		var frag = template(new CanMap());
+		var frag = template();
 
 		var tn = frag.firstChild.firstChild.firstChild;
 		equal(tn.nodeValue, "qux", "was bound!");
