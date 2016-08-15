@@ -20,7 +20,6 @@ var className = require("can-util/dom/class-name/class-name");
 var domMutate = require('can-util/dom/mutate/mutate');
 var domData = require('can-util/dom/data/data');
 var types = require("can-util/js/types/types");
-var getFragment = require("can-util/dom/fragment/fragment");
 
 var isPromise = require('can-util/js/is-promise/is-promise');
 
@@ -287,7 +286,6 @@ function makeTest(name, doc, mutObs) {
 			}
 		]);
 	});
-
 
 	test("lexical scoping", function() {
 		Component.extend({
@@ -1904,44 +1902,44 @@ function makeTest(name, doc, mutObs) {
 		equal(one.firstChild.nodeValue, "", "external content, internal export");
 		equal(two.firstChild.nodeValue, "OTHER-EXPORT", "external content, external export");*/
 	});
-}
 
-test("custom renderer can provide setupBindings", function(){
-	DOCUMENT(document);
-	var renderer = function(tmpl){
-		var frag = getFragment(tmpl);
-		return function(scope, options){
-			options = options || new Scope.Options({});
+	test("custom renderer can provide setupBindings", function(){
+		DOCUMENT(document);
+		var renderer = function(tmpl){
+			var frag = getFragment(tmpl);
+			return function(scope, options){
+				options = options || new Scope.Options({});
 
-			if(frag.firstChild.nodeName === "CUSTOM-RENDERER") {
-				viewCallbacks.tagHandler(frag.firstChild, "custom-renderer", {
-					scope: scope,
-					options: options,
-					templateType: "my-renderer",
-					setupBindings: function(el, callback, data){
-						callback({
-							foo: "qux"
-						});
-					}
-				});
-			} else {
-				var tn = frag.firstChild.firstChild;
-				tn.nodeValue = scope.read("foo").value;
-			}
+				if(frag.firstChild.nodeName === "CUSTOM-RENDERER") {
+					viewCallbacks.tagHandler(frag.firstChild, "custom-renderer", {
+						scope: scope,
+						options: options,
+						templateType: "my-renderer",
+						setupBindings: function(el, callback, data){
+							callback({
+								foo: "qux"
+							});
+						}
+					});
+				} else {
+					var tn = frag.firstChild.firstChild;
+					tn.nodeValue = scope.read("foo").value;
+				}
 
-			return frag;
+				return frag;
+			};
 		};
-	};
 
-	Component.extend({
-		tag: "custom-renderer",
-		template: renderer("<div>{{foo}}</div>"),
-		ViewModel: CanMap.extend({})
+		Component.extend({
+			tag: "custom-renderer",
+			template: renderer("<div>{{foo}}</div>"),
+			ViewModel: CanMap.extend({})
+		});
+
+		var template = renderer("<custom-renderer foo='bar'></custom-renderer>");
+		var frag = template(new CanMap());
+
+		var tn = frag.firstChild.firstChild.firstChild;
+		equal(tn.nodeValue, "qux", "was bound!");
 	});
-
-	var template = renderer("<custom-renderer foo='bar'></custom-renderer>");
-	var frag = template(new CanMap());
-
-	var tn = frag.firstChild.firstChild.firstChild;
-	equal(tn.nodeValue, "qux", "was bound!");
-});
+}
