@@ -9,6 +9,20 @@ Extends the [can-component] [can-construct constructor function] with prototype
 properties and methods.  Registers the component by its [can-component::tag] with
 [can-view-callbacks.tag can-view-callbacks.tag].
 
+```js
+var Component = require("can-component");
+var stache = require("can-stache");
+var DefineMap = require("can-define/map/map");
+
+var VM = DefineMap.extend({ ... });
+
+Component.extend({
+  tag: "tag-name",
+  ViewModel: VM,
+  template: stache(" .... ")
+});
+```
+
 @param {{}} prototype An object set as the prototype of the
 constructor function. You will typically provide the following values
 on the prototype object:
