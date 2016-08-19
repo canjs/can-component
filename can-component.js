@@ -23,7 +23,7 @@ var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
 var types = require("can-util/js/types/types");
-var assign = require("can-util/js/assign/assign");
+var string = require("can-util/js/string/string");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
@@ -58,22 +58,45 @@ var Component = Construct.extend(
 				// Define a control using the `events` prototype property.
 				this.Control = ComponentControl.extend(this.prototype.events);
 
-				// Backwards compatible with viewModel: Map
-				// If this a CanMap constructor, use that as the ViewModel property.
+				// Look at viewModel, scope, and ViewModel properties and set one of:
+				//  - this.viewModelHandler
+				//  - this.ViewModel
+				//  - this.viewModelInstance
 				var protoViewModel = this.prototype.viewModel || this.prototype.scope;
 
 				if(protoViewModel && this.prototype.ViewModel) {
 					throw new Error("Cannot provide both a ViewModel and a viewModel property");
 				}
-
-				if(protoViewModel && types.isMapLike(protoViewModel.prototype)) {
-					this.prototype.viewModel = this.prototype.scope = undefined;
+				var vmName = string.capitalize( string.camelize(this.prototype.tag) )+"VM";
+				if(this.prototype.ViewModel) {
+					if(typeof this.prototype.ViewModel === "function") {
+						this.ViewModel = this.prototype.ViewModel;
+					} else {
+						this.ViewModel = types.DefaultMap.extend(vmName,protoViewModel);
+					}
 				} else {
-					protoViewModel = undefined;
-				}
 
-				this.ViewModel = this.prototype.ViewModel ||
-					protoViewModel || types.DefaultMap;
+					if(protoViewModel) {
+						if(typeof protoViewModel === "function") {
+							if(types.isMapLike(protoViewModel.prototype)) {
+								this.ViewModel = protoViewModel;
+							} else {
+								this.viewModelHandler = protoViewModel;
+							}
+						} else {
+							if(types.isMapLike(protoViewModel)) {
+								//!steal-remove-start
+								console.warn("can-component: "+this.prototype.tag+" is sharing a single map across all component instances");
+								//!steal-remove-end
+								this.viewModelInstance = protoViewModel;
+							} else {
+								this.ViewModel = types.DefaultMap.extend(vmName,protoViewModel);
+							}
+						}
+					} else {
+						this.ViewModel = types.DefaultMap.extend(vmName,{});
+					}
+				}
 
 				// Convert the template into a renderer function.
 				if (this.prototype.template || this.prototype.view) {
@@ -122,32 +145,35 @@ var Component = Construct.extend(
 																											callback, data);
 					};
 				teardownBindings = setupFn(el, function(initialViewModelData) {
-					// Make %root available on the viewModel.
-					initialViewModelData["%root"] = componentTagData.scope.get("%root");
 
-					// Create the component's viewModel.
-					var protoViewModel = component.scope || component.viewModel;
+					var ViewModel = component.constructor.ViewModel,
+						viewModelHandler = component.constructor.viewModelHandler,
+						viewModelInstance = component.constructor.viewModelInstance;
 
-					if (typeof protoViewModel === "function") {
-						// If `component.viewModel` is a function, call the function and
-						var scopeResult = protoViewModel.call(component, initialViewModelData, componentTagData.scope, el);
-
-						// If the function returns a CanMap, use that as the viewModel
-						viewModel = scopeResult;
-					} else if(protoViewModel instanceof types.DefaultMap) {
-							viewModel = protoViewModel;
-					} else {
-						var scopeData = assign(assign({}, initialViewModelData), protoViewModel);
-
-						viewModel = new component.constructor.ViewModel(scopeData);
+					if(viewModelHandler) {
+						var scopeResult = viewModelHandler.call(component, initialViewModelData, componentTagData.scope, el);
+						if (types.isMapLike( scopeResult ) ) {
+							// If the function returns a can.Map, use that as the viewModel
+							viewModelInstance = scopeResult;
+						} else if ( types.isMapLike(scopeResult.prototype) ) {
+							// If `scopeResult` is of a `can.Map` type, use it to wrap the `initialViewModelData`
+							ViewModel = scopeResult;
+						} else {
+							// Otherwise extend `can.Map` with the `scopeResult` and initialize it with the `initialViewModelData`
+							ViewModel = types.DefaultMap.extend(scopeResult);
+						}
 					}
 
-					return viewModel;
+					if(ViewModel) {
+						viewModelInstance = new component.constructor.ViewModel(initialViewModelData);
+					}
+					viewModel = viewModelInstance;
+					return viewModelInstance;
 				}, initialViewModelData);
 			}
 
 			// Set `viewModel` to `this.viewModel` and set it to the element's `data` object as a `viewModel` property
-			this.scope = this.viewModel = viewModel;
+			this.viewModel = viewModel;
 
 			domData.set.call(el, "viewModel", viewModel);
 			domData.set.call(el, "preventDataBindings", true);

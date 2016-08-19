@@ -5,23 +5,23 @@
 a component's viewModel values in the user content.
 
 @option {Boolean}  `false` limits reading to:
- 
+
 - the component's viewModel from the component's template, and
 - the outer scope values from the user content.
 
 `true` adds the ability to read:
 
 - the outer [can-view-scope scope] values from the component's template, and
-- the component's [can-component.prototype.viewModel viewModel] values from the user content. 
- 
-The default value is `true`.  This may reverse in 3.0.
+- the component's [can-component.prototype.ViewModel] values from the user content.
+
+The default value is `false`. 
 
 @body
 
 ## Use
 
-A component's [can-component::leakScope leakScope] option controls if a 
-component's template can access the component's outer scope and the 
+A component's [can-component::leakScope leakScope] option controls if a
+component's template can access the component's outer scope and the
 user content can read the component's view model.
 
 Lets define what __outer scope__, __component's template__ and __user content__ mean.
@@ -76,8 +76,8 @@ But if `leakScope` is false:
 
     <hello-world>Hello World</hello-world>
 
-Because when the scope isn't leaked, the __component's template__ 
-does not see `exclamation`. The __user content__ does not see the 
+Because when the scope isn't leaked, the __component's template__
+does not see `exclamation`. The __user content__ does not see the
 viewModel's `subject` and uses the outer scope's `subject` which is `"World"`.
 
 Using the `leakScope: false` option is useful for hiding and protecting
