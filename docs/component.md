@@ -4,36 +4,56 @@
 @parent can-core
 @release 2.0
 @link ../docco/component/component.html docco
-@group can-component.static static
-@group can-component.prototype prototype
+@group can-component.static 0 static
+@group can-component.prototype 1 prototype
+@group can-component.elements 2 elements
+@group can-component.events 3 special events
 
-@description Create widgets that use a template, a view-model 
-and custom tags.
+@description Create a custom element that can be used to manage widgets
+or application logic.
 
-@signature `< TAG BINDINGS... >`
+@signature `&lt;TAG BINDINGS...>[LIGHT_DOM]&lt;/TAG>`
 
   Create an instance of a component on a particular tag in a [can-stache] template.
   In 2.3, use the [can-stache-bindings bindings] syntaxes to setup bindings.
 
   @release 2.3
-  
+
   @param {String} TAG An HTML tag name that matches the [can-component::tag tag]
-  property of the component.
-  
-  @param {can-stache-bindings} BINDINGS Use the following binding syntaxes
-  to connect the component's [can-component::viewModel] to the template's [can-view-scope scope]:
-  
-   - [can-stache-bindings.toChild]=[can-stache.key] - one way binding to child
-   - [can-stache-bindings.toParent]=[can-stache.key] - one way binding to parent
-   - [can-stache-bindings.twoWay]=[can-stache.key] - two way binding child to parent
-   
-  Example:
-  
-  ```
-  <my-tag {to-child}="key" 
-          {^to-parent}="key" 
-          {(two-way)}="key"></my-tag>
-  ```
+  property of the component. Tag names should include a hypen (`-`) or a colon (`:`) like:
+  `acme-tabs` or `acme:tabs`.
+
+  @param {can-stache-bindings} [BINDINGS] Use the following binding syntaxes
+  to connect the component's [can-component::ViewModel] to the template's [can-view-scope scope]:
+
+   - [can-stache-bindings.toChild]=[can-stache.expressions expression] - one way data binding to child
+   - [can-stache-bindings.toParent]=[can-stache.expressions expression] - one way data binding to parent
+   - [can-stache-bindings.twoWay]=[can-stache.expressions expression] - two way data binding child to parent
+   - [can-stache-bindings.event]=[can-stache/expressions/call expression] - event binding on the view model
+
+   Note that because DOM attribute names are case-insensitive, use hypens (`-`) to
+   in the attribute name to setup for `camelCase` properties.
+
+   Example:
+
+   ```
+   <my-tag {to-child}="expression"
+           {^to-parent}="expression"
+           {(two-way)}="expression"
+           (event)="callExpression()"></my-tag>
+   ```
+
+   @param {can-stache.sectionRenderer} [LIGHT_DOM] The content between the starting and ending
+   tag. For example, `Hello <b>World</b>` is the `LIGHT_DOM` in the following:
+
+   ```
+   <my-tag>Hello <b>World</b></my-tag>
+   ```
+
+   The `LIGHT_DOM` can be positioned with a component's [can-component.prototype.template] with
+   the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
+   with [can-component.prototype.leakScope].
+
 
 @body
 
@@ -43,56 +63,64 @@ and custom tags.
 To create a Component, you must first [can-component.extend extend] `Component`
 with the methods and properties of how your component behaves:
 
-    Component.extend({
-      tag: "hello-world",
-      template: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
-      viewModel: {
-        visible: false,
-        message: "Hello There!"
-      },
-      events: {
-        click: function(){
-        	this.viewModel.attr("visible", !this.viewModel.attr("visible") );
-        }
-      }
-    });
+```js
+var Component = require("can-component");
+var DefineMap = require("can-define/map/map");
+var stache = require("can-stache");
 
-This element says "Click me" until a user clicks it and then 
-says "Hello There!".  To create a a instance of this component on the page, 
-add `<hello-world></hello-world>` to a mustache template, render
+var HelloWorldVM = DefineMap.extend({
+    visible: {value: false},
+    message: {value: "Hello There!"}
+});
+
+Component.extend({
+  tag: "hello-world",
+  template: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
+  ViewModel: HelloWorldVM,
+  events: {
+    click: function(){
+    	this.viewModel.visible = !this.viewModel.visible;
+    }
+  }
+});
+```
+
+This element says "Click me" until a user clicks it and then
+says "Hello There!".  To create a a instance of this component on the page,
+add `<hello-world/>` to a [can-stache] template, render
 the template and insert the result in the page like:
 
-    var template = stache("<hello-world></hello-world>");
-    $(document.body).append( template() );
+    var template = stache("<hello-world/>");
+    document.body.appendChild(template({}));
 
 Check this out here:
 
 @demo demos/can-component/click_me.html
 
 
-Typically, you do not append a single component at a time.  Instead, 
+Typically, you do not append a single component at a time.  Instead,
 you'll render a template with many custom tags like:
 
     <srchr-app>
-      <srchr-search models="models">
+      <srchr-search {models}="models">
         <input name="search"/>
       </srchr-search>
       <ui-panel>
         <srchr-history/>
-        <srchr-results models="models"/>
+        <srchr-results {models}="models"/>
       </ui-panel>
     </srchr-app>
 
-### Creating a Component
+### Defining a Component
 
-Use [can-component.extend] to create a `Component` constructor function
-that will automatically get initialized whenever the component's tag is 
-found. 
+Use [can-component.extend] to define a `Component` constructor function
+that automatically gets initialized whenever the component's tag is
+found.
 
-Note that inheriting from components works differently than other CanJS APIs. You 
-can't call `.extend` on a particular component to create a "subclass" of that component. 
+Note that inheriting from components works differently than other CanJS APIs. You
+can't call `.extend` on a particular component to create a "subclass" of that component.
 
-Instead, components work more like HTML elements. To reuse functionality from a base component, build on top of it with parent 
+Instead, components work more like HTML elements. To reuse functionality from a base component, build on top of it with parent
 components that wrap other components in their template and pass any needed viewModel properties via attributes.
 
 ### Tag
@@ -119,11 +147,11 @@ The following component:
       template: stache("<h1>Hello World</h1>")
     });
 
-Changes `<hello-world></hello-world>` elements into:
+Changes `<hello-world/>` elements into:
 
     <hello-world><h1>Hello World</h1></hello-world>
 
-Use the `<content/>` tag to position the custom element's source HTML.
+Use the [can-component/content] tag to position the custom element's source HTML.
 
 The following component:
 
@@ -136,12 +164,12 @@ Changes `<hello-world>Hi There</hello-world>` into:
 
     <hello-world><h1>Hi There</h1></hello-world>
 
-### viewModel
+### ViewModel
 
-A component's [can-component::viewModel viewModel] defines a Map that
-is used to render the component's template. The maps properties 
-are typically set by attribute [can-stache-bindings bindings] on the custom element. 
-By default, every attribute's value is looked up in the parent viewModel
+A component's [can-component::ViewModel ViewModel] defines a constructor that creates
+instances used to render the component's template. The instance's properties
+are typically set by attribute [can-stache-bindings data bindings] on the custom element.
+By default, every data binding's value is looked up in the parent [can-view-scope]
 of the custom element and added to the viewModel object.
 
 The following component:
@@ -181,7 +209,7 @@ Into:
 
     <hello-world><h1>Hi</h1></hello-world>
 
-If you want to set the string value of the attribute on viewModel,
+If you want to set the string value of the attribute on the ViewModel,
 set an attribute without any binding syntax.
 
 The following template, with the previous `"hello-world"` component:
@@ -204,14 +232,16 @@ adds "!" to the message every time `<hello-world>` is clicked:
       template: stache("<h1>{{message}}</h1>"),
       events: {
         "click" : function(){
-          var currentMessage = this.viewModel.attr("message");
-          this.viewModel.attr("message", currentMessage+ "!")
+          var currentMessage = this.viewModel.message;
+          this.viewModel.message = currentMessage+ "!";
         }
       }
     });
 
-Components have the ability to bind to special inserted and removed events 
-that are called when a component's tag has been inserted into or removed from the page.
+Components have the ability to bind to special [can-util/dom/events/inserted/inserted],
+[can-component/beforeremove] and [can-util/dom/events/removed/removed] events
+that are called when a component's tag has been inserted into,
+is about to removed, or was removed from the page.
 
 ### Helpers
 
@@ -235,43 +265,8 @@ only renders friendly messages:
       }
     });
 
-## Differences between components in can-stache
-
-A [can-mustache] template passes values from the viewModel to a `Component`
-by specifying the key of the value in the attribute directly.  For example:
-
-    Component.extend({
-      tag: "my-tag",
-      template: "<h1>{{greeting}}</h1>"
-    });
-
-    var template = stache("<my-tag greeting='message'></my-tag>");
-    
-    var frag = template({
-      message: "Hi"
-    });
-    
-    frag //-> <my-tag greeting='message'><h1>Hi</h1></my-tag>
-   
-With [can-stache], you wrap the attribute name with `{}` for parent to child binding. For example:
-
-    Component.extend({
-      tag: "my-tag",
-      template: stache("<h1>{{greeting}}</h1>")
-    });
-    var template = stache("<my-tag {greeting}='message'></my-tag>");
-    
-    var frag = template({
-      message: "Hi"
-    });
-   
-    frag //-> <my-tag {greeting}='message'><h1>Hi</h1></my-tag>
-
-If the key was not wrapped, the template would render:
-
-    frag //-> <my-tag greeting='message'><h1>message</h1></my-tag>
- 
-Because the attribute value would be passed as the value of `greeting`.
+Generally speaking, helpers should only be used for view related functionality, like
+formatting a date.  Data related methods should be in the view model or models.
 
 ## Examples
 
@@ -311,7 +306,7 @@ and adds its data to the tabs' list of panels with:
 
 The following tree combo lets people walk through a hierarchy and select locations.
 
-@demo can/component/examples/treecombo.html
+@demo demos/can-component/treecombo.html
 
 The secret to this widget is the viewModel's `breadcrumb` property, which is an array
 of items the user has navigated through, and `selectableItems`, which represents the children of the
@@ -321,14 +316,14 @@ last item in the breadcrub.  These are defined on the viewModel like:
     breadcrumb: [],
     selectableItems: function(){
       var breadcrumb = this.attr("breadcrumb");
-	      	
+
       // if there's an item in the breadcrumb
       if(breadcrumb.attr('length')){
-			
+
         // return the last item's children
         return breadcrumb.attr(""+(breadcrumb.length-1)+'.children');
       } else{
-		    
+
         // return the top list of items
         return this.attr('items');
       }
@@ -344,7 +339,7 @@ adds that item to the breadcrumb like:
 
 ### Paginate
 
-The following example shows 3 
+The following example shows 3
 widget-like components: a grid, next / prev buttons, and a page count indicator. And, it shows an application component that puts them all together.
 
 @demo demos/can-component/paginate.html
@@ -354,17 +349,19 @@ This demo uses a `Paginate` [can-define/map/map] to assist with maintaining a pa
     var Paginate = DefineMap.extend({
     ...
     });
-    
-The `app` component, using the [can-define can-define], creates an instance of the `Paginate` model
+
+The `app` component, using [can-define/map/map], creates an instance of the `Paginate` model
 and a `websitesPromise` that represents a request for the Websites
-that should be displayed.
+that should be displayed.  Notice how the paginate's `count` value is tied to the
+value of the `webistesPromise`'s resolved `value`'s `count`.
 
 ```js
 var AppViewModel = DefineMap.extend({
 	paginate: {
 		value: function() {
 			return new Paginate({
-				limit: 5
+				limit: 5,
+				count: compute(this, "websitesPromise.value.count")
 			});
 		}
 	},
@@ -402,15 +399,3 @@ its sub-components:
       <next-prev {paginate}='paginate'></next-prev>
       <page-count {page}='paginate.page' {count}='paginate.pageCount'/>
     </app>
-
-## Videos
-
-Watch this video for an overview of [can-component], why you should use it, and a hello world example:
-
-<iframe width="662" height="372" src="https://www.youtube.com/embed/BM1Jc3lVUrk" frameborder="0" allowfullscreen></iframe>
-
-This video provides a more in depth overview of the API and goes over several examples of Components:
-
-<iframe width="662" height="372" src="https://www.youtube.com/embed/ogX765S4iuc" frameborder="0" allowfullscreen></iframe>
-
-Note: the videos above reference the `scope` property, which was replaced by the [can-component::viewModel viewModel] property in 2.2.

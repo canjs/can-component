@@ -5,6 +5,7 @@ var QUnit = require("steal-qunit");
 var define = require("can-define");
 
 var viewModel = require("can-view-model");
+var types = require("can-util/js/types/types");
 
 QUnit.module("can-component with can-define");
 
@@ -46,4 +47,23 @@ QUnit.test('Works with can-define', function () {
 	vm.lastName = 'Meyer';
 
 	QUnit.equal(frag.firstChild.innerHTML, 'Name: Justin Meyer', 'Rendered fullName after change');
+});
+
+
+QUnit.test('scope method works', function () {
+
+
+	Component.extend({
+		tag: "my-element",
+		viewModel: function(properties, scope, element){
+			QUnit.deepEqual(properties, {first: "Justin", last: "Meyer"});
+			return new types.DefaultMap(properties);
+		}
+	});
+
+	stache("<my-element {first}='firstName' last='Meyer'/>")({
+	  firstName: "Justin",
+	  middleName: "Barry"
+	});
+
 });
