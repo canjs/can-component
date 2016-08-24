@@ -50,9 +50,48 @@ QUnit.test('Works with can-define', function () {
 });
 
 
+QUnit.test('Works with can-define:value', function () {
+
+	var VM = define.Constructor({
+		address: {
+			value(){
+				return {
+					city: 'Ticaboo',
+					state: 'UT'
+				};
+			}
+		},
+		favoriteColor: {
+			value: 'blue'
+		}
+	});
+
+	Component.extend({
+		tag: 'can-define-value',
+		ViewModel: VM,
+		template: stache('Address: {{address.city}}, {{address.state}}')
+	});
+
+	var frag = stache('<can-define-value />')();
+
+	var vm = viewModel(frag.firstChild);
+
+	QUnit.deepEqual(vm.address, {
+		city: 'Ticaboo',
+		state: 'UT'
+	}, 'value function ran correctly');
+	QUnit.equal(vm.favoriteColor, 'blue', 'value was set correctly');
+	QUnit.equal(frag.firstChild.innerHTML, 'Address: Ticaboo, UT', 'Rendered address');
+
+	vm.address = {
+		city: 'Timbuktu',
+		state: 'CA'
+	};
+	QUnit.equal(frag.firstChild.innerHTML, 'Address: Timbuktu, CA', 'Rendered address after change');
+});
+
+
 QUnit.test('scope method works', function () {
-
-
 	Component.extend({
 		tag: "my-element",
 		viewModel: function(properties, scope, element){
@@ -65,5 +104,4 @@ QUnit.test('scope method works', function () {
 	  firstName: "Justin",
 	  middleName: "Barry"
 	});
-
 });
