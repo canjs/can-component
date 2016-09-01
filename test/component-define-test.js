@@ -3,6 +3,7 @@ var stache = require("can-stache");
 var QUnit = require("steal-qunit");
 
 var define = require("can-define");
+var DefineMap = require("can-define/map/map");
 
 var viewModel = require("can-view-model");
 var types = require("can-util/js/types/types");
@@ -65,5 +66,24 @@ QUnit.test('scope method works', function () {
 	  firstName: "Justin",
 	  middleName: "Barry"
 	});
+
+});
+
+QUnit.test('works when instantiated with an object for ViewModel', function () {
+	
+	var test = Component.extend({
+		tag: "test-element",
+		template: stache("{{something}}"),
+		ViewModel: {
+			someMethod: function() {
+				ok(true, "Fuction got called");
+				return true;
+			}
+		}
+		
+	});
+	
+	var vm = test.ViewModel();
+	vm.someMethod();
 
 });
