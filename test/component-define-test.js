@@ -3,6 +3,8 @@ var stache = require("can-stache");
 var QUnit = require("steal-qunit");
 
 var define = require("can-define");
+var DefineMap = require("can-define/map/");
+var DefineList = require("can-define/list/");
 
 var viewModel = require("can-view-model");
 var types = require("can-util/js/types/types");
@@ -50,9 +52,92 @@ QUnit.test('Works with can-define', function () {
 });
 
 
+QUnit.test('Works with can-define:value', function () {
+
+	var VM = define.Constructor({
+		address: {
+			value(){
+				return {
+					city: 'Ticaboo',
+					state: 'UT'
+				};
+			}
+		},
+		favoriteColor: {
+			value: 'blue'
+		}
+	});
+
+	Component.extend({
+		tag: 'can-define-value',
+		ViewModel: VM,
+		template: stache('Address: {{address.city}}, {{address.state}}')
+	});
+
+	var frag = stache('<can-define-value />')();
+
+	var vm = viewModel(frag.firstChild);
+
+	QUnit.deepEqual(vm.address, {
+		city: 'Ticaboo',
+		state: 'UT'
+	}, 'value function ran correctly');
+	QUnit.equal(vm.favoriteColor, 'blue', 'value was set correctly');
+	QUnit.equal(frag.firstChild.innerHTML, 'Address: Ticaboo, UT', 'Rendered address');
+
+	vm.address = {
+		city: 'Timbuktu',
+		state: 'CA'
+	};
+	QUnit.equal(frag.firstChild.innerHTML, 'Address: Timbuktu, CA', 'Rendered address after change');
+});
+
+
+QUnit.test('Works with can-define:value lists', function () {
+	var Account = DefineMap.extend({
+		name: 'string',
+		type: 'string'
+	});
+	Account.List = DefineList.extend({
+		"*": Account
+	});
+
+	const VM = DefineMap.extend({
+		accounts: {
+			value(){
+				return new Account.List([{
+					name: 'My Checking',
+					type: 'Checking'
+				}, {
+					name: 'My Savings',
+					type: 'Savings'
+				}]);
+			}
+		}
+	});
+
+	Component.extend({
+		tag: 'account-list',
+		ViewModel: VM,
+		template: stache('{{#each accounts}}{{name}},{{/each}}')
+	});
+
+	var frag = stache('<account-list />')();
+
+	var vm = viewModel(frag.firstChild);
+
+	QUnit.deepEqual(vm.accounts.get(), [{
+		name: 'My Checking',
+		type: 'Checking'
+	}, {
+		name: 'My Savings',
+		type: 'Savings'
+	}], 'value function ran correctly');
+	QUnit.equal(frag.firstChild.innerHTML, 'My Checking,My Savings,', 'template built correctly from list.');
+});
+
+
 QUnit.test('scope method works', function () {
-
-
 	Component.extend({
 		tag: "my-element",
 		viewModel: function(properties, scope, element){
@@ -65,5 +150,20 @@ QUnit.test('scope method works', function () {
 	  firstName: "Justin",
 	  middleName: "Barry"
 	});
+});
 
+
+QUnit.test('scope method works', function () {
+	Component.extend({
+		tag: "my-element",
+		viewModel: function(properties, scope, element){
+			QUnit.deepEqual(properties, {first: "Justin", last: "Meyer"});
+			return new types.DefaultMap(properties);
+		}
+	});
+
+	stache("<my-element {first}='firstName' last='Meyer'/>")({
+	  firstName: "Justin",
+	  middleName: "Barry"
+	});
 });
