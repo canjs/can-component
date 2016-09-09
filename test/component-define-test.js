@@ -69,11 +69,11 @@ QUnit.test('scope method works', function () {
 
 });
 
-QUnit.test('works when instantiated with an object for ViewModel', function () {
+QUnit.test('33 - works when instantiated with an object for ViewModel', function () {
 	
-	var test = Component.extend({
+	Component.extend({
 		tag: "test-element",
-		template: stache("{{something}}"),
+		template: stache("{{someMethod}}"),
 		ViewModel: {
 			someMethod: function() {
 				ok(true, "Fuction got called");
@@ -83,7 +83,7 @@ QUnit.test('works when instantiated with an object for ViewModel', function () {
 		
 	});
 	
-	var vm = test.ViewModel();
-	vm.someMethod();
+	var template = stache("<test-element>");
+	template();
 
 });
