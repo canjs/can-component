@@ -72,7 +72,7 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
-						this.ViewModel = types.DefaultMap.extend(vmName,protoViewModel);
+						this.ViewModel = types.DefaultMap.extend(vmName, this.prototype.ViewModel);
 					}
 				} else {
 
