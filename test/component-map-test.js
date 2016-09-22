@@ -1793,12 +1793,12 @@ function makeTest(name, doc, mutObs) {
 			if(index < threads.length) {
 				threads[index]();
 				index++;
-				setTimeout(next, 10);
+				setTimeout(next, 50);
 			} else {
 				start();
 			}
 		};
-		setTimeout(next,10);
+		setTimeout(next, 50);
 	});
 
 	test("<content> (#2151)", function(){
