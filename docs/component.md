@@ -50,7 +50,7 @@ or application logic.
    <my-tag>Hello <b>World</b></my-tag>
    ```
 
-   The `LIGHT_DOM` can be positioned with a component's [can-component.prototype.template] with
+   The `LIGHT_DOM` can be positioned with a component's [can-component.prototype.view] with
    the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
    with [can-component.prototype.leakScope].
 
@@ -75,7 +75,7 @@ var HelloWorldVM = DefineMap.extend({
 
 Component.extend({
   tag: "hello-world",
-  template: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
+  view: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
   ViewModel: HelloWorldVM,
   events: {
     click: function(){
@@ -135,16 +135,16 @@ The following matches `<hello-world>` elements.
       tag: "hello-world"
     });
 
-### Template
+### View
 
-A component's [can-component::template template] is rendered as
+A component's [can-component::view view] is a template that is rendered as
 the element's innerHTML.
 
 The following component:
 
     Component.extend({
       tag: "hello-world",
-      template: stache("<h1>Hello World</h1>")
+      view: stache("<h1>Hello World</h1>")
     });
 
 Changes `<hello-world/>` elements into:
@@ -157,7 +157,7 @@ The following component:
 
     Component.extend({
       tag: "hello-world",
-      template: stache("<h1><content/></h1>")
+      view: stache("<h1><content/></h1>")
     });
 
 Changes `<hello-world>Hi There</hello-world>` into:
@@ -176,7 +176,7 @@ The following component:
 
     Component.extend({
       tag: "hello-world",
-      template: stache("<h1>{{message}}</h1>")
+      view: stache("<h1>{{message}}</h1>")
     });
 
 Changes the following rendered template:
@@ -194,7 +194,7 @@ Default values can be provided. The following component:
 
     Component.extend({
       tag: "hello-world",
-      template: stache("<h1>{{message}}</h1>"),
+      view: stache("<h1>{{message}}</h1>"),
       viewModel: {
         message: "Hi"
       }
@@ -229,7 +229,7 @@ adds "!" to the message every time `<hello-world>` is clicked:
 
     Component.extend({
       tag: "hello-world",
-      template: stache("<h1>{{message}}</h1>"),
+      view: stache("<h1>{{message}}</h1>"),
       events: {
         "click" : function(){
           var currentMessage = this.viewModel.message;
@@ -251,7 +251,7 @@ only renders friendly messages:
 
     Component.extend({
       tag: "hello-world",
-      template: stache("{{#isFriendly message}}"+
+      view: stache("{{#isFriendly message}}"+
                   "<h1>{{message}}</h1>"+
                 "{{/isFriendly}}"),
       helpers: {

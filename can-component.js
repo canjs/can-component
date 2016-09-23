@@ -99,8 +99,14 @@ var Component = Construct.extend(
 				}
 
 				// Convert the template into a renderer function.
-				if (this.prototype.template || this.prototype.view) {
-					this.renderer = this.prototype.view || this.prototype.template;
+				if (this.prototype.template) {
+					//!steal-remove-start
+					console.warn('can-component.prototype.template: is deprecated and will be removed in a future release. Use can-component.prototype.view');
+					//!steal-remove-end
+					this.renderer = this.prototype.template;
+				}
+				if (this.prototype.view) {
+					this.renderer = this.prototype.view;
 				}
 
 				// Register this component to be created when its `tag` is found.

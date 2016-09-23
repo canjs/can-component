@@ -19,7 +19,7 @@ var VM = DefineMap.extend({ ... });
 Component.extend({
   tag: "tag-name",
   ViewModel: VM,
-  template: stache(" .... ")
+  view: stache(" .... ")
 });
 ```
 
@@ -34,7 +34,7 @@ on the prototype object:
   - __ViewModel__ {[can-component.prototype.ViewModel]} - Specifies an object
   that is is used to render the component's template.
 
-  - __template__ {[can-component.prototype.template]} - Specifies the template
+  - __view__ {[can-component.prototype.view]} - Specifies the template
   rendered within the custom element.
 
 And sometimes the following values are provided:

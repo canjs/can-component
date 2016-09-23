@@ -1,7 +1,7 @@
 @function can-component.prototype.view-model viewModel
 @parent can-component.prototype
 
-Return the view model instance or type with which the component's [can-component.prototype.template]
+Return the view model instance or type with which the component's [can-component.prototype.view]
 is rendered.  This is used when more fine grained control is needed over [can-component::ViewModel].
 
 @signature `function(properties, parentScope, element)`
@@ -9,7 +9,7 @@ is rendered.  This is used when more fine grained control is needed over [can-co
 The `viewModel` function takes the `properties` and values that are used to
 typically initialize a [can-component.prototype.ViewModel], the
 [can-view-scope] the component is rendered within, and the component's element
-and returns either the view-model instance or ViewModel type that the component's [can-component.prototype.template]
+and returns either the view-model instance or ViewModel type that the component's [can-component.prototype.view]
 is rendered with.
 
 This is typically used only for special situations where a custom scope or custom bindings

@@ -43,7 +43,7 @@ Finally, if `<hello-world>` is defined like:
 ```
 Component.extend({
   tag: "hello-world",
-  template: stache("{{greeting}} <content/>{{exclamation}}")
+  view: stache("{{greeting}} <content/>{{exclamation}}")
 })
 ```
 
@@ -56,7 +56,7 @@ If the following component is defined:
     Component.extend({
         tag: "hello-world",
         leakScope: true, // the default value
-        template: stache("{{greeting}} <content/>{{exclamation}}"),
+        view: stache("{{greeting}} <content/>{{exclamation}}"),
         viewModel: { subject: "LEAK", exclamation: "!" }
     })
 

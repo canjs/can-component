@@ -1,4 +1,4 @@
-@property {can-stache.renderer} [can-component.prototype.template] template
+@property {can-stache.renderer} [can-component.prototype.view] view
 @parent can-component.prototype
 
 Provides a template to render directly within the component's tag. The template is rendered with the
@@ -8,7 +8,7 @@ component's [can-component::ViewModel] instance.  [can-component/content] elemen
 
     Component({
       tag: "my-tabs",
-      template: stache("<ul>{{#panels}}<li>{{title}}</li> ...")
+      view: stache("<ul>{{#panels}}<li>{{title}}</li> ...")
     });
 
 
@@ -17,7 +17,7 @@ component's [can-component::ViewModel] instance.  [can-component/content] elemen
 
 ## Use
 
-The template specified by the `template` property works similar to
+The template specified by the `view` property works similar to
 the [http://www.w3.org/TR/shadow-dom/ W3C Shadow DOM proposal]. It represents the contents
 of a custom element, while being able to reposition the user provided __source__ elements
 with the [can-component/content] tag.
@@ -39,7 +39,7 @@ __Component:__
 ```js
 Component({
 	tag: "my-greeting",
-	template: stache("<h1><content/></h1>"),
+	view: stache("<h1><content/></h1>"),
 	ViewModel: DefineMap.extend({
 		title: {
 			value: "can-component"
@@ -97,13 +97,13 @@ The following sections break this down more.
 
 ## Template insertion
 
-The template specified by template is rendered directly withing the custom tag.
+The template specified by `view` is rendered directly withing the custom tag.
 
 For example the following component:
 
     Component({
       tag: "my-greeting",
-      template: stache("<h1>Hello There</h1>")
+      view: stache("<h1>Hello There</h1>")
     });
 
 With the following source html:
@@ -138,7 +138,7 @@ template. For example, if we change the component to look like:
 
     Component({
       tag: "my-greeting",
-      template: stache("<h1><content/></h1>")
+      view: stache("<h1><content/></h1>")
     });
 
 and rendered with source html, like:
@@ -157,7 +157,7 @@ change the component to look like:
 
     Component({
       tag: "my-greeting",
-      template: stache("<h1><content>Hello World</content></h1>")
+      view: stache("<h1><content>Hello World</content></h1>")
     });
 
 and rendered with source html like:
