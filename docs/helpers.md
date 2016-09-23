@@ -14,7 +14,7 @@ are always called back with `this` as the [can-component::ViewModel] instance.
 ## Use
 
 [can-component]'s helper object lets you provide helper functions that are localized to
-the component's [can-component::template template].  The following example
+the component's [can-component::view template].  The following example
 uses an `isSelected` helper to render content for selected items. Click
 one of the following libraries to toggle them within the `selected` array.
 

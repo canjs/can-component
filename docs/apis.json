@@ -5,7 +5,7 @@
 		]},
 		{"prototype": [
 			"can-component.prototype.tag",
-			"can-component.prototype.template",
+			"can-component.prototype.view",
 			"can-component.prototype.viewModel",
 			"can-component.prototype.events",
 			"can-component.prototype.helpers",

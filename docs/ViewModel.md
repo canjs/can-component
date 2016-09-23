@@ -4,12 +4,12 @@
 @description
 
 Provides or describes a constructor function that provides values and methods
-to the components [can-component::template template]. The constructor function
+to the component's [can-component::view template]. The constructor function
 is initialized with values specified by the component element's [can-stache-bindings data bindings].
 
 @option {function} A constructor function usually defined by [can-define/map/map.extend DefineMap.extend] or
 [can-map Map.extend] that will be used to create an new observable instance accessible by
-the component's [can-component::template].
+the component's [can-component::view].
 
 For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
 be created:
@@ -22,7 +22,7 @@ var MyTagViewModel = DefineMap.extend("MyTagViewModel",{
 Component.extend({
     tag: "my-tag",
     ViewModel: MyTagViewModel,
-    template: stache("<h1>{{message}}</h1>")
+    view: stache("<h1>{{message}}</h1>")
 })
 ```
 
@@ -41,7 +41,7 @@ Use [can-view-model] to read a component's view model instance.
   ```
 
   @return {Object} A new instance of the corresponding constructor function. This instance is
-  added to the top of the [can-view-scope] the component's [can-component::template] is rendered with.
+  added to the top of the [can-view-scope] the component's [can-component::view] is rendered with.
 
 @type {Object} A short hand for the prototype methods and properties used to extend the
 [can-util/js/types/types.DefaultMap default Map type] (typically [can-define/map/map]) and use
@@ -94,7 +94,7 @@ var MyPaginateViewModel = DefineMap.extend({
 Component.extend({
   tag: "my-paginate",
   ViewModel: MyPaginateViewModel,
-  template: stache("Page {{page}}.")
+  view: stache("Page {{page}}.")
 })
 ```
 
@@ -157,7 +157,7 @@ The following component requires an `offset` and `limit`:
           return Math.floor(this.attr('offset') / this.attr('limit')) + 1;
         }
       },
-      template: stache("Page {{page}}.")
+      view: stache("Page {{page}}.")
     });
 
 If `<my-paginate>`'s source html is rendered like:
@@ -234,7 +234,7 @@ var ViewModel = DefineMap.extend({
 Component.extend({
 	tag: "my-paginate",
 	ViewModel: ViewModel,
-	template: stache("Page {{page}} <button ($click)='next()'>Next</button>")
+	view: stache("Page {{page}} <button ($click)='next()'>Next</button>")
 });
 ```
 
@@ -250,7 +250,7 @@ dispatches a `"close"` event when it's close method is called:
 ```
 Component.extend({
 	tag: "player-edit",
-	template: stache($('#player-edit-stache').html()),
+	view: stache($('#player-edit-stache').html()),
 	ViewModel: DefineMap.extend({
 		player: Player,
 		close: function(){

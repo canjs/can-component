@@ -18,7 +18,7 @@ example, to position the `LIGHT_DOM` within an `<h1>`, `<my-tag>` could be defin
 ```
 Component.extend({
 	tag: "my-tag",
-	template: stache("<h1><content/></h1>")
+	view: stache("<h1><content/></h1>")
 });
 ```
 
@@ -30,6 +30,6 @@ Component.extend({
    ```
    Component.extend({
    	tag: "my-tag",
-   	template: stache("<h1><content>Hi There!</content></h1>")
+   	view: stache("<h1><content>Hi There!</content></h1>")
    });
    ```
