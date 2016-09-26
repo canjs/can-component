@@ -10,16 +10,23 @@ var observeReader = require('can-observation/reader/reader');
 var paramReplacer = /\{([^\}]+)\}/g;
 
 var ComponentControl = Control.extend({
-		// Change lookup to first look in the viewModel.
+		// the lookup path - where templated keys will be looked up
+		// change lookup to first look in the viewModel
 		_lookup: function(options) {
 			return [options.scope, options, window];
 		},
-		// Remove `scope` or `viewModel` from key values
-		_removeLookupFromKey: function(key) {
+		// strip strings that represent delegates from the key
+		// viewModel.foo -> foo
+		_removeDelegateFromKey: function (key) {
 			return key.replace(/^(scope|^viewModel)\./, "");
 		},
-		_inLookup: function(key) {
+		// return whether the key is a delegate
+		_isDelegate: function(options, key) {
 			return key === 'scope' || key === 'viewModel';
+		},
+		// return the delegate object for a given key
+		_getDelegate: function(options, key) {
+			return options[key];
 		},
 		_action: function(methodName, options, controlInstance) {
 			var hasObjectLookup;
