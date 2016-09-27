@@ -10,92 +10,36 @@ var observeReader = require('can-observation/reader/reader');
 var paramReplacer = /\{([^\}]+)\}/g;
 
 var ComponentControl = Control.extend({
-		// Change lookup to first look in the viewModel.
+		// the lookup path - where templated keys will be looked up
+		// change lookup to first look in the viewModel
 		_lookup: function(options) {
 			return [options.scope, options, window];
 		},
+		// strip strings that represent delegates from the key
+		// viewModel.foo -> foo
+		_removeDelegateFromKey: function (key) {
+			return key.replace(/^(scope|^viewModel)\./, "");
+		},
+		// return whether the key is a delegate
+		_isDelegate: function(options, key) {
+			return key === 'scope' || key === 'viewModel';
+		},
+		// return the delegate object for a given key
+		_getDelegate: function(options, key) {
+			return options[key];
+		},
 		_action: function(methodName, options, controlInstance) {
-			var hasObjectLookup, readyCompute;
+			var hasObjectLookup;
 
 			paramReplacer.lastIndex = 0;
 
 			hasObjectLookup = paramReplacer.test(methodName);
 
-			// If we don't have options (a `control` instance), we'll run this
-			// later.
+			// If we don't have options (a `control` instance), we'll run this later.
 			if (!controlInstance && hasObjectLookup) {
 				return;
-			} else if (!hasObjectLookup) {
-				return Control._action.apply(this, arguments);
 			} else {
-				// We have `hasObjectLookup` and `controlInstance`.
-
-				readyCompute = canCompute(function() {
-					var delegate;
-
-					// Set the delegate target and get the name of the event we're listening to.
-					var name = methodName.replace(paramReplacer, function(matched, key) {
-						var value;
-
-						// If we are listening directly on the `viewModel` set it as a delegate target.
-						if (key === "scope" || key === "viewModel") {
-							delegate = options.viewModel;
-							return "";
-						}
-
-						// Remove `viewModel.` from the start of the key and read the value from the `viewModel`.
-						key = key.replace(/^(scope|^viewModel)\./, "");
-						value = observeReader.read(options.viewModel, observeReader.reads(key), {
-							// if we find a compute, we should bind on that and not read it
-							readCompute: false
-						}).value;
-
-						// If `value` is undefined use `string.getObject` to get the value.
-						if (value === undefined) {
-							value = string.getObject(key);
-						}
-
-						// If `value` is a string we just return it, otherwise we set it as a delegate target.
-						if (typeof value === "string") {
-							return value;
-						} else {
-							delegate = value;
-							return "";
-						}
-
-					});
-
-					// Get the name of the `event` we're listening to.
-					var parts = name.split(/\s+/g),
-						event = parts.pop();
-
-					// Return everything needed to handle the event we're listening to.
-					return {
-						processor: this.processors[event] || this.processors.click,
-						parts: [name, parts.join(" "), event],
-						delegate: delegate || undefined
-					};
-
-				}, this);
-
-				// Create a handler function that we'll use to handle the `change` event on the `readyCompute`.
-				var handler = function(ev, ready) {
-					// unbinds the old binding
-					controlInstance._bindings.control[methodName](controlInstance.element);
-					// binds the new
-					controlInstance._bindings.control[methodName] = ready.processor(
-						ready.delegate || controlInstance.element,
-						ready.parts[2], ready.parts[1], methodName, controlInstance);
-				};
-
-				readyCompute.bind("change", handler);
-
-				controlInstance._bindings.readyComputes[methodName] = {
-					compute: readyCompute,
-					handler: handler
-				};
-
-				return readyCompute();
+				return Control._action.apply(this, arguments);
 			}
 		}
 	},
