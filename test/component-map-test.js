@@ -180,7 +180,7 @@ function makeTest(name, doc, mutObs) {
 			ViewModel: TabsViewModel,
 			template: stache("<ul>" +
 				"{{#panels}}" +
-				"<li {{#isActive}}class='active'{{/isActive}} can-click='makeActive'>{{title}}</li>" +
+				"<li {{#isActive(.)}}class='active'{{/isActive}} can-click='makeActive'>{{title}}</li>" +
 				"{{/panels}}" +
 				"</ul>" +
 				"<content></content>")
@@ -387,6 +387,9 @@ function makeTest(name, doc, mutObs) {
 				} else {
 					selected.splice(index, 1);
 				}
+			},
+			isSelected: function (item) {
+				return this.attr("selected").indexOf(item) > -1;
 			}
 		});
 
@@ -401,8 +404,8 @@ function makeTest(name, doc, mutObs) {
 				"<ul class='options'>" +
 				"<content>" +
 				"{{#selectableItems}}" +
-				"<li {{#isSelected}}class='active'{{/isSelected}} can-click='toggle'>" +
-				"<input type='checkbox' {{#isSelected}}checked{{/isSelected}}/>" +
+				"<li {{#isSelected(.)}}class='active'{{/isSelected}} can-click='toggle'>" +
+				"<input type='checkbox' {{#isSelected(.)}}checked{{/isSelected}}/>" +
 				"{{title}}" +
 				"{{#if children.length}}" +
 				"<button class='showChildren' can-click='showChildren'>+</button>" +
@@ -411,17 +414,7 @@ function makeTest(name, doc, mutObs) {
 				"{{/selectableItems}}" +
 				"</content>" +
 				"</ul>"),
-			ViewModel: TreeComboViewModel,
-			helpers: {
-				isSelected: function (options) {
-					if (this.attr("selected")
-						.indexOf(options.context) > -1) {
-						return options.fn();
-					} else {
-						return options.inverse();
-					}
-				}
-			}
+			ViewModel: TreeComboViewModel
 		});
 
 		var template = stache("<treecombo {(items)}='locations' title='Locations'></treecombo>");
