@@ -8,6 +8,7 @@
 @group can-component.prototype 1 prototype
 @group can-component.elements 2 elements
 @group can-component.events 3 special events
+@package ../package.json
 
 @description Create a custom element that can be used to manage widgets
 or application logic.
