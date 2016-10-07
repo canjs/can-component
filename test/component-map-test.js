@@ -551,7 +551,7 @@ function makeTest(name, doc, mutObs) {
 
 			start();
 
-		}, 10);
+		}, 50);
 
 	});
 
@@ -669,7 +669,7 @@ function makeTest(name, doc, mutObs) {
 				// update set to change the deferred.
 				viewModel.attr("set", 1);
 
-			}, 10);
+			}, 50);
 		};
 
 		gridScope.bind('waiting', waitingHandler);
@@ -1192,7 +1192,7 @@ function makeTest(name, doc, mutObs) {
 			equal(inited, 1, "inited");
 			equal(inserted, 1, "inserted");
 			start();
-		},30);
+		}, 50);
 	});
 
 
@@ -1382,7 +1382,7 @@ function makeTest(name, doc, mutObs) {
 
 		domMutate.appendChild.call(this.fixture, template());
 		stop();
-		setTimeout(start,10);
+		setTimeout(start, 50);
 	});
 
 	test("hyphen-less tag names", function () {
@@ -1449,7 +1449,7 @@ function makeTest(name, doc, mutObs) {
 		setTimeout(function(){
 			equal(viewModel.attr('class'),undefined, "the viewModel is not updated when the class attribute changes");
 			start();
-		},20);
+		}, 50);
 
 	});
 
@@ -1493,7 +1493,6 @@ function makeTest(name, doc, mutObs) {
 			tag: 'destroyable-component',
 			events: {
 				destroy: function(){
-
 					this.viewModel.attr('product', null);
 				}
 			}
@@ -1509,9 +1508,7 @@ function makeTest(name, doc, mutObs) {
 		setTimeout(function(){
 			ok(state.attr('product') == null, 'product was removed');
 			start();
-		},10);
-
-
+		}, 50);
 	});
 
 	test('changing viewModel property rebinds {viewModel.<...>} events (#1529)', 2, function(){
@@ -1648,7 +1645,7 @@ function makeTest(name, doc, mutObs) {
 							textNode = simpleExample.firstChild;
 						equal(textNode.nodeValue, "100", "updated value with reference");
 						start();
-					}, 10);
+					}, 50);
 
 				}
 			}
