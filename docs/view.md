@@ -1,8 +1,8 @@
 @property {can-stache.renderer} [can-component.prototype.view] view
 @parent can-component.prototype
 
-Provides a template to render directly within the component's tag. The template is rendered with the
-component's [can-component::ViewModel] instance.  [can-component/content] elements within the template are replaced by the source elements within the component's tag.
+Provides a template to render directly within the component's element. The template is rendered with the
+component's [can-component::ViewModel] instance.  `<content/>` elements within the template are replaced by the source elements within the component's tag.
 
 @option {can-stache.renderer} A [can-stache.renderer] returned by [can-stache]. For example:
 
@@ -39,28 +39,29 @@ __Component:__
 ```js
 Component({
 	tag: "my-greeting",
-	view: stache("<h1><content/></h1>"),
+	view: stache("<h1><content/> - {{title}}</h1>"),
 	ViewModel: DefineMap.extend({
 		title: {
 			value: "can-component"
 		}
-	}),
-	leakScope: true
+	})
 });
 ```
 
 This registers a component for elements like `<my-greeting>`. Its template
 will place an `<h1>` element directly within `<my-greeting>` and put
-the original contents of `<my-greeting>` within the `<h1>`. The component's
+the original contents of `<my-greeting>` within the beginning of `<h1>`. The component's
 [can-component::ViewModel] adds a title value.
 
 __Source template:__
 
-    <header>
-      <my-greeting>
-         {{site}} - {{title}}
-      </my-greeting>
-    </header>
+```html
+<header>
+  <my-greeting>
+     {{site}}
+  </my-greeting>
+</header>
+```
 
 The source template is the template that
 uses `<my-greeting>`.  In the demo, this is defined within a `<script>`
@@ -68,8 +69,8 @@ tag.
 
 Notice:
 
- - There is content within `<my-greeting>`.
- - The content looks for a `site` and `title` value.
+ - There is content within `<my-greeting>`.  This is called the __light__ or __user__ content.
+ - The content looks for a `site` value.
 
 __Source data:__
 
@@ -88,16 +89,16 @@ __HTML Result:__
     </header>
 
 This is the result of the template transformations. The
-content within the original `<my-greeting>` is placed within the `<h1>`
-tag.  Also, notice that the original content is able to access data from
-the source data and from the component's viewModel.
+__user__ content within the original `<my-greeting>` is placed within the start of the `<h1>`
+tag.  Also, notice that the __user__ content is able to access data from
+the source data.
 
 The following sections break this down more.
 
 
 ## Template insertion
 
-The template specified by `view` is rendered directly withing the custom tag.
+The template specified by `view` is rendered directly within the custom tag.
 
 For example the following component:
 
