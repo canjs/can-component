@@ -50,6 +50,8 @@ And sometimes the following values are provided:
 @body
 
 
+## Use
+
 Note that inheriting from components works differently than other CanJS APIs. You can't call `.extend` on a particular component to create a "subclass" of that component.
 
 Instead, components work more like HTML elements. To reuse functionality from a base component, build on top of it with parent components that wrap other components in their template and pass any needed viewModel properties via attributes.

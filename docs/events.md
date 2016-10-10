@@ -6,22 +6,31 @@ Listen to events on elements and observables.
 @option {Object.<can-control.eventDescription,can-control.eventHandler>} An object of event names and methods
 that handle the event. For example:
 
-    Component({
+    Component.extend({
+	  ViewModel: {
+		limit: "number",
+		offset: "number",
+	    next: function(){
+	      this.offset = this.offset + this.limit;
+	    }
+	  },
       events: {
         ".next click": function(){
           this.viewModel.next()
-        }
-      },
-      ViewModel: {
-        next: function(){
-          this.offset = this.offset + this.limit;
-        }
+        },
+		"{viewModel} limit": function(viewModel, ev, newValue){
+		  console.log("limit is now", newValue);
+		}
       }
     })
 
 
 A component's events object is used as the prototype of a [can-control]. The control gets created on the component's
-element. The component's viewModel is available within event handlers as `this.viewModel`.
+element.
+
+The component's [can-component.prototype.ViewModel] instance is available within event handlers as `this.viewModel`.
+
+The component element is available as `this.element`.
 
 
 @body
