@@ -14,7 +14,22 @@ a component's viewModel values in the user content.
 - the outer [can-view-scope scope] values from the component's template, and
 - the component's [can-component.prototype.ViewModel] values from the user content.
 
-The default value is `false`. 
+The default value is `false`.
+
+To change leakScope from the default
+```js
+Component.extend({
+	tag: "my-component",
+	leakScope: true,
+	ViewModel: { message: "Hello World!" },
+	view: stache("{{message}}")
+})
+```
+
+Leaving `leakScope` as the default `false` is useful for hiding and protecting
+internal details of `Component`, potentially preventing accidental
+clashes. It can be helpful to set it to true if you, for example, wanted to customize __user content__ 
+based on some value in the component's ViewModel.
 
 @body
 
@@ -55,9 +70,9 @@ If the following component is defined:
 
     Component.extend({
         tag: "hello-world",
-        leakScope: true, // the default value
+        leakScope: true, // changed to true instead of default value
         view: stache("{{greeting}} <content/>{{exclamation}}"),
-        viewModel: { subject: "LEAK", exclamation: "!" }
+        ViewModel: { subject: "LEAK", exclamation: "!" }
     })
 
 And used like so:
@@ -78,8 +93,4 @@ But if `leakScope` is false:
 
 Because when the scope isn't leaked, the __component's template__
 does not see `exclamation`. The __user content__ does not see the
-viewModel's `subject` and uses the outer scope's `subject` which is `"World"`.
-
-Using the `leakScope: false` option is useful for hiding and protecting
-internal details of `Component`, potentially preventing accidental
-clashes.
+ViewModel's `subject` and uses the outer scope's `subject` which is `"World"`.
