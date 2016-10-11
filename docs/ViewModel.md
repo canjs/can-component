@@ -77,7 +77,7 @@ Component.extend({
 
 ## Use
 
-[can-component]'s ViewModel property is used to define a __object__, typically an instance
+[can-component]'s ViewModel property is used to define an __object__, typically an instance
 of a [can-define/map/map], that will be used to render the component's
 template. This is most easily understood with an example.  The following
 component shows the current page number based off a `limit` and `offset` value:
