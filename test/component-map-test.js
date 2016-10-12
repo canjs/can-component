@@ -47,12 +47,12 @@ var runTasks = function(tasks){
 		var next = tasks.shift();
 		next();
 		if(tasks.length) {
-			setTimeout(nextTask,10);
+			setTimeout(nextTask, 10);
 		} else {
 			start();
 		}
 	};
-	setTimeout(nextTask,10);
+	setTimeout(nextTask, 10);
 };
 
 function makeTest(name, doc, mutObs) {
@@ -80,7 +80,7 @@ function makeTest(name, doc, mutObs) {
 				start();
 				DOCUMENT(DOC);
 				MUTATION_OBSERVER(MUT_OBS);
-			},1);
+			}, 1);
 
 
 		}
@@ -551,7 +551,7 @@ function makeTest(name, doc, mutObs) {
 
 			start();
 
-		}, 50);
+		}, 100);
 
 	});
 
@@ -669,7 +669,7 @@ function makeTest(name, doc, mutObs) {
 				// update set to change the deferred.
 				viewModel.attr("set", 1);
 
-			}, 50);
+			}, 100);
 		};
 
 		gridScope.bind('waiting', waitingHandler);
@@ -1192,7 +1192,7 @@ function makeTest(name, doc, mutObs) {
 			equal(inited, 1, "inited");
 			equal(inserted, 1, "inserted");
 			start();
-		}, 50);
+		}, 100);
 	});
 
 
@@ -1382,7 +1382,7 @@ function makeTest(name, doc, mutObs) {
 
 		domMutate.appendChild.call(this.fixture, template());
 		stop();
-		setTimeout(start, 50);
+		setTimeout(start, 100);
 	});
 
 	test("hyphen-less tag names", function () {
@@ -1449,7 +1449,7 @@ function makeTest(name, doc, mutObs) {
 		setTimeout(function(){
 			equal(viewModel.attr('class'),undefined, "the viewModel is not updated when the class attribute changes");
 			start();
-		}, 50);
+		}, 100);
 
 	});
 
@@ -1508,7 +1508,7 @@ function makeTest(name, doc, mutObs) {
 		setTimeout(function(){
 			ok(state.attr('product') == null, 'product was removed');
 			start();
-		}, 50);
+		}, 100);
 	});
 
 	test('changing viewModel property rebinds {viewModel.<...>} events (#1529)', 2, function(){
@@ -1645,7 +1645,7 @@ function makeTest(name, doc, mutObs) {
 							textNode = simpleExample.firstChild;
 						equal(textNode.nodeValue, "100", "updated value with reference");
 						start();
-					}, 50);
+					}, 100);
 
 				}
 			}
@@ -1783,12 +1783,12 @@ function makeTest(name, doc, mutObs) {
 			if(index < threads.length) {
 				threads[index]();
 				index++;
-				setTimeout(next, 50);
+				setTimeout(next, 100);
 			} else {
 				start();
 			}
 		};
-		setTimeout(next, 50);
+		setTimeout(next, 100);
 	});
 
 	test("<content> (#2151)", function(){
