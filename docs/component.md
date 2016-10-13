@@ -13,7 +13,7 @@
 @description Create a custom element that can be used to manage widgets
 or application logic.
 
-@signature `&lt;TAG BINDINGS...>[LIGHT_DOM]&lt;/TAG>`
+@signature `<TAG BINDINGS...>[LIGHT_DOM]</TAG>`
 
   Create an instance of a component on a particular tag in a [can-stache] template.
   In 2.3, use the [can-stache-bindings bindings] syntaxes to setup bindings.
