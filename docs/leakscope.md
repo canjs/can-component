@@ -64,7 +64,10 @@ Component.extend({
 
 `{{greeting}} <content/>{{exclamation}}` represents the __component's template__.
 
-## Example - outer scope into component template
+## Using outer scope in component template
+
+If `leakScope` is `true`, the __component's template__ can read the data in the outer scope and will
+see `name: "John"` overwriting `name: "World"` in the component's viewModel instance in the following example.
 
 If the following component is defined:
 ```js
@@ -83,20 +86,18 @@ And used like so:
 
     <hello-world />
 
-It will render as such if `leakScope` is `true`:
+If `leakScope` is `true` it will render:
 
     <hello-world>Hello John</hello-world>
 
-..and:
+If `leakScope` is `false` it will render:
 
     <hello-world>Hello World</hello-world>
 
-if `leakScope` is `false`
+## Using viewModel in user content
 
-This is because if `leakScope` is `true`, the __component's template__ can read the data in the outer scope and will
-see `name: "John"` overwriting `name: "World"` in the component's viewModel instance.
-
-## Example - viewModel into user content
+if `leakScope` is `true`, the __user content__ is able to see the name property on the component's
+viewModel instance in the following example. Else, name won't be seen.
 
 If the following component is defined:
 ```js
@@ -111,15 +112,10 @@ And used like so:
 
     <hello-world>{{name}}</hello-world>
 
-It will render as such if `leakScope` is `true`:
+If `leakScope` is `true` it will render:
 
     <hello-world>Hello World</hello-world>
 
-..and:
+If `leakScope` is `false` it will render:
 
     <hello-world>Hello </hello-world>
-		
-if `leakScope` is `false`
-
-This is because if `leakScope` is `true`, the __user content__ is able to see the name property on the component's
-viewModel instance. Else, name won't be seen.
