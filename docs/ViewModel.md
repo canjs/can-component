@@ -1,4 +1,4 @@
-@property {function|Object} can-component.prototype.ViewModel ViewModel
+@property {function} can-component.prototype.ViewModel ViewModel
 @parent can-component.prototype
 
 @description
@@ -16,69 +16,38 @@ be created:
 
 ```js
 var MyTagViewModel = DefineMap.extend("MyTagViewModel",{
-    message: "string"
+	message: "string"
 });
 
 Component.extend({
-    tag: "my-tag",
-    ViewModel: MyTagViewModel,
-    view: stache("<h1>{{message}}</h1>")
+	tag: "my-tag",
+	ViewModel: MyTagViewModel,
+	view: stache("<h1>{{message}}</h1>")
 })
 ```
 
 Use [can-view-model] to read a component's view model instance.
 
-  @param {Object} properties The initial properties that are passed by the [can-stache-bindings data bindings].
+@param {Object} properties The initial properties that are passed by the [can-stache-bindings data bindings].
 
-  The view bindings on a tag control the properties and values used to instantiate the `ViewModel`. For example, calling `<my-tag>` as follows invokes `MyTagViewModel` as shown in the comments:
+The view bindings on a tag control the properties and values used to instantiate the `ViewModel`. For example, calling `<my-tag>` as follows invokes `MyTagViewModel` as shown in the following example:
 
-  ```
-  <my-tag/> <!-- new MyTagViewModel({}) -->
+```
+<my-tag/> <!-- new MyTagViewModel({}) -->
 
-  <my-tag
-      {message}="'Hi There'"/> <!-- new MyTagViewModel({message: "Hi There"}) -->
-
-  ```
-
-  @return {Object} A new instance of the corresponding constructor function. This instance is
-  added to the top of the [can-view-scope] the component's [can-component::view] is rendered with.
-
-@type {Object} A short hand for the prototype methods and properties used to extend the
-[can-util/js/types/types.DefaultMap default Map type] (typically [can-define/map/map]) and use
-that anonymous type as the view model.
-
-The following:
-
-```js
-Component.extend({
-    tag: "my-paginate",
-    ViewModel: {
-        offset: {value: 0},
-        limit: {value: 20}
-    }
-})
+<my-tag
+	{message}="'Hi There'"/> <!-- new MyTagViewModel({message: "Hi There"}) -->
 ```
 
-This is shorthand for:
-
-```js
-var AnonymousViewModel = DefineMap.extend({
-    offset: {value: 0},
-    limit: {value: 20}
-})
-
-Component.extend({
-    tag: "my-paginate",
-    ViewModel: AnonymousViewModel
-})
-```
+@return {Object} A new instance of the corresponding constructor function. This instance is
+added to the top of the [can-view-scope] the component's [can-component::view] is rendered with.
 
 @body
 
 ## Use
 
-[can-component]'s viewModel property is used to define an __object__, typically an instance
-of a [can-map], that will be used to render the component's
+[can-component]'s ViewModel property is used to create an __object__, typically an instance
+of a [can-define/map/map], that will be used to render the component's
 template. This is most easily understood with an example.  The following
 component shows the current page number based off a `limit` and `offset` value:
 
@@ -86,9 +55,9 @@ component shows the current page number based off a `limit` and `offset` value:
 var MyPaginateViewModel = DefineMap.extend({
   offset: {value: 0},
   limit: {value: 20},
-  page: function(){
-    return Math.floor(this.offset / this.limit) + 1;
-  }
+	get page() {
+		return Math.floor(this.offset / this.limit) + 1;
+	}
 });
 
 Component.extend({
@@ -99,99 +68,110 @@ Component.extend({
 ```
 
 If this component HTML was inserted into the page like:
-
-    var template = stache("<my-paginate/>")
-    $("body").append(template())
-
+```js
+var template = stache("<my-paginate/>");
+var frag = template();
+document.body.appendChild(frag);
+```
 It would result in:
 
     <my-paginate>Page 1</my-paginate>
 
-This is because the provided viewModel object is used to extend a [can-map] like:
+This is because the provided ViewModel object is used to create an instance of [can-define/map/map] like:
+```js
+var viewModel = new MyPaginateViewModel();
+```
 
-    CustomMap = Map.extend({
-      offset: 0,
-      limit: 20,
-      page: function(){
-        return Math.floor(this.attr('offset') / this.attr('limit')) + 1;
-      }
-    })
+The [can-define.types.value] property definition makes offset default to 0 and limit default to 20.
 
-Any primitives found on a `Map`'s prototype (ex: `offset: 0`) are used as
-default values.
+Next, the values are passed into `viewModel` from the [can-stache-bindings data bindings] within `<my-paginate>`
+(in this case there is none).
 
-Next, a new instance of CustomMap is created with the attribute data within `<my-paginate>`
-(in this case there is none) like:
+And finally, that data is used to render the component's template and inserted into the element using [can-view-scope] and [can-stache]:
+```js
+var newViewModel = new Scope(viewModel),
+	result = stache("Page {{page}}.")(newViewModel);
+element.innerHTML = result;
+```
 
-    componentData = new CustomMap(attrs);
+There is a short-hand for the prototype methods and properties used to extend the
+[can-util/js/types/types.DefaultMap default Map type] (typically [can-define/map/map])
+by setting the Component's ViewModel to an object and using
+that anonymous type as the view model.
 
-And finally, that data is added to the [can-view-scope parentScope] of the component, used to
-render the component's template, and inserted into the element:
-
-    var newviewModel = parentScope.add(componentData),
-        result = stache("Page {{page}}.")(newviewModel);
-    $(element).html(result);
+The following does the same as above:
+```js
+Component.extend({
+	tag: "my-paginate",
+	ViewModel: {
+		offset: {value: 0},
+		limit: {value: 20},
+		get page() {
+			return Math.floor(this.offset / this.limit) + 1;
+		}
+	},
+	view: stache("Page {{page}}.")
+})
+```
 
 ## Values passed from attributes
 
-Values can be "passed" into the viewModel of a component, similar to passing arguments into a function. Using
+Values can be "passed" into the viewModel instance of a component, similar to passing arguments into a function. Using
 [can-stache-bindings], the following binding types can be setup:
 
-- [can-stache-bindings.toChild] - Update the component's viewModel when the parent scope value changes.
-- [can-stache-bindings.toParent] - Update the parent scope when the component's viewModel changes.
-- [can-stache-bindings.twoWay] - Update the parent scope or the component's viewModel when the other changes.
+- [can-stache-bindings.toChild] - Update the component's viewModel instance when the parent scope value changes.
+- [can-stache-bindings.toParent] - Update the parent scope when the component's viewModel instance changes.
+- [can-stache-bindings.twoWay] - Update the parent scope or the component's viewModel instance when the other changes.
 
-As mentioned in the deprecation warning above, using [can-stache], values are passed into components like this:
+Using [can-stache], values are passed into components like this:
 
-    <my-paginate {offset}='index' {limit}='size'></my-paginate>
+    <my-paginate {offset}='index' {limit}='size' />
 
-The above would create an offset and limit property on the component that are initialized to whatever index and size are, NOT two-way bind (between component and parent viewModels)
-the offset and limit properties to the index and size.
+The above creates an offset and limit property on the component that are initialized to whatever index and size are.
 
 The following component requires an `offset` and `limit`:
+```js
+Component.extend({
+	tag: "my-paginate",
+	ViewModel: {
+		offset: {value: 0},
+		limit: {value: 20},
+		get page() {
+			return Math.floor(this.offset / this.limit) + 1;
+		}
+	},
+	view: stache("Page {{page}}.")
+});
+```
+If `<my-paginate>` is used like:
+```js
+var template = stache("<my-paginate {offset}='index' {limit}='size' />");
 
-    Component.extend({
-      tag: "my-paginate",
-      viewModel: {
-        page: function(){
-          return Math.floor(this.attr('offset') / this.attr('limit')) + 1;
-        }
-      },
-      view: stache("Page {{page}}.")
-    });
+var pageInfo = new DefineMap({index: 0, size: 20});
 
-If `<my-paginate>`'s source html is rendered like:
-
-    var template = stache("<my-paginate {offset}='index' {limit}='size'></my-paginate>");
-
-    var pageInfo = new Map({
-      index: 0,
-      size: 20
-    });
-
-    $("body").append( template( pageInfo ) );
-
+document.body.appendChild(template(pageInfo));
+```
 ... `pageInfo`'s index and size are set as the component's offset and
 limit attributes. If we were to change the value of `pageInfo`'s
 index like:
-
-    pageInfo.attr("index",20)
-
+```js
+pageInfo.index = 20;
+```
 ... the component's offset value will change and its template will update to:
 
-    <my-paginate>Page 1</my-paginate>
+    <my-paginate>Page 2</my-paginate>
 
 ### Using attribute values
 
 You can also pass a literal string value of the attribute. To do this in [can-stache],
-simply pass any value not wrapped in single brackets, and the viewModel property will
+simply pass any value not wrapped in single brackets, and the viewModel instance property will
 be initialized to this string value:
 
-    <my-tag title="hello"></my-tag>
+    <my-tag title="hello" />
 
-The above will create a title property in the component's viewModel, which has a string `hello`.  
+The above will set the title property on the component's viewModel instance to the string `hello`.  
 
-If the tag's `title` attribute is changed, it updates the viewModel property
+If the tag's `title` attribute is changed, it updates the viewModel instance property
 automatically.  This can be seen in the following example:
 
 @demo demos/can-component/accordion.html
@@ -209,24 +189,20 @@ out.addEventListener("click", function(ev){
 });
 ```
 
-## Calling methods on viewModel from events within the template
+## Calling methods on ViewModel from events within the template
 
-Using html attributes like `can-EVENT-METHOD`, you can directly call a viewModel method
+Using html attributes like `can-EVENT-METHOD`, you can directly call a ViewModel method
 from a template. For example, we can make `<my-paginate>` elements include a next
-button that calls the viewModel's `next` method like:
+button that calls the ViewModel's `next` method like:
 
 ```js
 var ViewModel = DefineMap.extend({
-	offset: {
-		value: 0
-	},
-	limit: {
-		value: 20
-	},
+	offset: {value: 0},
+	limit: {value: 20},
 	next: function(){
 		this.offset = this.offset + this.limit;
 	},
-	page: function(){
+	get page() {
 		return Math.floor(this.offset / this.limit) + 1;
 	}
 });
@@ -238,19 +214,19 @@ Component.extend({
 });
 ```
 
-viewModel methods get called back with the current context, the element that you are listening to and the event that triggered the callback.
+ViewModel methods get called back with the current context, the element that you are listening to and the event that triggered the callback.
 
 @demo demos/can-component/paginate_next.html
 
-## Publishing events on viewModels
+## Publishing events on ViewModels
 
-Maps can publish events on themselves. For instance, the following `<player-edit>` component,
+DefineMaps can publish events on themselves. For instance, the following `<player-edit>` component,
 dispatches a `"close"` event when it's close method is called:
 
-```
+```js
 Component.extend({
 	tag: "player-edit",
-	view: stache($('#player-edit-stache').html()),
+	view: stache.from('player-edit-stache'),
 	ViewModel: DefineMap.extend({
 		player: Player,
 		close: function(){
@@ -263,10 +239,10 @@ Component.extend({
 
 These can be listened to with [can-stache-bindings.event] bindings like:
 
-```
+```js
 <player-edit
   	(close)="removeEdit()"
-  	{player}="editingPlayer"/>
+  	{player}="editingPlayer" />
 ```
 
 The following demo uses this ability to create a close button that

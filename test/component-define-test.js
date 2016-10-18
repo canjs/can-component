@@ -76,7 +76,7 @@ QUnit.test('33 - works when instantiated with an object for ViewModel', function
 		template: stache("{{someMethod}}"),
 		ViewModel: {
 			someMethod: function() {
-				ok(true, "Fuction got called");
+				ok(true, "Function got called");
 				return true;
 			}
 		}
