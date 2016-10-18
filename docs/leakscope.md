@@ -28,7 +28,7 @@ Component.extend({
 
 Leaving `leakScope` as the default `false` is useful for hiding and protecting
 internal details of `Component`, potentially preventing accidental
-clashes. It can be helpful to set it to true if you, for example, wanted to customize __user content__ 
+clashes. It can be helpful to set it to `true` if you, for example, wanted to customize __user content__
 based on some value in the component's ViewModel.
 
 @body
@@ -64,33 +64,62 @@ Component.extend({
 
 `{{greeting}} <content/>{{exclamation}}` represents the __component's template__.
 
-## Example
+## Example - outer scope into component template
 
 If the following component is defined:
-
-    Component.extend({
-        tag: "hello-world",
-        leakScope: true, // changed to true instead of default value
-        view: stache("{{greeting}} <content/>{{exclamation}}"),
-        ViewModel: { subject: "LEAK", exclamation: "!" }
-    })
-
+```js
+Component.extend({
+	tag: 'hello-world',
+	leakScope: true, // changed to true instead of the default value
+	ViewModel: {name: "World"},
+	view: stache("Hello {{name}}")
+});
+```
+With this data in the outer scope:
+```js
+{ name: "John" }
+```
 And used like so:
 
-    <hello-world>{{subject}}</hello-world>
+    <hello-world />
 
-With the following data in the outer scope:
+It will render as such if `leakScope` is `true`:
 
-    { greeting: "Hello", subject: "World"}
+    <hello-world>Hello John</hello-world>
 
-Will render the following if `leakScope` is true:
-
-    <hello-world>Hello LEAK!</hello-world>
-
-But if `leakScope` is false:
+..and:
 
     <hello-world>Hello World</hello-world>
 
-Because when the scope isn't leaked, the __component's template__
-does not see `exclamation`. The __user content__ does not see the
-ViewModel's `subject` and uses the outer scope's `subject` which is `"World"`.
+if `leakScope` is `false`
+
+This is because if `leakScope` is `true`, the __component's template__ can read the data in the outer scope and will
+see `name: "John"` overwriting `name: "World"` in the component's viewModel instance.
+
+## Example - viewModel into user content
+
+If the following component is defined:
+```js
+Component.extend({
+	tag: 'hello-world',
+	leakScope: true, // changed to true instead of the default value
+	ViewModel: {name: "World"},
+	view: stache("Hello <content />")
+});
+```
+And used like so:
+
+    <hello-world>{{name}}</hello-world>
+
+It will render as such if `leakScope` is `true`:
+
+    <hello-world>Hello World</hello-world>
+
+..and:
+
+    <hello-world>Hello </hello-world>
+		
+if `leakScope` is `false`
+
+This is because if `leakScope` is `true`, the __user content__ is able to see the name property on the component's
+viewModel instance. Else, name won't be seen.

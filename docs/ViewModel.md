@@ -1,4 +1,4 @@
-@property {function|Object} can-component.prototype.ViewModel ViewModel
+@property {function} can-component.prototype.ViewModel ViewModel
 @parent can-component.prototype
 
 @description
@@ -30,14 +30,13 @@ Use [can-view-model] to read a component's view model instance.
 
 @param {Object} properties The initial properties that are passed by the [can-stache-bindings data bindings].
 
-The view bindings on a tag control the properties and values used to instantiate the `ViewModel`. For example, calling `<my-tag>` as follows invokes `MyTagViewModel` as shown in the comments:
+The view bindings on a tag control the properties and values used to instantiate the `ViewModel`. For example, calling `<my-tag>` as follows invokes `MyTagViewModel` as shown in the following example:
 
 ```
 <my-tag/> <!-- new MyTagViewModel({}) -->
 
 <my-tag
 	{message}="'Hi There'"/> <!-- new MyTagViewModel({message: "Hi There"}) -->
-
 ```
 
 @return {Object} A new instance of the corresponding constructor function. This instance is
@@ -56,9 +55,9 @@ component shows the current page number based off a `limit` and `offset` value:
 var MyPaginateViewModel = DefineMap.extend({
   offset: {value: 0},
   limit: {value: 20},
-  page: function(){
-    return Math.floor(this.offset / this.limit) + 1;
-  }
+	get page() {
+		return Math.floor(this.offset / this.limit) + 1;
+	}
 });
 
 Component.extend({
@@ -70,7 +69,7 @@ Component.extend({
 
 If this component HTML was inserted into the page like:
 ```js
-var template = stache("<my-paginate/>")
+var template = stache("<my-paginate/>");
 var frag = template();
 document.body.appendChild(frag);
 ```
@@ -80,74 +79,55 @@ It would result in:
 
 This is because the provided ViewModel object is used to create an instance of [can-define/map/map] like:
 ```js
-CustomMap = DefineMap.extend({
-	offset: {value: 0},
-	limit: {value: 20},
-	page: function(){
-		return Math.floor(this.offset / this.limit) + 1;
-	}
-})
+var viewModel = new MyPaginateViewModel();
 ```
 
-Any properties found on a `DefineMap`'s prototype with a value (ex: `offset: {value: 0}`) are used as
-default values.
+The [can-define.types.value] property definition makes offset default to 0 and limit default to 20.
 
-Next, a new instance of componentData is created from the [can-stache-bindings data bindings] within `<my-paginate>`
+Next, the values are passed into `viewModel` from the [can-stache-bindings data bindings] within `<my-paginate>`
 (in this case there is none).
 
-And finally, that data used to render the component's template and inserted into the element:
+And finally, that data is used to render the component's template and inserted into the element using [can-view-scope] and [can-stache]:
 ```js
-var newViewModel = parentScope.add(componentData),
+var newViewModel = new Scope(viewModel),
 	result = stache("Page {{page}}.")(newViewModel);
 element.innerHTML = result;
 ```
 
 There is a short-hand for the prototype methods and properties used to extend the
-[can-util/js/types/types.DefaultMap default Map type] (typically [can-define/map/map]) 
+[can-util/js/types/types.DefaultMap default Map type] (typically [can-define/map/map])
 by setting the Component's ViewModel to an object and using
 that anonymous type as the view model.
 
-The following:
-
+The following does the same as above:
 ```js
 Component.extend({
 	tag: "my-paginate",
 	ViewModel: {
 		offset: {value: 0},
-		limit: {value: 20}
-	}
-})
-```
-
-This is shorthand for:
-
-```js
-var AnonymousViewModel = DefineMap.extend({
-    offset: {value: 0},
-    limit: {value: 20}
-})
-
-Component.extend({
-    tag: "my-paginate",
-    ViewModel: AnonymousViewModel
+		limit: {value: 20},
+		get page() {
+			return Math.floor(this.offset / this.limit) + 1;
+		}
+	},
+	view: stache("Page {{page}}.")
 })
 ```
 
 ## Values passed from attributes
 
-Values can be "passed" into the ViewModel of a component, similar to passing arguments into a function. Using
+Values can be "passed" into the viewModel instance of a component, similar to passing arguments into a function. Using
 [can-stache-bindings], the following binding types can be setup:
 
-- [can-stache-bindings.toChild] - Update the component's ViewModel when the parent scope value changes.
-- [can-stache-bindings.toParent] - Update the parent scope when the component's ViewModel changes.
-- [can-stache-bindings.twoWay] - Update the parent scope or the component's ViewModel when the other changes.
+- [can-stache-bindings.toChild] - Update the component's viewModel instance when the parent scope value changes.
+- [can-stache-bindings.toParent] - Update the parent scope when the component's viewModel instance changes.
+- [can-stache-bindings.twoWay] - Update the parent scope or the component's viewModel instance when the other changes.
 
 Using [can-stache], values are passed into components like this:
 
     <my-paginate {offset}='index' {limit}='size' />
 
-The above would create an offset and limit property on the component that are initialized to whatever index and size are, NOT two-way bind (between component and parent ViewModels)
-the offset and limit properties to the index and size.
+The above creates an offset and limit property on the component that are initialized to whatever index and size are.
 
 The following component requires an `offset` and `limit`:
 ```js
@@ -156,21 +136,18 @@ Component.extend({
 	ViewModel: {
 		offset: {value: 0},
 		limit: {value: 20},
-		page: function() {
+		get page() {
 			return Math.floor(this.offset / this.limit) + 1;
 		}
 	},
 	view: stache("Page {{page}}.")
 });
 ```
-If `<my-paginate>`'s source html is rendered like:
+If `<my-paginate>` is used like:
 ```js
-var template = stache("<my-paginate {offset}='index' {limit}='size'></my-paginate>");
+var template = stache("<my-paginate {offset}='index' {limit}='size' />");
 
-var pageInfo = new DefineMap({
-	index: {value: 0},
-	size: {value: 20}
-});
+var pageInfo = new DefineMap({index: 0, size: 20});
 
 document.body.appendChild(template(pageInfo));
 ```
@@ -178,7 +155,7 @@ document.body.appendChild(template(pageInfo));
 limit attributes. If we were to change the value of `pageInfo`'s
 index like:
 ```js
-pageInfo.set("index", 20)
+pageInfo.index = 20;
 ```
 ... the component's offset value will change and its template will update to:
 
@@ -187,14 +164,14 @@ pageInfo.set("index", 20)
 ### Using attribute values
 
 You can also pass a literal string value of the attribute. To do this in [can-stache],
-simply pass any value not wrapped in single brackets, and the ViewModel property will
+simply pass any value not wrapped in single brackets, and the viewModel instance property will
 be initialized to this string value:
 
     <my-tag title="hello" />
 
-The above will set the title property in the component's ViewModel to the string `hello`.  
+The above will set the title property on the component's viewModel instance to the string `hello`.  
 
-If the tag's `title` attribute is changed, it updates the ViewModel property
+If the tag's `title` attribute is changed, it updates the viewModel instance property
 automatically.  This can be seen in the following example:
 
 @demo demos/can-component/accordion.html
@@ -225,7 +202,7 @@ var ViewModel = DefineMap.extend({
 	next: function(){
 		this.offset = this.offset + this.limit;
 	},
-	page: function(){
+	get page() {
 		return Math.floor(this.offset / this.limit) + 1;
 	}
 });
