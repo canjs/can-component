@@ -67,7 +67,7 @@
     "can-list": "^3.0.0-pre.6",
     "can-map": "^3.0.0-pre.7",
     "can-stache": "^3.0.0-pre.15",
-    "can-vdom": "^0.0.5",
+    "can-vdom": "^3.0.1",
     "cssify": "^1.0.2",
     "bit-docs": "0.0.6",
     "done-serve": "^0.2.5",
