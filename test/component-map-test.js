@@ -129,164 +129,6 @@ function makeTest(name, doc, mutObs) {
 		}
 	});
 
-	test("basic tabs", function () {
-		var TabsViewModel = CanMap.extend({
-			init: function() {
-				this.attr('panels', []);
-			},
-			addPanel: function (panel) {
-
-				if (this.attr("panels")
-					.length === 0) {
-					this.makeActive(panel);
-				}
-				this.attr("panels")
-					.push(panel);
-			},
-			removePanel: function (panel) {
-				var panels = this.attr("panels");
-				canBatch.start();
-				var index = panels.indexOf(panel);
-				console.log(index);
-				panels.splice(index, 1);
-				if (panel === this.attr("active")) {
-					if (panels.length) {
-						this.makeActive(panels[0]);
-					} else {
-						this.removeAttr("active");
-					}
-				}
-				canBatch.stop();
-			},
-			makeActive: function (panel) {
-				this.attr("active", panel);
-				this.attr("panels")
-					.each(function (panel) {
-						panel.attr("active", false);
-					});
-				panel.attr("active", true);
-
-			},
-			// this is viewModel, not stache
-			// consider removing viewModel as arg
-			isActive: function (panel) {
-				return this.attr('active') === panel;
-			}
-		});
-
-		// new Tabs() ..
-		Component.extend({
-			tag: "tabs",
-			ViewModel: TabsViewModel,
-			template: stache("<ul>" +
-				"{{#panels}}" +
-				"<li {{#isActive(.)}}class='active'{{/isActive}} can-click='makeActive'>{{title}}</li>" +
-				"{{/panels}}" +
-				"</ul>" +
-				"<content></content>")
-		});
-
-		Component.extend({
-			// make sure <content/> works
-			template: stache("{{#if active}}<content></content>{{/if}}"),
-			tag: "panel",
-			ViewModel: CanMap.extend({
-				active: false
-			}),
-			events: {
-				" inserted": function () {
-					canViewModel(this.element.parentNode)
-						.addPanel(this.viewModel);
-
-				},
-
-				" beforeremove": function () {
-					console.log("I AM BEING REMOVED");
-					canViewModel(this.element.parentNode)
-						.removePanel(this.viewModel);
-				}
-			}
-		});
-
-		var template = stache("<tabs>{{#each foodTypes}}<panel title='{{title}}'>{{content}}</panel>{{/each}}</tabs>");
-
-		var foodTypes = new CanList([{
-			title: "Fruits",
-			content: "oranges, apples"
-		}, {
-			title: "Breads",
-			content: "pasta, cereal"
-		}, {
-			title: "Sweets",
-			content: "ice cream, candy"
-		}]);
-
-		var frag = template({
-			foodTypes: foodTypes
-		});
-
-		domMutate.appendChild.call(this.fixture, frag);
-
-		var testArea = this.fixture;
-
-		stop();
-
-		runTasks([
-			function() {
-				var lis = testArea.getElementsByTagName("li");
-
-				equal(lis.length, 3, "three lis added");
-
-				foodTypes.each(function (type, i) {
-					equal(innerHTML(lis[i]), type.attr("title"), "li " + i + " has the right content");
-				});
-
-				foodTypes.push({
-					title: "Vegies",
-					content: "carrots, kale"
-				});
-			}, function(){
-				var lis = testArea.getElementsByTagName("li");
-
-				equal(lis.length, 4, "li added");
-
-
-				foodTypes.each(function (type, i) {
-					equal( innerHTML(lis[i]), type.attr("title"), "li " + i + " has the right content");
-				});
-
-				equal(testArea.getElementsByTagName("panel")
-					.length, 4, "panel added");
-				console.log("SHIFTY");
-				foodTypes.shift();
-			},
-			function(){
-				var lis = testArea.getElementsByTagName("li");
-
-				equal(lis.length, 3, "removed li after shifting a foodType");
-				foodTypes.each(function (type, i) {
-					equal( innerHTML(lis[i]), type.attr("title"), "li " + i + " has the right content");
-				});
-
-				// test changing the active element
-				var panels = testArea.getElementsByTagName("panel");
-
-				equal(lis[0].className, "active", "the first element is active");
-				equal(innerHTML( panels[0] ), "pasta, cereal", "the first content is shown");
-				equal(innerHTML( panels[1] ), "", "the second content is removed");
-
-				canEvent.trigger.call(lis[1], "click");
-				lis = testArea.getElementsByTagName("li");
-
-				equal(lis[1].className, "active", "the second element is active");
-				equal(lis[0].className, "", "the first element is not active");
-
-				equal( innerHTML( panels[0]), "", "the second content is removed");
-				equal( innerHTML( panels[1]), "ice cream, candy", "the second content is shown");
-			}
-		]);
-	});
-
 	test("lexical scoping", function() {
 		Component.extend({
 			tag: "hello-world",
@@ -1575,55 +1417,6 @@ function makeTest(name, doc, mutObs) {
 		ok(changeCount < 500, "more than 500 events");
 	});
 
-	test('DOM trees not releasing when referencing CanMap inside CanMap in template (#1593)', function() {
-		var baseTemplate = stache('{{#if show}}<my-outside></my-outside>{{/if}}'),
-			show = canCompute(true),
-			state = new CanMap({
-				inner: 1
-			});
-
-		var removeCount = 0;
-
-		Component.extend({
-			tag: 'my-inside',
-			events: {
-				removed: function() {
-					removeCount++;
-				}
-			},
-			leakScope: true
-		});
-
-		Component.extend({
-			tag: 'my-outside',
-			template: stache('{{#if state.inner}}<my-inside></my-inside>{{/if}}'),
-			leakScope: true
-		});
-
-		domMutate.appendChild.call(this.fixture, baseTemplate({
-			show: show,
-			state: state
-		}));
-
-		runTasks([function(){
-			show(false);
-		},function(){
-			state.removeAttr('inner');
-		}, function(){
-			equal(removeCount, 1, 'internal removed once');
-			show(true);
-		}, function(){
-			state.attr('inner', 2);
-		}, function(){
-			state.removeAttr('inner');
-		}, function(){
-			equal(removeCount, 2, 'internal removed twice');
-		}]);
-
-		stop();
-
-	});
-
 	test("references scopes are available to bindings nested in components (#2029)", function(){
 
 		var template = stache('<export-er {^value}="*reference" />'+
@@ -1933,4 +1726,214 @@ function makeTest(name, doc, mutObs) {
 		var tn = frag.firstChild.firstChild.firstChild;
 		equal(tn.nodeValue, "qux", "was bound!");
 	});
+
+if(System.env !== 'canjs-test') {
+		// Brittle in IE
+		test("basic tabs", function () {
+			var TabsViewModel = CanMap.extend({
+				init: function() {
+					this.attr('panels', []);
+				},
+				addPanel: function (panel) {
+
+					if (this.attr("panels")
+						.length === 0) {
+						this.makeActive(panel);
+					}
+					this.attr("panels")
+						.push(panel);
+				},
+				removePanel: function (panel) {
+					var panels = this.attr("panels");
+					canBatch.start();
+					var index = panels.indexOf(panel);
+					console.log(index);
+					panels.splice(index, 1);
+					if (panel === this.attr("active")) {
+						if (panels.length) {
+							this.makeActive(panels[0]);
+						} else {
+							this.removeAttr("active");
+						}
+					}
+					canBatch.stop();
+				},
+				makeActive: function (panel) {
+					this.attr("active", panel);
+					this.attr("panels")
+						.each(function (panel) {
+							panel.attr("active", false);
+						});
+					panel.attr("active", true);
+
+				},
+				// this is viewModel, not stache
+				// consider removing viewModel as arg
+				isActive: function (panel) {
+					return this.attr('active') === panel;
+				}
+			});
+
+			// new Tabs() ..
+			Component.extend({
+				tag: "tabs",
+				ViewModel: TabsViewModel,
+				template: stache("<ul>" +
+					"{{#panels}}" +
+					"<li {{#isActive(.)}}class='active'{{/isActive}} can-click='makeActive'>{{title}}</li>" +
+					"{{/panels}}" +
+					"</ul>" +
+					"<content></content>")
+			});
+
+			Component.extend({
+				// make sure <content/> works
+				template: stache("{{#if active}}<content></content>{{/if}}"),
+				tag: "panel",
+				ViewModel: CanMap.extend({
+					active: false
+				}),
+				events: {
+					" inserted": function () {
+						canViewModel(this.element.parentNode)
+							.addPanel(this.viewModel);
+
+					},
+
+					" beforeremove": function () {
+						console.log("I AM BEING REMOVED");
+						canViewModel(this.element.parentNode)
+							.removePanel(this.viewModel);
+					}
+				}
+			});
+
+			var template = stache("<tabs>{{#each foodTypes}}<panel title='{{title}}'>{{content}}</panel>{{/each}}</tabs>");
+
+			var foodTypes = new CanList([{
+				title: "Fruits",
+				content: "oranges, apples"
+			}, {
+				title: "Breads",
+				content: "pasta, cereal"
+			}, {
+				title: "Sweets",
+				content: "ice cream, candy"
+			}]);
+
+			var frag = template({
+				foodTypes: foodTypes
+			});
+
+			domMutate.appendChild.call(this.fixture, frag);
+
+			var testArea = this.fixture;
+
+			stop();
+
+			runTasks([
+				function() {
+					var lis = testArea.getElementsByTagName("li");
+
+					equal(lis.length, 3, "three lis added");
+
+					foodTypes.each(function (type, i) {
+						equal(innerHTML(lis[i]), type.attr("title"), "li " + i + " has the right content");
+					});
+
+					foodTypes.push({
+						title: "Vegies",
+						content: "carrots, kale"
+					});
+				}, function(){
+					var lis = testArea.getElementsByTagName("li");
+
+					equal(lis.length, 4, "li added");
+
+
+					foodTypes.each(function (type, i) {
+						equal( innerHTML(lis[i]), type.attr("title"), "li " + i + " has the right content");
+					});
+
+					equal(testArea.getElementsByTagName("panel")
+						.length, 4, "panel added");
+					console.log("SHIFTY");
+					foodTypes.shift();
+				},
+				function(){
+					var lis = testArea.getElementsByTagName("li");
+
+					equal(lis.length, 3, "removed li after shifting a foodType");
+					foodTypes.each(function (type, i) {
+						equal( innerHTML(lis[i]), type.attr("title"), "li " + i + " has the right content");
+					});
+
+					// test changing the active element
+					var panels = testArea.getElementsByTagName("panel");
+
+					equal(lis[0].className, "active", "the first element is active");
+					equal(innerHTML( panels[0] ), "pasta, cereal", "the first content is shown");
+					equal(innerHTML( panels[1] ), "", "the second content is removed");
+
+					canEvent.trigger.call(lis[1], "click");
+					lis = testArea.getElementsByTagName("li");
+
+					equal(lis[1].className, "active", "the second element is active");
+					equal(lis[0].className, "", "the first element is not active");
+
+					equal( innerHTML( panels[0]), "", "the second content is removed");
+					equal( innerHTML( panels[1]), "ice cream, candy", "the second content is shown");
+				}
+			]);
+		});
+
+		test('DOM trees not releasing when referencing CanMap inside CanMap in template (#1593)', function() {
+			var baseTemplate = stache('{{#if show}}<my-outside></my-outside>{{/if}}'),
+				show = canCompute(true),
+				state = new CanMap({
+					inner: 1
+				});
+
+			var removeCount = 0;
+
+			Component.extend({
+				tag: 'my-inside',
+				events: {
+					removed: function() {
+						removeCount++;
+					}
+				},
+				leakScope: true
+			});
+
+			Component.extend({
+				tag: 'my-outside',
+				template: stache('{{#if state.inner}}<my-inside></my-inside>{{/if}}'),
+				leakScope: true
+			});
+
+			domMutate.appendChild.call(this.fixture, baseTemplate({
+				show: show,
+				state: state
+			}));
+
+			runTasks([function(){
+				show(false);
+			},function(){
+				state.removeAttr('inner');
+			}, function(){
+				equal(removeCount, 1, 'internal removed once');
+				show(true);
+			}, function(){
+				state.attr('inner', 2);
+			}, function(){
+				state.removeAttr('inner');
+			}, function(){
+				equal(removeCount, 2, 'internal removed twice');
+			}]);
+
+			stop();
+
+		});
+	}
 }
