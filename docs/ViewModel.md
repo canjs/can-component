@@ -8,7 +8,7 @@ to the component's [can-component::view template]. The constructor function
 is initialized with values specified by the component element's [can-stache-bindings data bindings].
 
 @option {function} A constructor function usually defined by [can-define/map/map.extend DefineMap.extend] or
-[can-map Map.extend] that will be used to create an new observable instance accessible by
+[can-map Map.extend] that will be used to create a new observable instance accessible by
 the component's [can-component::view].
 
 For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
