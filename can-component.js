@@ -10,7 +10,7 @@
 // `Component.setup` prepares everything needed by the `Component.prototype.setup`
 // to hookup the component.
 var ComponentControl = require("./control/control");
-var namespace = require('can-util/namespace');
+var namespace = require('can-namespace');
 
 var Construct = require("can-construct");
 var stacheBindings = require("can-stache-bindings");
@@ -22,7 +22,7 @@ var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
-var types = require("can-util/js/types/types");
+var types = require("can-types");
 var string = require("can-util/js/string/string");
 
 var canEach = require('can-util/js/each/each');
