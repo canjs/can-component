@@ -19,7 +19,7 @@ var attr = require("can-util/dom/attr/attr");
 var className = require("can-util/dom/class-name/class-name");
 var domMutate = require('can-util/dom/mutate/mutate');
 var domData = require('can-util/dom/data/data');
-var types = require("can-util/js/types/types");
+var types = require("can-types");
 
 var isPromise = require('can-util/js/is-promise/is-promise');
 
