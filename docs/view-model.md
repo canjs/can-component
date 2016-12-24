@@ -1,15 +1,15 @@
 @function can-component.prototype.view-model viewModel
 @parent can-component.prototype
 
-Return the view model instance or type with which the component's [can-component.prototype.view]
+Return the view model instance or type with which the component’s [can-component.prototype.view]
 is rendered.  This is used when more fine grained control is needed over [can-component::ViewModel].
 
 @signature `function(properties, parentScope, element)`
 
 The `viewModel` function takes the `properties` and values that are used to
 typically initialize a [can-component.prototype.ViewModel], the
-[can-view-scope] the component is rendered within, and the component's element
-and returns either the view-model instance or ViewModel type that the component's [can-component.prototype.view]
+[can-view-scope] the component is rendered within, and the component’s element
+and returns either the view-model instance or ViewModel type that the component’s [can-component.prototype.view]
 is rendered with.
 
 This is typically used only for special situations where a custom scope or custom bindings
@@ -34,7 +34,7 @@ stache("<my-element {first}='firstName' last='Meyer'/>")({
 });
 ```
 
-@param {Object} properties An object of values specified by the custom element's attributes. For example, a template rendered like:
+@param {Object} properties An object of values specified by the custom element’s attributes. For example, a template rendered like:
 
     stache("<my-element title='name'></my-element>")({
       name: "Justin"
@@ -53,7 +53,7 @@ And calls the viewModel function with `properties` like `{title: "Justin"}`.
 
 @param {can-view-scope} parentScope
 
-The viewModel the custom tag was found within.  By default, any attribute's values will
+The viewModel the custom tag was found within.  By default, any attribute’s values will
 be looked up within the current viewModel, but if you want to add values without needing
 the user to provide an attribute, you can set this up here.  For example:
 
@@ -64,7 +64,7 @@ the user to provide an attribute, you can set this up here.  For example:
     	}
     });
 
-Notice how the `middleName` value is looked up in `my-element`'s parent scope.
+Notice how the `middleName` value is looked up in `my-element`’s parent scope.
 
 @param {HTMLElement} element The element the [can-component] is going to be placed on. If you want
 to add custom attribute handling, you can do that here.  For example:
@@ -85,4 +85,4 @@ This example should be done with the [can-component::events] object instead.
 @return {Map|Object} Returns one of the following.
 
    - An observable map or list type.
-   - The prototype of an observable map or list type that will be used to render the component's template.
+   - The prototype of an observable map or list type that will be used to render the component’s template.

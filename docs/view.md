@@ -1,8 +1,8 @@
 @property {can-stache.renderer} [can-component.prototype.view] view
 @parent can-component.prototype
 
-Provides a template to render directly within the component's element. The template is rendered with the
-component's [can-component::ViewModel] instance.  `<content/>` elements within the template are replaced by the source elements within the component's tag.
+Provides a template to render directly within the component’s element. The template is rendered with the
+component’s [can-component::ViewModel] instance.  `<content/>` elements within the template are replaced by the source elements within the component’s tag.
 
 @option {can-stache.renderer} A [can-stache.renderer] returned by [can-stache]. For example:
 
@@ -22,11 +22,11 @@ the [http://www.w3.org/TR/shadow-dom/ W3C Shadow DOM proposal]. It represents th
 of a custom element, while being able to reposition the user provided __source__ elements
 with the [can-component/content] tag.
 
-There are three things to understand about a [can-component]'s template:
+There are three things to understand about a [can-component]’s template:
 
- - It is inserted into the component's tag.
- - It is rendered with access to the component instance's viewModel.
- - [can-component/content] tags within the template act as insertion points for the source elements.
+ - It is inserted into the component’s tag.
+ - It is rendered with access to the component instance’s viewModel.
+ - Any [can-component/content `<content>`] tags within the template act as insertion points for the source elements.
 
 The following example demonstrates all three features:
 
@@ -50,7 +50,7 @@ Component({
 
 This registers a component for elements like `<my-greeting>`. Its template
 will place an `<h1>` element directly within `<my-greeting>` and put
-the original contents of `<my-greeting>` within the beginning of `<h1>`. The component's
+the original contents of `<my-greeting>` within the beginning of `<h1>`. The component’s
 [can-component::ViewModel] adds a title value.
 
 __Source template:__
@@ -125,7 +125,7 @@ However, if there was existing content within the source html, like:
       <my-greeting>DO REMOVE ME!!!</my-greeting>
     </header>
 
-that content is removed, and replaced by the component's template:
+that content is removed, and replaced by the component’s template:
 
     <header>
       <my-greeting><h1>Hello There</h1></my-greeting>
@@ -134,7 +134,7 @@ that content is removed, and replaced by the component's template:
 ### The `<content>` element
 
 Use the `<content>` element to place the source content in the
-component's element within the component's
+component’s element within the component’s
 template. For example, if we change the component to look like:
 
     Component({

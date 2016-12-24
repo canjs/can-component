@@ -32,7 +32,7 @@ on the prototype object:
   created.
 
   - __ViewModel__ {[can-component.prototype.ViewModel]} - Specifies an object
-  that is is used to render the component's template.
+  that is is used to render the component’s template.
 
   - __view__ {[can-component.prototype.view]} - Specifies the template
   rendered within the custom element.
@@ -43,7 +43,7 @@ And sometimes the following values are provided:
   dom elements or observable objects the component listens to.
 
   - __helpers__ {[can-component.prototype.helpers]} - Specifies mustache helpers
-  used to render the component's template.
+  used to render the component’s template.
 
 
 
@@ -52,6 +52,6 @@ And sometimes the following values are provided:
 
 ## Use
 
-Note that inheriting from components works differently than other CanJS APIs. You can't call `.extend` on a particular component to create a "subclass" of that component.
+Note that inheriting from components works differently than other CanJS APIs. You can’t call `.extend` on a particular component to create a “subclass” of that component.
 
 Instead, components work more like HTML elements. To reuse functionality from a base component, build on top of it with parent components that wrap other components in their template and pass any needed viewModel properties via attributes.

@@ -4,12 +4,12 @@
 @description
 
 Provides or describes a constructor function that provides values and methods
-to the component's [can-component::view template]. The constructor function
-is initialized with values specified by the component element's [can-stache-bindings data bindings].
+to the component’s [can-component::view template]. The constructor function
+is initialized with values specified by the component element’s [can-stache-bindings data bindings].
 
 @option {function} A constructor function usually defined by [can-define/map/map.extend DefineMap.extend] or
 [can-map Map.extend] that will be used to create a new observable instance accessible by
-the component's [can-component::view].
+the component’s [can-component::view].
 
 For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
 be created:
@@ -26,7 +26,7 @@ Component.extend({
 })
 ```
 
-Use [can-view-model] to read a component's view model instance.
+Use [can-view-model] to read a component’s view model instance.
 
 @param {Object} properties The initial properties that are passed by the [can-stache-bindings data bindings].
 
@@ -40,14 +40,14 @@ The view bindings on a tag control the properties and values used to instantiate
 ```
 
 @return {Object} A new instance of the corresponding constructor function. This instance is
-added to the top of the [can-view-scope] the component's [can-component::view] is rendered with.
+added to the top of the [can-view-scope] the component’s [can-component::view] is rendered with.
 
 @body
 
 ## Use
 
-[can-component]'s ViewModel property is used to create an __object__, typically an instance
-of a [can-define/map/map], that will be used to render the component's
+[can-component]’s ViewModel property is used to create an __object__, typically an instance
+of a [can-define/map/map], that will be used to render the component’s
 template. This is most easily understood with an example.  The following
 component shows the current page number based off a `limit` and `offset` value:
 
@@ -87,7 +87,7 @@ The [can-define.types.value] property definition makes offset default to 0 and l
 Next, the values are passed into `viewModel` from the [can-stache-bindings data bindings] within `<my-paginate>`
 (in this case there is none).
 
-And finally, that data is used to render the component's template and inserted into the element using [can-view-scope] and [can-stache]:
+And finally, that data is used to render the component’s template and inserted into the element using [can-view-scope] and [can-stache]:
 ```js
 var newViewModel = new Scope(viewModel),
 	result = stache("Page {{page}}.")(newViewModel);
@@ -95,8 +95,8 @@ element.innerHTML = result;
 ```
 
 There is a short-hand for the prototype methods and properties used to extend the
-[can-util/js/types/types.DefaultMap default Map type] (typically [can-define/map/map])
-by setting the Component's ViewModel to an object and using
+[can-types.DefaultMap default Map type] (typically [can-define/map/map])
+by setting the Component’s ViewModel to an object and using
 that anonymous type as the view model.
 
 The following does the same as above:
@@ -119,9 +119,9 @@ Component.extend({
 Values can be "passed" into the viewModel instance of a component, similar to passing arguments into a function. Using
 [can-stache-bindings], the following binding types can be setup:
 
-- [can-stache-bindings.toChild] - Update the component's viewModel instance when the parent scope value changes.
-- [can-stache-bindings.toParent] - Update the parent scope when the component's viewModel instance changes.
-- [can-stache-bindings.twoWay] - Update the parent scope or the component's viewModel instance when the other changes.
+- [can-stache-bindings.toChild] — Update the component’s viewModel instance when the parent scope value changes.
+- [can-stache-bindings.toParent] — Update the parent scope when the component’s viewModel instance changes.
+- [can-stache-bindings.twoWay] — Update the parent scope or the component’s viewModel instance when the other changes.
 
 Using [can-stache], values are passed into components like this:
 
@@ -151,13 +151,13 @@ var pageInfo = new DefineMap({index: 0, size: 20});
 
 document.body.appendChild(template(pageInfo));
 ```
-... `pageInfo`'s index and size are set as the component's offset and
-limit attributes. If we were to change the value of `pageInfo`'s
+... `pageInfo`’s index and size are set as the component’s offset and
+limit attributes. If we were to change the value of `pageInfo`’s
 index like:
 ```js
 pageInfo.index = 20;
 ```
-... the component's offset value will change and its template will update to:
+... the component’s offset value will change and its template will update to:
 
     <my-paginate>Page 2</my-paginate>
 
@@ -169,14 +169,14 @@ be initialized to this string value:
 
     <my-tag title="hello" />
 
-The above will set the title property on the component's viewModel instance to the string `hello`.  
+The above will set the title property on the component’s viewModel instance to the string `hello`.
 
-If the tag's `title` attribute is changed, it updates the viewModel instance property
+If the tag’s `title` attribute is changed, it updates the viewModel instance property
 automatically.  This can be seen in the following example:
 
 @demo demos/can-component/accordion.html
 
-Clicking the __Change title__ button sets a `<panel>` element's `title` attribute like:
+Clicking the __Change title__ button sets a `<panel>` element’s `title` attribute like:
 
 ```js
 out.addEventListener("click", function(ev){
@@ -193,7 +193,7 @@ out.addEventListener("click", function(ev){
 
 Using html attributes like `can-EVENT-METHOD`, you can directly call a ViewModel method
 from a template. For example, we can make `<my-paginate>` elements include a next
-button that calls the ViewModel's `next` method like:
+button that calls the ViewModel’s `next` method like:
 
 ```js
 var ViewModel = DefineMap.extend({
@@ -221,7 +221,7 @@ ViewModel methods get called back with the current context, the element that you
 ## Publishing events on ViewModels
 
 DefineMaps can publish events on themselves. For instance, the following `<player-edit>` component,
-dispatches a `"close"` event when it's close method is called:
+dispatches a `"close"` event when its close method is called:
 
 ```js
 Component.extend({
