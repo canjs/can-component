@@ -16,7 +16,7 @@ or application logic.
 @signature `<TAG BINDINGS...>[LIGHT_DOM]</TAG>`
 
   Create an instance of a component on a particular tag in a [can-stache] template.
-  In 2.3, use the [can-stache-bindings bindings] syntaxes to setup bindings.
+  In 2.3, use the [can-stache-bindings bindings] syntaxes to set up bindings.
 
   @release 2.3
 
@@ -25,12 +25,12 @@ or application logic.
   `acme-tabs` or `acme:tabs`.
 
   @param {can-stache-bindings} [BINDINGS] Use the following binding syntaxes
-  to connect the component's [can-component::ViewModel] to the template's [can-view-scope scope]:
+  to connect the component’s [can-component::ViewModel] to the template’s [can-view-scope scope]:
 
-   - [can-stache-bindings.toChild]=[can-stache.expressions expression] - one way data binding to child
-   - [can-stache-bindings.toParent]=[can-stache.expressions expression] - one way data binding to parent
-   - [can-stache-bindings.twoWay]=[can-stache.expressions expression] - two way data binding child to parent
-   - [can-stache-bindings.event]=[can-stache/expressions/call expression] - event binding on the view model
+   - [can-stache-bindings.toChild]=[can-stache.expressions expression] — one-way data binding to child
+   - [can-stache-bindings.toParent]=[can-stache.expressions expression] — one-way data binding to parent
+   - [can-stache-bindings.twoWay]=[can-stache.expressions expression] — two-way data binding child to parent
+   - [can-stache-bindings.event]=[can-stache/expressions/call expression] — event binding on the view model
 
    Note that because DOM attribute names are case-insensitive, use hypens (`-`) to
    in the attribute name to setup for `camelCase` properties.
@@ -51,7 +51,7 @@ or application logic.
    <my-tag>Hello <b>World</b></my-tag>
    ```
 
-   The `LIGHT_DOM` can be positioned with a component's [can-component.prototype.view] with
+   The `LIGHT_DOM` can be positioned with a component’s [can-component.prototype.view] with
    the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
    with [can-component.prototype.leakScope].
 
@@ -86,8 +86,8 @@ Component.extend({
 });
 ```
 
-This element says "Click me" until a user clicks it and then
-says "Hello There!".  To create a a instance of this component on the page,
+This element says “Click me” until a user clicks it and then
+says “Hello There!”.  To create a a instance of this component on the page,
 add `<hello-world/>` to a [can-stache] template, render
 the template and insert the result in the page like:
 
@@ -115,18 +115,18 @@ you'll render a template with many custom tags like:
 ### Defining a Component
 
 Use [can-component.extend] to define a `Component` constructor function
-that automatically gets initialized whenever the component's tag is
+that automatically gets initialized whenever the component’s tag is
 found.
 
 Note that inheriting from components works differently than other CanJS APIs. You
-can't call `.extend` on a particular component to create a "subclass" of that component.
+can’t call `.extend` on a particular component to create a “subclass” of that component.
 
 Instead, components work more like HTML elements. To reuse functionality from a base component, build on top of it with parent
 components that wrap other components in their template and pass any needed viewModel properties via attributes.
 
 ### Tag
 
-A component's [can-component::tag tag] is the element node name that
+A component’s [can-component::tag tag] is the element node name that
 the component will be created on.
 
 
@@ -138,8 +138,8 @@ The following matches `<hello-world>` elements.
 
 ### View
 
-A component's [can-component::view view] is a template that is rendered as
-the element's innerHTML.
+A component’s [can-component::view view] is a template that is rendered as
+the element’s innerHTML.
 
 The following component:
 
@@ -152,7 +152,7 @@ Changes `<hello-world/>` elements into:
 
     <hello-world><h1>Hello World</h1></hello-world>
 
-Use the [can-component/content] tag to position the custom element's source HTML.
+Use the [can-component/content] tag to position the custom element’s source HTML.
 
 The following component:
 
@@ -167,10 +167,10 @@ Changes `<hello-world>Hi There</hello-world>` into:
 
 ### ViewModel
 
-A component's [can-component::ViewModel ViewModel] defines a constructor that creates
-instances used to render the component's template. The instance's properties
+A component’s [can-component::ViewModel ViewModel] defines a constructor that creates
+instances used to render the component’s template. The instance’s properties
 are typically set by attribute [can-stache-bindings data bindings] on the custom element.
-By default, every data binding's value is looked up in the parent [can-view-scope]
+By default, every data binding’s value is looked up in the parent [can-view-scope]
 of the custom element and added to the viewModel object.
 
 The following component:
@@ -213,7 +213,7 @@ Into:
 If you want to set the string value of the attribute on the ViewModel,
 set an attribute without any binding syntax.
 
-The following template, with the previous `"hello-world"` component:
+The following template, with the previous `hello-world` component:
 
     var template = stache("<hello-world message='Howdy'/>");
     template({})
@@ -224,9 +224,9 @@ Renders to:
 
 ### Events
 
-A component's [can-component::events events] object is used to listen to events (that are not
+A component’s [can-component::events events] object is used to listen to events (that are not
 listened to with [can-stache-bindings view bindings]). The following component
-adds "!" to the message every time `<hello-world>` is clicked:
+adds “!” to the message every time `<hello-world>` is clicked:
 
     Component.extend({
       tag: "hello-world",
@@ -241,13 +241,13 @@ adds "!" to the message every time `<hello-world>` is clicked:
 
 Components have the ability to bind to special [can-util/dom/events/inserted/inserted],
 [can-component/beforeremove] and [can-util/dom/events/removed/removed] events
-that are called when a component's tag has been inserted into,
+that are called when a component’s tag has been inserted into,
 is about to removed, or was removed from the page.
 
 ### Helpers
 
-A component's [can-component::helpers helpers] object provides [can-stache.helper stache helper] functions
-that are available within the component's template.  The following component
+A component’s [can-component::helpers helpers] object provides [can-stache.helper stache helper] functions
+that are available within the component’s template.  The following component
 only renders friendly messages:
 
     Component.extend({
@@ -275,7 +275,7 @@ Check out the following examples built with `Component`.
 
 ### Tabs
 
-The following demos a tabs widget.  Click "Add Vegetables"
+The following demos a tabs widget.  Click “Add Vegetables”
 to add a new tab.
 
 @demo demos/can-component/tabs.html
@@ -309,7 +309,7 @@ The following tree combo lets people walk through a hierarchy and select locatio
 
 @demo demos/can-component/treecombo.html
 
-The secret to this widget is the viewModel's `breadcrumb` property, which is an array
+The secret to this widget is the viewModel’s `breadcrumb` property, which is an array
 of items the user has navigated through, and `selectableItems`, which represents the children of the
 last item in the breadcrub.  These are defined on the viewModel like:
 
@@ -318,10 +318,10 @@ last item in the breadcrub.  These are defined on the viewModel like:
     selectableItems: function(){
       var breadcrumb = this.attr("breadcrumb");
 
-      // if there's an item in the breadcrumb
+      // if there’s an item in the breadcrumb
       if(breadcrumb.attr('length')){
 
-        // return the last item's children
+        // return the last item’s children
         return breadcrumb.attr(""+(breadcrumb.length-1)+'.children');
       } else{
 
@@ -330,7 +330,7 @@ last item in the breadcrub.  These are defined on the viewModel like:
       }
     }
 
-When the "+" icon is clicked next to each item, the viewModel's `showChildren` method is called, which
+When the “+” icon is clicked next to each item, the viewModel’s `showChildren` method is called, which
 adds that item to the breadcrumb like:
 
     showChildren: function(item, ev) {
@@ -353,8 +353,8 @@ This demo uses a `Paginate` [can-define/map/map] to assist with maintaining a pa
 
 The `app` component, using [can-define/map/map], creates an instance of the `Paginate` model
 and a `websitesPromise` that represents a request for the Websites
-that should be displayed.  Notice how the paginate's `count` value is tied to the
-value of the `webistesPromise`'s resolved `value`'s `count`.
+that should be displayed.  Notice how the paginate’s `count` value is tied to the
+value of the `websitesPromise`’s resolved `value`’s `count`.
 
 ```js
 var AppViewModel = DefineMap.extend({
@@ -385,7 +385,7 @@ var AppViewModel = DefineMap.extend({
 });
 ```
 
-The `app` control passes paginate, paginate's values, and websitesPromise to
+The `app` control passes paginate, paginate’s values, and websitesPromise to
 its sub-components:
 
     <app>
