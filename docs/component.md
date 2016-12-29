@@ -280,14 +280,14 @@ to add a new tab.
 
 @demo demos/can-component/tabs.html
 
-An instance of the tabs widget is created by creating `<tabs>` and `<panel>`
+An instance of the tabs widget is created by creating `<my-tabs>` and `<my-panel>`
 elements like:
 
-    <tabs>
+    <my-tabs>
       {{#each foodTypes}}
-        <panel title='title'>{{content}}</panel>
+        <my-panel title='title'>{{content}}</my-panel>
       {{/each}}
-    </tabs>
+    </my-tabs>
 
 To add another panel, all we have to do is add data to `foodTypes` like:
 
@@ -296,7 +296,7 @@ To add another panel, all we have to do is add data to `foodTypes` like:
       content: "Carrots, peas, kale"
     })
 
-The secret is that the `<panel>` element listens to when it is inserted
+The secret is that the `<my-panel>` element listens to when it is inserted
 and adds its data to the tabs' list of panels with:
 
     var vm = this.parentViewModel = canViewModel(this.element.parentNode);
@@ -385,18 +385,18 @@ var AppViewModel = DefineMap.extend({
 });
 ```
 
-The `app` control passes paginate, paginate’s values, and websitesPromise to
+The `my-app` component passes paginate, paginate’s values, and websitesPromise to
 its sub-components:
 
-    <app>
-      <grid {promise-data}='websitesPromise'>
+    <my-app>
+      <my-grid {promise-data}='websitesPromise'>
         {{#each items}}
           <tr>
             <td width='40%'>{{name}}</td>
             <td width='70%'>{{url}}</td>
           </tr>
         {{/each}}
-      </grid>
+      </my-grid>
       <next-prev {paginate}='paginate'></next-prev>
       <page-count {page}='paginate.page' {count}='paginate.pageCount'/>
-    </app>
+    </my-app>
