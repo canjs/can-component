@@ -37,7 +37,7 @@ makeTest("can-component - map - dom", document, MUT_OBS);
 makeTest("can-component - map - vdom", makeDocument(), null);
 
 var innerHTML = function(node){
-	if("innerHTML" in node) {
+	if(node && "innerHTML" in node) {
 		return node.innerHTML;
 	}
 };
@@ -47,12 +47,12 @@ var runTasks = function(tasks){
 		var next = tasks.shift();
 		next();
 		if(tasks.length) {
-			setTimeout(nextTask, 10);
+			setTimeout(nextTask, 100);
 		} else {
 			start();
 		}
 	};
-	setTimeout(nextTask, 10);
+	setTimeout(nextTask, 100);
 };
 
 function makeTest(name, doc, mutObs) {
@@ -80,7 +80,7 @@ function makeTest(name, doc, mutObs) {
 				start();
 				DOCUMENT(DOC);
 				MUTATION_OBSERVER(MUT_OBS);
-			}, 1);
+			}, 100);
 
 
 		}
@@ -503,7 +503,7 @@ function makeTest(name, doc, mutObs) {
 						setTimeout(function () {
 							equal(innerHTML(tds[0]), "Brian", "td changed to brian");
 							start();
-						}, 10);
+						}, 100);
 
 					}
 				});
