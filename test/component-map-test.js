@@ -37,7 +37,7 @@ makeTest("can-component - map - dom", document, MUT_OBS);
 makeTest("can-component - map - vdom", makeDocument(), null);
 
 var innerHTML = function(node){
-	if("innerHTML" in node) {
+	if(node && "innerHTML" in node) {
 		return node.innerHTML;
 	}
 };
