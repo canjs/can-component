@@ -58,7 +58,7 @@
     "can-event": "^3.0.1",
     "can-list": "^3.0.1",
     "can-map": "^3.0.3",
-    "can-stache": "^3.0.14",
+    "can-stache": "3.0.19",
     "can-vdom": "^3.0.0",
     "bit-docs": "0.0.7",
     "done-serve": "^0.2.5",
