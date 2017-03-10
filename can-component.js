@@ -27,6 +27,7 @@ var string = require("can-util/js/string/string");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
+var canLog = require('can-util/js/log/log');
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
@@ -86,7 +87,7 @@ var Component = Construct.extend(
 						} else {
 							if(types.isMapLike(protoViewModel)) {
 								//!steal-remove-start
-								console.warn("can-component: "+this.prototype.tag+" is sharing a single map across all component instances");
+								canLog.warn("can-component: "+this.prototype.tag+" is sharing a single map across all component instances");
 								//!steal-remove-end
 								this.viewModelInstance = protoViewModel;
 							} else {
@@ -101,7 +102,7 @@ var Component = Construct.extend(
 				// Convert the template into a renderer function.
 				if (this.prototype.template) {
 					//!steal-remove-start
-					console.warn('can-component.prototype.template: is deprecated and will be removed in a future release. Use can-component.prototype.view');
+					canLog.warn('can-component.prototype.template: is deprecated and will be removed in a future release. Use can-component.prototype.view');
 					//!steal-remove-end
 					this.renderer = this.prototype.template;
 				}
