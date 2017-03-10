@@ -29,6 +29,7 @@ var DOCUMENT = require("can-util/dom/document/document");
 var getFragment = require("can-util/dom/fragment/fragment");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
+var canLog = require("can-util/js/log/log");
 
 
 var DOC = DOCUMENT();
@@ -1747,7 +1748,7 @@ if(System.env !== 'canjs-test') {
 					var panels = this.attr("panels");
 					canBatch.start();
 					var index = panels.indexOf(panel);
-					console.log(index);
+					canLog.log(index);
 					panels.splice(index, 1);
 					if (panel === this.attr("active")) {
 						if (panels.length) {
@@ -1801,7 +1802,7 @@ if(System.env !== 'canjs-test') {
 					},
 
 					" beforeremove": function () {
-						console.log("I AM BEING REMOVED");
+						canLog.log("I AM BEING REMOVED");
 						canViewModel(this.element.parentNode)
 							.removePanel(this.viewModel);
 					}
@@ -1857,7 +1858,7 @@ if(System.env !== 'canjs-test') {
 
 					equal(testArea.getElementsByTagName("panel")
 						.length, 4, "panel added");
-					console.log("SHIFTY");
+					canLog.log("SHIFTY");
 					foodTypes.shift();
 				},
 				function(){
