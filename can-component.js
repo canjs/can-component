@@ -328,10 +328,6 @@ var Component = Construct.extend(
 		}
 	});
 
-// This was moved from the legacy view/scanner.js to here in prep for 3.0.0
-viewCallbacks.tag("content", function(el, tagData) {
-	return tagData.scope;
-});
 
 
 module.exports = namespace.Component = Component;
