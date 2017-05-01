@@ -309,7 +309,7 @@ var Component = Construct.extend(
 						// Restore the content tag so it could potentially be used again (as in lists)
 						options.tags.super = superHookup;
 					}
-				}
+				};
 
 				// We need be alerted to when a <content> element is rendered so we can put the original contents of the widget in its place
 				options.tags.content = function contentHookup(el, contentTagData) {
