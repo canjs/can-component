@@ -24,6 +24,7 @@ var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
 var types = require("can-types");
 var string = require("can-util/js/string/string");
+var deepAssign = require("can-util/js/deep-assign/deep-assign");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
@@ -44,6 +45,12 @@ var Component = Construct.extend(
 	 */
 
 	{
+		extend: function(componentProperties) {
+			componentProperties.events = deepAssign({}, this.prototype.events, componentProperties.events);
+			this.prototype.parentRenderer = this.prototype.view || this.prototype.template;
+
+			return Construct.extend.apply(this, arguments);
+		},
 		// ### setup
 		//
 		// When a component is extended, this sets up the component's internal constructor
@@ -253,12 +260,63 @@ var Component = Construct.extend(
 					options.tags = {};
 				}
 
+				options.parentRenderer = this.parentRenderer;
+				options.parentViewModel = this.viewModel;
+				options.parentTag = this.parentTag;
+
+				options.tags.super = function superHookup(el, superTagData) {
+					var superTemplate = options.parentRenderer || superTagData.subtemplate,
+						renderingLightContent = superTemplate === options.parentRenderer;
+
+					if (superTemplate) {
+						// `superTagData.options` is a viewModel of helpers where `<super>` was found, so
+						// the right helpers should already be available.
+						// However, `_tags.super` is going to point to this current super callback.  We need to
+						// remove that so it will walk up the chain
+
+						delete options.tags.super;
+
+						// By default, light dom scoping is
+						// dynamic. This means that any `{{foo}}`
+						// bindings inside the "light dom" content of
+						// the component will have access to the
+						// internal viewModel. This can be overridden to be
+						// lexical with the leakScope option.
+						var lightTemplateData;
+						if (renderingLightContent) {
+							lightTemplateData = {
+								scope: superTagData.scope.cloneFromRef(),
+								options: superTagData.options
+							};
+
+						} else {
+							// we are rendering default content so this content should
+							// use the same scope as the <super> tag was found within.
+							lightTemplateData = superTagData;
+						}
+
+						if (renderingLightContent) {
+							options.superTagSubtemplate = superTagData.subtemplate;
+						}
+
+						if (superTagData.parentNodeList) {
+							var frag = superTemplate(lightTemplateData.scope, lightTemplateData.options, superTagData.parentNodeList);
+							nodeLists.replace([el], frag);
+						} else {
+							nodeLists.replace([el], superTemplate(lightTemplateData.scope, lightTemplateData.options));
+						}
+
+						// Restore the content tag so it could potentially be used again (as in lists)
+						options.tags.super = superHookup;
+					}
+				}
+
 				// We need be alerted to when a <content> element is rendered so we can put the original contents of the widget in its place
 				options.tags.content = function contentHookup(el, contentTagData) {
 					// First check if there was content within the custom tag
 					// otherwise, render what was within <content>, the default code.
 					// `componentTagData.subtemplate` is the content inside this component
-					var subtemplate = componentTagData.subtemplate || contentTagData.subtemplate,
+					var subtemplate = componentTagData.subtemplate || contentTagData.subtemplate || options.superTagSubtemplate,
 						renderingLightContent = subtemplate === componentTagData.subtemplate;
 
 					if (subtemplate) {
@@ -268,6 +326,7 @@ var Component = Construct.extend(
 						// However, `_tags.content` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
 
+						delete options.superTagSubtemplate;
 						delete options.tags.content;
 
 						// By default, light dom scoping is
