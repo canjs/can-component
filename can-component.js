@@ -24,7 +24,6 @@ var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
 var types = require("can-types");
 var string = require("can-util/js/string/string");
-var deepAssign = require("can-util/js/deep-assign/deep-assign");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
