@@ -34,6 +34,16 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
+// This was moved from the legacy view/scanner.js and can-stache to here.
+// This makes sure content and super elements will be able to have a callback.
+viewCallbacks.tag("content", function(el, tagData) {
+	return tagData.scope;
+});
+
+viewCallbacks.tag("super", function(el, tagData) {
+	return tagData.scope;
+});
+
 /**
  * @add Component
  */
@@ -46,8 +56,8 @@ var Component = Construct.extend(
 
 	{
 		extend: function(componentProperties) {
-			componentProperties.events = deepAssign({}, this.prototype.events, componentProperties.events);
 			this.prototype.parentRenderer = this.prototype.view || this.prototype.template;
+			this.ParentControl = this.Control;
 
 			return Construct.extend.apply(this, arguments);
 		},
@@ -64,7 +74,7 @@ var Component = Construct.extend(
 				var self = this;
 
 				// Define a control using the `events` prototype property.
-				this.Control = ComponentControl.extend(this.prototype.events);
+				this.Control = (this.ParentControl || ComponentControl).extend(this.prototype.events);
 
 				// Look at viewModel, scope, and ViewModel properties and set one of:
 				//  - this.viewModelHandler

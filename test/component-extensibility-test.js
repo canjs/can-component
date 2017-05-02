@@ -62,9 +62,9 @@ QUnit.test("Extended component should listen to events it inherits", function() 
     }
   });
 
-  QUnit.ok(ExtendedComponent.prototype.events["{viewModel} name"], "{viewModel} name inherited");
-  QUnit.equal(ExtendedComponent.prototype.events[" beforeremoved"], baseOnRemove, "before remove event inherited");
-  QUnit.notEqual(ExtendedComponent.prototype.events[" inserted"], baseOnInsert, "inserted event overwritten");
+  QUnit.ok(ExtendedComponent.Control.prototype["{viewModel} name"], "{viewModel} name inherited");
+  QUnit.equal(ExtendedComponent.Control.prototype[" beforeremoved"], baseOnRemove, "before remove event inherited");
+  QUnit.notEqual(ExtendedComponent.Control.prototype[" inserted"], baseOnInsert, "inserted event overwritten");
 });
 
 QUnit.test("Extended component should have access to parent helpers", function() {
