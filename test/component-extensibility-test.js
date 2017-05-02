@@ -10,7 +10,7 @@ QUnit.module("can-components - extensibility");
 QUnit.test("Component renders parent template if one isn't provided", function() {
   var BaseComponent = Component.extend({
     tag: "base-component",
-    template: stache("Hello")
+    view: stache("Hello")
   });
 
   var ExtendedComponent = BaseComponent.extend({
@@ -25,12 +25,12 @@ QUnit.test("Component renders parent template if one isn't provided", function()
 QUnit.test("Component and inherited component each render unique template", function() {
   var BaseComponent = Component.extend({
     tag: "base-component",
-    template: stache("Hello")
+    view: stache("Hello")
   });
 
   var ExtendedComponent = BaseComponent.extend({
     tag: "extended-component",
-    template: stache ("Hi there")
+    view: stache ("Hi there")
   });
 
   var extendedFrag = stache("<extended-component />")({});
@@ -45,7 +45,7 @@ QUnit.test("Extended component should listen to events it inherits", function() 
   var baseOnRemove = function onRemove() { }
   var BaseComponent = Component.extend({
     tag: "base-component",
-    template: stache("{{name}}"),
+    view: stache("{{name}}"),
     events: {
       " inserted": baseOnInsert,
       " beforeremoved": baseOnRemove,
@@ -79,7 +79,7 @@ QUnit.test("Extended component should have access to parent helpers", function()
 
   var ExtendedComponent = BaseComponent.extend({
     tag: "extended-component",
-    template: stache("<h1>{{prependText('Dean', 'Mr.'')}}</h1>")
+    view: stache("<h1>{{prependText('Dean', 'Mr.'')}}</h1>")
   });
 
   var frag = stache("<extended-component />")({});
@@ -105,12 +105,12 @@ QUnit.test("Self closed super tag works", function() {
   var NameComponent = Component.extend({
     tag: "name-component",
     ViewModel: ViewModel,
-    template: stache("{{fullName}}")
+    view: stache("{{fullName}}")
   })
 
   var WelcomeComponent = NameComponent.extend({
     tag: "welcome-component",
-    template: stache("Welcome to Bitovi <super />!")
+    view: stache("Welcome to Bitovi <super />!")
   });
 
   var frag = stache("<welcome-component {first-name}='firstName' {last-name}='lastName' />")({
@@ -130,12 +130,12 @@ QUnit.test("Self closed super tag works", function() {
 QUnit.test("<super> tag with inner HTML render in parent component's <content> tag", function() {
   var FormComponent = Component.extend({
     tag: "form-component",
-    template: stache("<form><content/></form>")
+    view: stache("<form><content/></form>")
   });
 
   var ExampleFormComponent = FormComponent.extend({
     tag: "example-form-component",
-    template: stache("<super><input {($value)}=\"val\">{{val}}</super>")
+    view: stache("<super><input {($value)}=\"val\">{{val}}</super>")
   });
 
   var frag = stache("<example-form-component {val}=\"value\" />")({
@@ -149,17 +149,17 @@ QUnit.test("<super> tag with inner HTML render in parent component's <content> t
 /*QUnit.test("Components that are extended more than once will render all content", function() {
   var FooComponent = Component.extend({
     tag: "foo-component",
-    template: stache("Foo")
+    view: stache("Foo")
   });
 
   var BarComponent = FooComponent.extend({
     tag: "bar-component",
-    template: stache("<super /> Bar")
+    view: stache("<super /> Bar")
   });
 
   var BazComponent = BarComponent.extend({
     tag: "baz-component",
-    template: stache("<super /> Baz")
+    view: stache("<super /> Baz")
   });
 
   var frag = stache("<bar-component />")({});
