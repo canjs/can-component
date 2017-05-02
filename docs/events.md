@@ -59,12 +59,12 @@ Components have the ability to bind to special inserted and removed events that 
         }
       }
 
-## High performance template rendering
+## High performance view rendering
 
-While [can-stache-bindings] conveniently allows you to call a [can-component::ViewModel] method from a template like:
+While [can-stache-bindings] conveniently allows you to call a [can-component::ViewModel] method from a view like:
 
     <input ($change)="doSomething()"/>
 
 This has the effect of binding an event handler directly to this element. Every element that has a `($click)` or similar attribute has an event handler bound to it. For a large grid or list, this could have a performance penalty.
 
-By contrast, events bound using [can-component]’s events object use event delegation, which is useful for high performance template rendering. In a large grid or list, event delegation only binds a single event handler rather than one per row.
+By contrast, events bound using [can-component]’s events object use event delegation, which is useful for high performance view rendering. In a large grid or list, event delegation only binds a single event handler rather than one per row.

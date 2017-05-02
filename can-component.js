@@ -2,7 +2,7 @@
 // # can/component/component.js
 //
 // This implements the `Component` which allows you to create widgets
-// that use a template, a view-model and custom tags.
+// that use a view, a view-model, and custom tags.
 //
 // `Component` implements most of it's functionality in the `Component.setup`
 // and the `Component.prototype.setup` functions.
@@ -47,7 +47,7 @@ var Component = Construct.extend(
 		// ### setup
 		//
 		// When a component is extended, this sets up the component's internal constructor
-		// functions and templates for later fast initialization.
+		// functions and views for later fast initialization.
 		setup: function() {
 			Construct.setup.apply(this, arguments);
 
@@ -123,10 +123,10 @@ var Component = Construct.extend(
 		 * @prototype
 		 */
 		// ### setup
-		// When a new component instance is created, setup bindings, render the template, etc.
+		// When a new component instance is created, setup bindings, render the view, etc.
 		setup: function(el, componentTagData) {
 			var component = this;
-			// If a template is not provided, we fall back to
+			// If a view is not provided, we fall back to
 			// dynamic scoping regardless of settings.
 			var lexicalContent = (
 					(typeof this.leakScope === "undefined" ? true : !this.leakScope) &&
@@ -186,16 +186,16 @@ var Component = Construct.extend(
 			domData.set.call(el, "preventDataBindings", true);
 
 			// Create a real Scope object out of the viewModel property
-			// The scope used to render the component's template.
-			// However, if there is no template, the "light" dom is rendered with this anyway.
+			// The scope used to render the component's view.
+			// However, if there is no view, the "light" dom is rendered with this anyway.
 			var shadowScope;
 			if (lexicalContent) {
 				shadowScope = Scope.refsScope().add(this.viewModel, {
 					viewModel: true
 				});
 			} else {
-				// if this component has a template,
-				// render the template with it's own Refs scope
+				// if this component has a view,
+				// render the view with it's own Refs scope
 				// otherwise, just add this component's viewModel.
 				shadowScope = (this.constructor.renderer ?
 						componentTagData.scope.add(new Scope.Refs()) :
@@ -246,7 +246,7 @@ var Component = Construct.extend(
 				nodeLists.unregister(nodeList);
 			});
 
-			// If this component has a template (that we've already converted to a renderer)
+			// If this component has a view (that we've already converted to a renderer)
 			if (this.constructor.renderer) {
 				// If `options.tags` doesn't exist set it to an empty object.
 				if (!options.tags) {
@@ -311,7 +311,7 @@ var Component = Construct.extend(
 						options.tags.content = contentHookup;
 					}
 				};
-				// Render the component's template
+				// Render the component's view
 				frag = this.constructor.renderer(shadowScope, componentTagData.options.add(options), nodeList);
 			} else {
 				// Otherwise render the contents between the element
