@@ -20,14 +20,14 @@ Custom elements for CanJS.
 
 
 ## <code>__can-component__ </code>
-Create widgets that use a template, a view-model  and custom tags.
+Create widgets that use a view, a view-model, and custom tags.
 
 
 
 ### <code>< TAG BINDINGS... ></code>
 
 
-  Create an instance of a component on a particular tag in a [can-stache] template.
+  Create an instance of a component on a particular tag in a [can-stache] view.
   In 2.3, use the [can-stache-bindings bindings] syntaxes to set up bindings.
 
   
@@ -38,7 +38,7 @@ Create widgets that use a template, a view-model  and custom tags.
   
 1. __BINDINGS__ <code>{can-stache-bindings}</code>:
   Use the following binding syntaxes
-  to connect the component’s [viewModel](#viewmodel-objectcan-mapfunctionattrs-parentscope-tag-bindings--element) to the template’s [can-view-scope scope]:
+  to connect the component’s [viewModel](#viewmodel-objectcan-mapfunctionattrs-parentscope-tag-bindings--element) to the view’s [can-view-scope scope]:
   
    - [can-stache-bindings.toChild]=[can-stache.key] — one-way binding to child
    - [can-stache-bindings.toParent]=[can-stache.key] — one-way binding to parent
@@ -80,11 +80,11 @@ tag with [can-view-callbacks.tag tag].
 
 
 
-#### template `{can-stache.renderer|String}`
+#### view `{can-stache.renderer|String}`
 
 
-Provides a template to render directly within the component’s tag. The template is rendered with the
-component’s [viewModel](#viewmodel-objectcan-mapfunctionattrs-parentscope-tag-bindings--element).  `<content>` elements within the template are replaced by
+Provides a view to render directly within the component’s tag. The view is rendered with the
+component’s [viewModel](#viewmodel-objectcan-mapfunctionattrs-parentscope-tag-bindings--element).  `<content>` elements within the view are replaced by
 the source elements within the component’s tag.
 
 
@@ -94,17 +94,17 @@ A [can-stache.renderer] returned by [can-stache]. For example:
 
     Component({
       tag: "my-tabs",
-      template: stache("<ul>{{#panels}}<li>{{title}}</li> ...")
+      view: stache("<ul>{{#panels}}<li>{{title}}</li> ...")
     })
 
 
 
 ##### <code>String</code>
-The string contents of a [can-stache] template.  For example:
+The string contents of a [can-stache] view.  For example:
 
     Component({
       tag: "my-tabs",
-      template: "<ul>{{#panels}}<li>{{title}}</li> ..."
+      view: "<ul>{{#panels}}<li>{{title}}</li> ..."
     })
 
 Note: Using mustache is deprecated.  Please switch to [can-stache].
@@ -114,7 +114,7 @@ Note: Using mustache is deprecated.  Please switch to [can-stache].
 
  
 Provides or describes a [can-map] constructor function or `Map` instance that will be
-used to retrieve values found in the component’s [template](#template-can-stacherendererstring). The map
+used to retrieve values found in the component’s [view](#template-can-stacherendererstring). The map
 instance is initialized with values specified by the component element’s attributes.
 
 __Note:__ This page documents behavior of components in [can-stache]. [can-mustache] behaves
@@ -144,7 +144,7 @@ A plain JavaScript object that is used to define the prototype methods and prope
 
 ##### <code>can-map</code>
 A `Map` constructor function will be used to create an instance of the observable
-`Map` placed at the head of the template’s viewModel.  For example:
+`Map` placed at the head of the view’s viewModel.  For example:
 
     var Paginate = Map.extend({
       offset: 0,
@@ -167,7 +167,7 @@ to the viewModel.
 
 1. __attrs__ <code>{Object}</code>:
   An object of values specified by the custom element’s attributes. For example,
-  a template rendered like:
+  a view rendered like:
   
       stache("<my-element title='name'></my-element>")({
         name: "Justin"
@@ -216,8 +216,8 @@ to the viewModel.
 - __returns__ <code>{can-map|Object}</code>:
   Specifies one of the following:
   
-   - The data used to render the component’s template.
-   - The prototype of a `Map` that will be used to render the component’s template.
+   - The data used to render the component’s view.
+   - The prototype of a `Map` that will be used to render the component’s view.
    
 #### events `{Object\<can-control.eventDescription,can-control.eventHandler\>}`
 
@@ -251,7 +251,7 @@ element. The component’s viewModel is available within event handlers as `this
 #### helpers `{Object\<String,can-stache.helper\>}`
 
 
-Helper functions used with the component’s template.
+Helper functions used with the component’s view.
 
 
 
@@ -259,12 +259,12 @@ Helper functions used with the component’s template.
 
 
 An object of [can-stache] helper names and methods. The helpers are only
-available within the component’s template and source html. Helpers
+available within the component’s view and source html. Helpers
 are always called back with `this` as the [viewModel](#viewmodel-objectcan-mapfunctionattrs-parentscope-tag-bindings--element).
 
 #### leakScope `{Boolean}`
 
-Allow reading the outer scope values from a component’s template and a component’s viewModel values in the user content.
+Allow reading the outer scope values from a component’s view and a component’s viewModel values in the user content.
 
 
 
@@ -272,12 +272,12 @@ Allow reading the outer scope values from a component’s template and a compone
 ##### <code>Boolean</code>
 `false` limits reading to:
  
-- the component’s viewModel from the component’s template, and
+- the component’s viewModel from the component’s view, and
 - the outer scope values from the user content.
 
 `true` adds the ability to read:
 
-- the outer [can-view-scope scope] values from the component’s template, and
+- the outer [can-view-scope scope] values from the component’s view, and
 - the component’s [viewModel](#viewmodel-objectcan-mapfunctionattrs-parentscope-tag-bindings--element) values from the user content.
  
 The default value is `true`.  This may reverse in 3.0.

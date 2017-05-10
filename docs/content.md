@@ -5,7 +5,7 @@ Positions the `LIGHT_DOM` within a component’s [can-component.prototype.view].
 
 @signature `<content>DEFAULT_CONTENT</content>`
 
-When a user creates a new component in a template, the content between the tags is the
+When a user creates a new component in a view, the content between the tags is the
 `LIGHT_DOM`.  For example, `Hello <b>World</b>` is the `LIGHT_DOM` in the following:
 
 ```

@@ -29,7 +29,7 @@ QUnit.test('Works with can-define', function () {
 	Component.extend({
 		tag: 'can-define-component',
 		ViewModel: VM,
-		template: stache('Name: {{fullName}}')
+		view: stache('Name: {{fullName}}')
 	});
 
 	var frag = stache('<can-define-component {first-name}="firstName" {last-name}="lastName" />')({
@@ -73,7 +73,7 @@ QUnit.test('33 - works when instantiated with an object for ViewModel', function
 	
 	Component.extend({
 		tag: "test-element",
-		template: stache("{{someMethod}}"),
+		view: stache("{{someMethod}}"),
 		ViewModel: {
 			someMethod: function() {
 				ok(true, "Function got called");
@@ -83,7 +83,7 @@ QUnit.test('33 - works when instantiated with an object for ViewModel', function
 		
 	});
 	
-	var template = stache("<test-element>");
-	template();
+	var renderer = stache("<test-element>");
+	renderer();
 
 });

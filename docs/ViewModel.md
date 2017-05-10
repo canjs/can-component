@@ -4,7 +4,7 @@
 @description
 
 Provides or describes a constructor function that provides values and methods
-to the component’s [can-component::view template]. The constructor function
+to the component’s [can-component::view view]. The constructor function
 is initialized with values specified by the component element’s [can-stache-bindings data bindings].
 
 @option {function} A constructor function usually defined by [can-define/map/map.extend DefineMap.extend] or
@@ -48,7 +48,7 @@ added to the top of the [can-view-scope] the component’s [can-component::view]
 
 [can-component]’s ViewModel property is used to create an __object__, typically an instance
 of a [can-define/map/map], that will be used to render the component’s
-template. This is most easily understood with an example.  The following
+view. This is most easily understood with an example.  The following
 component shows the current page number based off a `limit` and `offset` value:
 
 ```js
@@ -69,8 +69,8 @@ Component.extend({
 
 If this component HTML was inserted into the page like:
 ```js
-var template = stache("<my-paginate/>");
-var frag = template();
+var renderer = stache("<my-paginate/>");
+var frag = renderer();
 document.body.appendChild(frag);
 ```
 It would result in:
@@ -87,7 +87,7 @@ The [can-define.types.value] property definition makes offset default to 0 and l
 Next, the values are passed into `viewModel` from the [can-stache-bindings data bindings] within `<my-paginate>`
 (in this case there is none).
 
-And finally, that data is used to render the component’s template and inserted into the element using [can-view-scope] and [can-stache]:
+And finally, that data is used to render the component’s view and inserted into the element using [can-view-scope] and [can-stache]:
 ```js
 var newViewModel = new Scope(viewModel),
 	result = stache("Page {{page}}.")(newViewModel);
@@ -145,11 +145,11 @@ Component.extend({
 ```
 If `<my-paginate>` is used like:
 ```js
-var template = stache("<my-paginate {offset}='index' {limit}='size' />");
+var renderer = stache("<my-paginate {offset}='index' {limit}='size' />");
 
 var pageInfo = new DefineMap({index: 0, size: 20});
 
-document.body.appendChild(template(pageInfo));
+document.body.appendChild(renderer(pageInfo));
 ```
 ... `pageInfo`’s index and size are set as the component’s offset and
 limit attributes. If we were to change the value of `pageInfo`’s
@@ -157,7 +157,7 @@ index like:
 ```js
 pageInfo.index = 20;
 ```
-... the component’s offset value will change and its template will update to:
+... the component’s offset value will change and its view will update to:
 
     <my-paginate>Page 2</my-paginate>
 
@@ -189,10 +189,10 @@ out.addEventListener("click", function(ev){
 });
 ```
 
-## Calling methods on ViewModel from events within the template
+## Calling methods on ViewModel from events within the view
 
 Using html attributes like `can-EVENT-METHOD`, you can directly call a ViewModel method
-from a template. For example, we can make `<my-paginate>` elements include a next
+from a view. For example, we can make `<my-paginate>` elements include a next
 button that calls the ViewModel’s `next` method like:
 
 ```js
