@@ -14,24 +14,27 @@ var innerHTML = function(node){
 
 QUnit.module("can-components - can-slots");
 
-    test("<can-slot> (#4)", function(){
+    test("<can-slot> (#4)", function() {
     //can-slots should render s"cope items, or default elements if not provided
     // can-slot attribute "name" matches to the key in the tempalates object and
     // renders that sub-template. If no match, or no default content, it renders
     // nothing
 
     var ViewModel = DefineMap.extend({
-        subject: "Hello World",
-        body: "Later Gator"
+        subject: {
+            value:"Hello World"
+        },
+        body: {
+            value: "Later Gator"
+        }
     });
 
     Component.extend({
         tag : 'my-email',
         view : stache(
-            '<div>' + '{{log}}' +
-                // '{{#each emails}}' +
-                    '<can-slot name="subject" scope=".">{{emails[0].subject}}</can-slot>' +
-                // '{{/each}}' +
+            '<div>' +
+                '<can-slot name="subject" scope=".">{{subject}}</can-slot>' +
+                '<can-slot name="body" scope=".">{{body}}</can-slot>' +
             '</div>'),
         ViewModel,
         leakScope: true
@@ -40,7 +43,7 @@ QUnit.module("can-components - can-slots");
     var template = stache(
         '<my-email>' +
             '<can-template name="subject">' +
-                    '<h2>Default Subject {{subject}}<h2>' +
+                    '<h2>Default Subject {{subject}}</h2>' +
             '</can-template>' +
         '</my-email>');
 
@@ -48,9 +51,9 @@ QUnit.module("can-components - can-slots");
 
     var frag = template();
     var slot = frag.firstChild;
+    debugger
 
     equal(innerHTML(slot).trim(), "Hello World");
-    debugger
 
     // canBatch.start();
     // canViewModel(frag.firstChild).attr('emails').each(function(email, index) {

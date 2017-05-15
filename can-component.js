@@ -143,6 +143,10 @@ var Component = Construct.extend(
 			var setupBindings = !domData.get.call(el, "preventDataBindings");
 			var viewModel, frag;
 
+			// Capture any can-slot templates
+			// TODO: setup scope for can-slots
+			var templates = componentTagData.templates;
+
 			// ## Scope
 			var teardownBindings;
 			if (setupBindings) {
@@ -184,6 +188,7 @@ var Component = Construct.extend(
 
 			domData.set.call(el, "viewModel", viewModel);
 			domData.set.call(el, "preventDataBindings", true);
+
 
 			// Create a real Scope object out of the viewModel property
 			// The scope used to render the component's template.
@@ -246,6 +251,15 @@ var Component = Construct.extend(
 				nodeLists.unregister(nodeList);
 			});
 
+			if (templates) { //Can-slots - emulate <content> code below
+				// TODO: check here for scope,
+				// Match name attr to slot name to render template with parent scope
+				// Else we need to render default content
+				var slot = this.constructor.renderer(shadowScope, componentTagData.options.add(options), nodeList);
+				var defaultSubject = templates.subject();
+				debugger;
+			}
+
 			// If this component has a template (that we've already converted to a renderer)
 			if (this.constructor.renderer) {
 				// If `options.tags` doesn't exist set it to an empty object.
@@ -260,6 +274,7 @@ var Component = Construct.extend(
 					// `componentTagData.subtemplate` is the content inside this component
 					var subtemplate = componentTagData.subtemplate || contentTagData.subtemplate,
 						renderingLightContent = subtemplate === componentTagData.subtemplate;
+
 
 					if (subtemplate) {
 
