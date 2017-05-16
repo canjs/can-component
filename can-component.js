@@ -189,7 +189,6 @@ var Component = Construct.extend(
 			domData.set.call(el, "viewModel", viewModel);
 			domData.set.call(el, "preventDataBindings", true);
 
-
 			// Create a real Scope object out of the viewModel property
 			// The scope used to render the component's template.
 			// However, if there is no template, the "light" dom is rendered with this anyway.
@@ -255,9 +254,8 @@ var Component = Construct.extend(
 				// TODO: check here for scope,
 				// Match name attr to slot name to render template with parent scope
 				// Else we need to render default content
-				var slot = this.constructor.renderer(shadowScope, componentTagData.options.add(options), nodeList);
-				var defaultSubject = templates.subject();
-				debugger;
+				// var slot = this.constructor.renderer(shadowScope, componentTagData.options.add(options), nodeList);
+				// var defaultSubject = templates.subject();
 			}
 
 			// If this component has a template (that we've already converted to a renderer)
