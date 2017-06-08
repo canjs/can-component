@@ -252,7 +252,7 @@ var Component = Construct.extend(
 			});
 
 			// Returns a hookupFuction that gets the proper template, renders it, and adds it to nodeLists
-			makeHookup = function(tagName, getPrimaryTemplate) {
+			var makeHookup = function(tagName, getPrimaryTemplate) {
 				return function hookupFunction(el, contentTagData) {
 					var subtemplate = getPrimaryTemplate(el) || contentTagData.subtemplate,
 						renderingLightContent = subtemplate === componentTagData.subtemplate;
@@ -303,8 +303,8 @@ var Component = Construct.extend(
 						// Restore the proper tag function so it could potentially be used again (as in lists)
 						options.tags[tagName] = hookupFunction;
 					}
-				}
-			}
+				};
+			};
 
 			// If this component has a view (that we've already converted to a renderer)
 			if (this.constructor.renderer) {
@@ -317,7 +317,7 @@ var Component = Construct.extend(
 					// TODO: check for passed scope
 
 					options.tags['can-slot'] = makeHookup('can-slot', function(el) {
-						return componentTagData.templates[el.getAttribute("name")]
+						return componentTagData.templates[el.getAttribute("name")];
 					});
 				}
 				else {
