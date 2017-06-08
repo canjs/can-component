@@ -315,7 +315,7 @@ var Component = Construct.extend(
 				}
 
 				if (!isEmptyObject(templates)) {
-					// TODO: check here for scope
+					// TODO: check for passed scope
 
 					options.tags['can-slot'] = makeHookup('can-slot', function(el) {
 						return componentTagData.templates[el.getAttribute("name")]

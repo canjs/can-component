@@ -51,7 +51,6 @@ test("<can-slot> Works", function() {
 	);
 
 	var testView = renderer();
-	debugger;
 	
 	equal(testView.firstChild.childNodes[0].textContent, 'Hello World');
 	equal(testView.firstChild.childNodes[1].textContent, 'Later Gator');
