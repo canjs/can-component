@@ -681,12 +681,13 @@ function makeTest(name, doc, mutObs) {
 				}
 			}
 		});
-		var template = stache("<my-app>" +
-			'{{^visible}}<button can-click="show">show</button>{{/visible}}' +
-			'<my-toggler {(visible)}="visible">' +
-			'content' +
-			'<button can-click="hide">hide</button>' +
-			'</my-toggler>' +
+		var template = stache(
+			"<my-app>" +
+				'{{^visible}}<button can-click="show">show</button>{{/visible}}' +
+				'<my-toggler {(visible)}="visible">' +
+					'content' +
+					'<button can-click="hide">hide</button>' +
+				'</my-toggler>' +
 			'</my-app>');
 
 		var frag = template({});
@@ -1600,12 +1601,13 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag : 'list-items',
-			template : stache("<ul>"+
-				"{{#items}}"+
-					"{{#if render}}"+
-						"<li><content /></li>"+
-					"{{/if}}"+
-					"{{/items}}"+
+			template : stache(
+				"<ul>" +
+					"{{#items}}" +
+						"{{#if render}}" +
+							"<li><content /></li>" +
+						"{{/if}}" +
+					"{{/items}}" +
 				"</ul>"),
 			viewModel: mapInstance,
 			leakScope: true

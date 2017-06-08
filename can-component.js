@@ -27,6 +27,7 @@ var string = require("can-util/js/string/string");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
+var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
 var canLog = require('can-util/js/log/log');
 
 require('can-util/dom/events/inserted/inserted');
@@ -251,17 +252,17 @@ var Component = Construct.extend(
 			});
 
 			makeHookup = function(tagName, getPrimaryTemplate) {
-				return function(el, contentTagData) {
-					debugger;
+				return function hookupFunction(el, contentTagData) {
 					var subtemplate = getPrimaryTemplate(el) || contentTagData.subtemplate,
 						renderingLightContent = subtemplate === componentTagData.subtemplate;
 
 					if (subtemplate) {
+
 						// `contentTagData.options` is a viewModel of helpers where `<content>` was found, so
 						// the right helpers should already be available.
 						// However, `_tags.content` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
-						delete options.tags[tagName];
+						delete options.tags.content;
 
 						// By default, light dom scoping is
 						// dynamic. This means that any `{{foo}}`
@@ -287,8 +288,7 @@ var Component = Construct.extend(
 								};
 							}
 
-						}
-						else {
+						} else {
 							// we are rendering default content so this content should
 							// use the same scope as the <content> tag was found within.
 							lightTemplateData = contentTagData;
@@ -302,7 +302,7 @@ var Component = Construct.extend(
 						}
 
 						// Restore the content tag so it could potentially be used again (as in lists)
-						options.tags[tagName] = makeHookup;
+						options.tags.content = hookupFunction; makeHookup();
 					}
 				}
 			}
@@ -314,91 +314,18 @@ var Component = Construct.extend(
 					options.tags = {};
 				}
 
-				if (templates) { //Can-slots - emulate <content> code below
-					// TODO: check here for scope,
-					// Match name attr to slot name to render template with parent scope
-					// Else we need to render default content
+				// if (!isEmptyObject(templates)) {
+					// TODO: check here for scope
 
-					// options.tags['can-slot'] = function slotsHookup(el) {
-					// 	var slot = el;
-					// 	canEach(componentTagData.templates, function(template, name) {
-					// 		if (name === this.attributes.name.value) {
-					// 			debugger;
-					// 			// Replace the slot with the template including scope
-					// 			nodeLists.replace([slot], template(componentTagData.scope, componentTagData.options));
-					// 		}
-					// 	}, slot);
-					// }
+				options.tags['can-slot'] = makeHookup('can-slot', function(el) {
+					return componentTagData.templates[el.getAttribute("name")]
+				});
+				// }
+				
+				options.tags.content = makeHookup('content', function() {
+					return componentTagData.subtemplate;
+				});
 
-					options.tags['can-slot'] = makeHookup('can-slot', function(el) {
-						return componentTagData.templates[el.getAttribute("name")]
-					});
-
-				}
-
-				// options.tags.content = makeHookup('content', function() {
-				// 	debugger;
-				// 	return componentTagData.subtemplate;
-				// });
-
-				// We need be alerted to when a <content> element is rendered so we can put the original contents of the widget in its place
-				// options.tags.content = function contentHookup(el, contentTagData) {
-				// 	// First check if there was content within the custom tag
-				// 	// otherwise, render what was within <content>, the default code.
-				// 	// `componentTagData.subtemplate` is the content inside this component
-				// 	var subtemplate = componentTagData.subtemplate || contentTagData.subtemplate,
-				// 		renderingLightContent = subtemplate === componentTagData.subtemplate;
-
-				// 	if (subtemplate) {
-
-				// 		// `contentTagData.options` is a viewModel of helpers where `<content>` was found, so
-				// 		// the right helpers should already be available.
-				// 		// However, `_tags.content` is going to point to this current content callback.  We need to
-				// 		// remove that so it will walk up the chain
-
-				// 		delete options.tags.content;
-
-				// 		// By default, light dom scoping is
-				// 		// dynamic. This means that any `{{foo}}`
-				// 		// bindings inside the "light dom" content of
-				// 		// the component will have access to the
-				// 		// internal viewModel. This can be overridden to be
-				// 		// lexical with the leakScope option.
-				// 		var lightTemplateData;
-				// 		if (renderingLightContent) {
-				// 			if (lexicalContent) {
-				// 				// render with the same scope the component was found within.
-				// 				lightTemplateData = componentTagData;
-				// 			} else {
-				// 				// render with the component's viewModel mixed in, however
-				// 				// we still want the outer refs to be used, NOT the component's refs
-				// 				// <component> {{some value }} </component>
-				// 				// To fix this, we
-				// 				// walk down the scope to the component's ref, clone scopes from that point up
-				// 				// use that as the new scope.
-				// 				lightTemplateData = {
-				// 					scope: contentTagData.scope.cloneFromRef(),
-				// 					options: contentTagData.options
-				// 				};
-				// 			}
-
-				// 		} else {
-				// 			// we are rendering default content so this content should
-				// 			// use the same scope as the <content> tag was found within.
-				// 			lightTemplateData = contentTagData;
-				// 		}
-
-				// 		if (contentTagData.parentNodeList) {
-				// 			var frag = subtemplate(lightTemplateData.scope, lightTemplateData.options, contentTagData.parentNodeList);
-				// 			nodeLists.replace([el], frag);
-				// 		} else {
-				// 			nodeLists.replace([el], subtemplate(lightTemplateData.scope, lightTemplateData.options));
-				// 		}
-
-				// 		// Restore the content tag so it could potentially be used again (as in lists)
-				// 		options.tags.content = contentHookup;
-				// 	}
-				// };
 				// Render the component's template
 				frag = this.constructor.renderer(shadowScope, componentTagData.options.add(options), nodeList);
 			} else {
@@ -414,7 +341,5 @@ var Component = Construct.extend(
 			nodeLists.update(nodeList, getChildNodes(el));
 		}
 	});
-
-
 
 module.exports = namespace.Component = Component;
