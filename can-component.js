@@ -2,7 +2,7 @@
 // # can/component/component.js
 //
 // This implements the `Component` which allows you to create widgets
-// that use a template, a view-model and custom tags.
+// that use a view, a view-model, and custom tags.
 //
 // `Component` implements most of it's functionality in the `Component.setup`
 // and the `Component.prototype.setup` functions.
@@ -48,7 +48,7 @@ var Component = Construct.extend(
 		// ### setup
 		//
 		// When a component is extended, this sets up the component's internal constructor
-		// functions and templates for later fast initialization.
+		// functions and views for later fast initialization.
 		setup: function() {
 			Construct.setup.apply(this, arguments);
 
@@ -124,10 +124,10 @@ var Component = Construct.extend(
 		 * @prototype
 		 */
 		// ### setup
-		// When a new component instance is created, setup bindings, render the template, etc.
+		// When a new component instance is created, setup bindings, render the view, etc.
 		setup: function(el, componentTagData) {
 			var component = this;
-			// If a template is not provided, we fall back to
+			// If a view is not provided, we fall back to
 			// dynamic scoping regardless of settings.
 			var lexicalContent = (
 					(typeof this.leakScope === "undefined" ? true : !this.leakScope) &&
@@ -191,16 +191,16 @@ var Component = Construct.extend(
 			domData.set.call(el, "preventDataBindings", true);
 
 			// Create a real Scope object out of the viewModel property
-			// The scope used to render the component's template.
-			// However, if there is no template, the "light" dom is rendered with this anyway.
+			// The scope used to render the component's view.
+			// However, if there is no view, the "light" dom is rendered with this anyway.
 			var shadowScope;
 			if (lexicalContent) {
 				shadowScope = Scope.refsScope().add(this.viewModel, {
 					viewModel: true
 				});
 			} else {
-				// if this component has a template,
-				// render the template with it's own Refs scope
+				// if this component has a view,
+				// render the view with it's own Refs scope
 				// otherwise, just add this component's viewModel.
 				shadowScope = (this.constructor.renderer ?
 						componentTagData.scope.add(new Scope.Refs()) :
@@ -262,7 +262,7 @@ var Component = Construct.extend(
 						// the right helpers should already be available.
 						// However, `_tags.content` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
-						delete options.tags.content;
+						delete options.tags[tagName];
 
 						// By default, light dom scoping is
 						// dynamic. This means that any `{{foo}}`
@@ -301,8 +301,8 @@ var Component = Construct.extend(
 							nodeLists.replace([el], subtemplate(lightTemplateData.scope, lightTemplateData.options));
 						}
 
-						// Restore the content tag so it could potentially be used again (as in lists)
-						options.tags.content = hookupFunction; makeHookup();
+						// Restore the proper tag function so it could potentially be used again (as in lists)
+						options.tags[tagName] = hookupFunction;
 					}
 				}
 			}
@@ -314,19 +314,20 @@ var Component = Construct.extend(
 					options.tags = {};
 				}
 
-				// if (!isEmptyObject(templates)) {
+				if (!isEmptyObject(templates)) {
 					// TODO: check here for scope
 
-				options.tags['can-slot'] = makeHookup('can-slot', function(el) {
-					return componentTagData.templates[el.getAttribute("name")]
-				});
-				// }
-				
-				options.tags.content = makeHookup('content', function() {
-					return componentTagData.subtemplate;
-				});
+					options.tags['can-slot'] = makeHookup('can-slot', function(el) {
+						return componentTagData.templates[el.getAttribute("name")]
+					});
+				}
+				else {
+					options.tags.content = makeHookup('content', function() {
+						return componentTagData.subtemplate;
+					});
+				}
 
-				// Render the component's template
+				// Render the component's view
 				frag = this.constructor.renderer(shadowScope, componentTagData.options.add(options), nodeList);
 			} else {
 				// Otherwise render the contents between the element

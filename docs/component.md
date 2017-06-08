@@ -15,7 +15,7 @@ or application logic.
 
 @signature `<TAG BINDINGS...>[LIGHT_DOM]</TAG>`
 
-  Create an instance of a component on a particular tag in a [can-stache] template.
+  Create an instance of a component on a particular tag in a [can-stache] view.
   In 2.3, use the [can-stache-bindings bindings] syntaxes to set up bindings.
 
   @release 2.3
@@ -25,7 +25,7 @@ or application logic.
   `acme-tabs` or `acme:tabs`.
 
   @param {can-stache-bindings} [BINDINGS] Use the following binding syntaxes
-  to connect the component’s [can-component::ViewModel] to the template’s [can-view-scope scope]:
+  to connect the component’s [can-component::ViewModel] to the view's [can-view-scope scope]:
 
    - [can-stache-bindings.toChild]=[can-stache.expressions expression] — one-way data binding to child
    - [can-stache-bindings.toParent]=[can-stache.expressions expression] — one-way data binding to parent
@@ -87,12 +87,12 @@ Component.extend({
 ```
 
 This element says “Click me” until a user clicks it and then
-says “Hello There!”.  To create a a instance of this component on the page,
-add `<hello-world/>` to a [can-stache] template, render
-the template and insert the result in the page like:
+says “Hello There!”.  To create an instance of this component on the page,
+add `<hello-world/>` to a [can-stache] view, render
+the view, and insert the result in the page like:
 
-    var template = stache("<hello-world/>");
-    document.body.appendChild(template({}));
+    var renderer = stache("<hello-world/>");
+    document.body.appendChild(renderer({ }));
 
 Check this out here:
 
@@ -100,7 +100,7 @@ Check this out here:
 
 
 Typically, you do not append a single component at a time.  Instead,
-you'll render a template with many custom tags like:
+you'll render a view with many custom tags like:
 
     <srchr-app>
       <srchr-search {models}="models">
@@ -122,7 +122,7 @@ Note that inheriting from components works differently than other CanJS APIs. Yo
 can’t call `.extend` on a particular component to create a “subclass” of that component.
 
 Instead, components work more like HTML elements. To reuse functionality from a base component, build on top of it with parent
-components that wrap other components in their template and pass any needed viewModel properties via attributes.
+components that wrap other components in their view and pass any needed viewModel properties via attributes.
 
 ### Tag
 
@@ -168,7 +168,7 @@ Changes `<hello-world>Hi There</hello-world>` into:
 ### ViewModel
 
 A component’s [can-component::ViewModel ViewModel] defines a constructor that creates
-instances used to render the component’s template. The instance’s properties
+instances used to render the component’s view. The instance’s properties
 are typically set by attribute [can-stache-bindings data bindings] on the custom element.
 By default, every data binding’s value is looked up in the parent [can-view-scope]
 of the custom element and added to the viewModel object.
@@ -180,10 +180,10 @@ The following component:
       view: stache("<h1>{{message}}</h1>")
     });
 
-Changes the following rendered template:
+Changes the following rendered view:
 
-    var template = stache("<hello-world {message}='greeting'/>");
-    template({
+    var renderer = stache("<hello-world {message}='greeting'/>");
+    renderer({
       greeting: "Salutations"
     })
 
@@ -201,10 +201,10 @@ Default values can be provided. The following component:
       }
     });
 
-Changes the following rendered template:
+Changes the following rendered view:
 
-    var template = stache("<hello-world/>");
-    template({})
+    var renderer = stache("<hello-world/>");
+    renderer({})
 
 Into:
 
@@ -213,12 +213,12 @@ Into:
 If you want to set the string value of the attribute on the ViewModel,
 set an attribute without any binding syntax.
 
-The following template, with the previous `hello-world` component:
+The following view, with the previous `hello-world` component:
 
-    var template = stache("<hello-world message='Howdy'/>");
-    template({})
+    var renderer = stache("<hello-world message='Howdy'/>");
+    renderer({})
 
-Renders to:
+Renders:
 
     <hello-world><h1>Howdy</h1></hello-world>
 
@@ -247,7 +247,7 @@ is about to removed, or was removed from the page.
 ### Helpers
 
 A component’s [can-component::helpers helpers] object provides [can-stache.helper stache helper] functions
-that are available within the component’s template.  The following component
+that are available within the component’s view.  The following component
 only renders friendly messages:
 
     Component.extend({

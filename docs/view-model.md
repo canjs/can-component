@@ -34,7 +34,7 @@ stache("<my-element {first}='firstName' last='Meyer'/>")({
 });
 ```
 
-@param {Object} properties An object of values specified by the custom element’s attributes. For example, a template rendered like:
+@param {Object} properties An object of values specified by the custom element’s attributes. For example, a view rendered like:
 
     stache("<my-element title='name'></my-element>")({
       name: "Justin"
@@ -85,4 +85,4 @@ This example should be done with the [can-component::events] object instead.
 @return {Map|Object} Returns one of the following.
 
    - An observable map or list type.
-   - The prototype of an observable map or list type that will be used to render the component’s template.
+   - The prototype of an observable map or list type that will be used to render the component’s view.
