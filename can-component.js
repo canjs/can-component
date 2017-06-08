@@ -251,6 +251,7 @@ var Component = Construct.extend(
 				nodeLists.unregister(nodeList);
 			});
 
+			// Returns a hookupFuction that gets the proper template, renders it, and adds it to nodeLists
 			makeHookup = function(tagName, getPrimaryTemplate) {
 				return function hookupFunction(el, contentTagData) {
 					var subtemplate = getPrimaryTemplate(el) || contentTagData.subtemplate,
@@ -258,9 +259,7 @@ var Component = Construct.extend(
 
 					if (subtemplate) {
 
-						// `contentTagData.options` is a viewModel of helpers where `<content>` was found, so
-						// the right helpers should already be available.
-						// However, `_tags.content` is going to point to this current content callback.  We need to
+						// However, `_tags.[tagName]` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
 						delete options.tags[tagName];
 
@@ -289,8 +288,8 @@ var Component = Construct.extend(
 							}
 
 						} else {
-							// we are rendering default content so this content should
-							// use the same scope as the <content> tag was found within.
+							// we are rendering within the component so this element should
+							// use the same scope.
 							lightTemplateData = contentTagData;
 						}
 
