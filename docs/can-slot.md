@@ -3,7 +3,7 @@
 
 @description Positions `<can-template />` elements with matching name attribute using current scope.
 
-@signature `<can-slot name='templateName' />`
+@signature `<can-slot name='TEMPLATE_NAME'>DEFAULT_CONTENT</can-slot>`
 
 Renders any `<can-slot name='subject' />` with `<can-template name='subject'>Some content</can-template>`.
 
@@ -19,8 +19,7 @@ Component.extend({
 	view : stache(
 		'<can-slot name="subject" />'
 	),
-	ViewModel,
-	leakScope: true
+	ViewModel
 });
 
 var renderer = stache(
@@ -33,3 +32,8 @@ var renderer = stache(
 
 renderer() //-> <my-email>Hello World</my-email>
 ```
+
+@param {string} [TEMPLATE_NAME] The name of the template to match and replace itself with
+
+@param {can-stache.sectionRenderer} [DEFAULT_CONTENT] The content that should be 
+used if there is no content in the matching `<can-template>`.

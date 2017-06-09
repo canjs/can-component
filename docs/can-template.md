@@ -3,9 +3,9 @@
 
 @description Create reusable templates that get positioned and replace `<can-slot>` elements with the same `name` attribute.
 
-@signature `<can-template name='templateName' />`
+@signature `<can-template name='TEMPLATE_NAME' />`
 
-Renders any `<can-slot name='subject' />` with `<can-template name='subject'>Some content</can-template>`.
+Renders any `<can-slot name='TEMPLATE_NAME' />` with `<can-template name='TEMPLATE_NAME'>Some content</can-template>`.
 
 ```js
 var ViewModel = DefineMap.extend({
@@ -19,8 +19,7 @@ Component.extend({
 	view : stache(
 		'<can-slot name="subject" />'
 	),
-	ViewModel,
-	leakScope: true
+	ViewModel
 });
 
 var renderer = stache(
@@ -33,3 +32,5 @@ var renderer = stache(
 
 renderer() //-> <my-email>Hello World</my-email>
 ```
+
+@param {string} [TEMPLATE_NAME] The name of the template to match and replace itself with

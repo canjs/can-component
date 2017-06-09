@@ -44,7 +44,7 @@
     "can-construct": "^3.0.6",
     "can-control": "^3.1.0-pre.0",
     "can-namespace": "1.0.0",
-    "can-observation": "^3.2.0-pre.10",
+    "can-observation": "^3.2.0-pre.13",
     "can-simple-map": "^3.2.0-pre.2",
     "can-stache-bindings": "^3.2.0-pre.0",
     "can-types": "^1.0.1",
