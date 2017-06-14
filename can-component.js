@@ -33,16 +33,9 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
-/**
- * @add Component
- */
 var Component = Construct.extend(
 
 	// ## Static
-	/**
-	 * @static
-	 */
-
 	{
 		// ### setup
 		//
@@ -119,9 +112,6 @@ var Component = Construct.extend(
 		}
 	}, {
 		// ## Prototype
-		/**
-		 * @prototype
-		 */
 		// ### setup
 		// When a new component instance is created, setup bindings, render the view, etc.
 		setup: function(el, componentTagData) {
