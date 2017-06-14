@@ -84,13 +84,17 @@ test("<can-slot> Works without leakScope", function() {
 			'<can-template name="body">' +
 				'{{body}}' +
 			'</can-template>' +
+			'Seomthing' +
 		'</my-email>'
 	);
 
-	var testView = renderer();
+	var testView = renderer({
+		subject: "foo",
+		body: "bar"
+	});
 	
-	equal(testView.firstChild.childNodes[0].textContent, 'Hello World');
-	equal(testView.firstChild.childNodes[1].textContent, 'Later Gator');
+	equal(testView.firstChild.childNodes[0].nodeValue, 'foo');
+	equal(testView.firstChild.childNodes[1].nodeValue, 'bar');
 });
 
 test("<can-slot> Re-use templates", function() {
@@ -170,8 +174,7 @@ test("<can-slot> Context one-way binding works", function() {
 		view : stache(
 			'<can-slot name="subject" {this}="subject" />'
 		),
-		ViewModel,
-		leakScope: false
+		ViewModel
 	});
 
 	var renderer = stache(
@@ -216,8 +219,6 @@ test("<can-slot> Context two-way binding works", function() {
 
 	var vm = viewModel(frag.firstChild);
 
-	debugger;
-	
 	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
 
 	vm.subject = "Later Gator";

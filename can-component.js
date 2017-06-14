@@ -37,6 +37,28 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
+
+function (el, tagData){
+	// TODO: check attribute exists or this actually happened!
+	domData.set.call(el, "preventDataBindings", true);
+	var vm, gotThis;
+	var teardown = stacheBindings.behaviors.viewModel(el, contentTagData, function(initialData) {
+		gotThis =  initialData.hasOwnProperty("this");
+		return vm = compute(initialData["this"]);
+	});
+	if(!gotThis) {
+		teardown();
+		return {tagData: tagData, teardown: null};
+	}
+
+	return {
+		scope: tagData.scope.add(vm),
+		options: tagData.options
+	};
+						
+}
+
+
 /**
  * @add Component
  */
@@ -258,8 +280,9 @@ var Component = Construct.extend(
 			var makeHookup = function(tagName, getPrimaryTemplate) {
 				return function hookupFunction(el, contentTagData) {
 					domData.set.call(el, "preventDataBindings", true);
-					var subtemplate = getPrimaryTemplate(el) || contentTagData.subtemplate,
-						renderingLightContent = subtemplate === componentTagData.subtemplate;
+					var userRenderer = getPrimaryTemplate(el),
+						subtemplate = userRenderer || contentTagData.subtemplate;
+						renderingLightContent = !!userRenderer;
 
 					if (subtemplate) {
 
@@ -292,6 +315,7 @@ var Component = Construct.extend(
 							}
 
 						} else {
+							debugger;
 							// we are rendering within the component so this element should
 							// use the same scope.
 							// lightTemplateData = contentTagData;
@@ -301,7 +325,7 @@ var Component = Construct.extend(
 								return vm = compute(initialData["this"]);
 							});
 							
-							lightTemplateData = contentTagData;
+							var lightTemplateData = contentTagData;
 							lightTemplateData.scope.add(vm);
 
 							// var scope = expression.parse(componentTagData.scope, { baseMethodType: "Call" });
