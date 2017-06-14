@@ -18,6 +18,9 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 
+//TODO: Change can-stache from devDeps to Deps
+var expression = require('can-stache/src/expression');
+var compute = require('can-compute');
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
@@ -27,6 +30,7 @@ var string = require("can-util/js/string/string");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
+var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
 var canLog = require('can-util/js/log/log');
 
 require('can-util/dom/events/inserted/inserted');
@@ -143,6 +147,10 @@ var Component = Construct.extend(
 			var setupBindings = !domData.get.call(el, "preventDataBindings");
 			var viewModel, frag;
 
+			// Capture any can-slot templates
+			// TODO: setup scope for can-slots
+			var templates = componentTagData.templates;
+
 			// ## Scope
 			var teardownBindings;
 			if (setupBindings) {
@@ -246,29 +254,18 @@ var Component = Construct.extend(
 				nodeLists.unregister(nodeList);
 			});
 
-			// If this component has a view (that we've already converted to a renderer)
-			if (this.constructor.renderer) {
-				// If `options.tags` doesn't exist set it to an empty object.
-				if (!options.tags) {
-					options.tags = {};
-				}
-
-				// We need be alerted to when a <content> element is rendered so we can put the original contents of the widget in its place
-				options.tags.content = function contentHookup(el, contentTagData) {
-					// First check if there was content within the custom tag
-					// otherwise, render what was within <content>, the default code.
-					// `componentTagData.subtemplate` is the content inside this component
-					var subtemplate = componentTagData.subtemplate || contentTagData.subtemplate,
+			// Returns a hookupFuction that gets the proper template, renders it, and adds it to nodeLists
+			var makeHookup = function(tagName, getPrimaryTemplate) {
+				return function hookupFunction(el, contentTagData) {
+					domData.set.call(el, "preventDataBindings", true);
+					var subtemplate = getPrimaryTemplate(el) || contentTagData.subtemplate,
 						renderingLightContent = subtemplate === componentTagData.subtemplate;
 
 					if (subtemplate) {
 
-						// `contentTagData.options` is a viewModel of helpers where `<content>` was found, so
-						// the right helpers should already be available.
-						// However, `_tags.content` is going to point to this current content callback.  We need to
+						// However, `_tags.[tagName]` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
-
-						delete options.tags.content;
+						delete options.tags[tagName];
 
 						// By default, light dom scoping is
 						// dynamic. This means that any `{{foo}}`
@@ -295,9 +292,21 @@ var Component = Construct.extend(
 							}
 
 						} else {
-							// we are rendering default content so this content should
-							// use the same scope as the <content> tag was found within.
+							// we are rendering within the component so this element should
+							// use the same scope.
+							// lightTemplateData = contentTagData;
+
+							var vm;
+							var teardown = stacheBindings.behaviors.viewModel(el, contentTagData, function(initialData) {
+								return vm = compute(initialData["this"]);
+							});
+							
 							lightTemplateData = contentTagData;
+							lightTemplateData.scope.add(vm);
+
+							// var scope = expression.parse(componentTagData.scope, { baseMethodType: "Call" });
+							// lightTemplateData.scope = scope;
+							// return parentExpression.value(scope, new Scope.Options({}));
 						}
 
 						if (contentTagData.parentNodeList) {
@@ -307,10 +316,32 @@ var Component = Construct.extend(
 							nodeLists.replace([el], subtemplate(lightTemplateData.scope, lightTemplateData.options));
 						}
 
-						// Restore the content tag so it could potentially be used again (as in lists)
-						options.tags.content = contentHookup;
+						// Restore the proper tag function so it could potentially be used again (as in lists)
+						options.tags[tagName] = hookupFunction;
 					}
 				};
+			};
+
+			// If this component has a view (that we've already converted to a renderer)
+			if (this.constructor.renderer) {
+				// If `options.tags` doesn't exist set it to an empty object.
+				if (!options.tags) {
+					options.tags = {};
+				}
+
+				if (!isEmptyObject(templates)) {
+					// TODO: check for passed scope
+
+					options.tags['can-slot'] = makeHookup('can-slot', function(el) {
+						return componentTagData.templates[el.getAttribute("name")];
+					});
+				}
+				else {
+					options.tags.content = makeHookup('content', function() {
+						return componentTagData.subtemplate;
+					});
+				}
+
 				// Render the component's view
 				frag = this.constructor.renderer(shadowScope, componentTagData.options.add(options), nodeList);
 			} else {
@@ -318,7 +349,6 @@ var Component = Construct.extend(
 				frag = componentTagData.subtemplate ?
 					componentTagData.subtemplate(shadowScope, componentTagData.options.add(options), nodeList) :
 					document.createDocumentFragment();
-
 			}
 			// Append the resulting document fragment to the element
 			domMutate.appendChild.call(el, frag);
@@ -327,7 +357,5 @@ var Component = Construct.extend(
 			nodeLists.update(nodeList, getChildNodes(el));
 		}
 	});
-
-
 
 module.exports = namespace.Component = Component;

@@ -681,6 +681,7 @@ function makeTest(name, doc, mutObs) {
 				}
 			}
 		});
+
 		var renderer = stache("<my-app>" +
 			'{{^visible}}<button can-click="show">show</button>{{/visible}}' +
 			'<my-toggler {(visible)}="visible">' +
