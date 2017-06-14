@@ -18,6 +18,9 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 
+//TODO: Change can-stache from devDeps to Deps
+var expression = require('can-stache/src/expression');
+var compute = require('can-compute');
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
@@ -254,6 +257,7 @@ var Component = Construct.extend(
 			// Returns a hookupFuction that gets the proper template, renders it, and adds it to nodeLists
 			var makeHookup = function(tagName, getPrimaryTemplate) {
 				return function hookupFunction(el, contentTagData) {
+					domData.set.call(el, "preventDataBindings", true);
 					var subtemplate = getPrimaryTemplate(el) || contentTagData.subtemplate,
 						renderingLightContent = subtemplate === componentTagData.subtemplate;
 
@@ -290,7 +294,19 @@ var Component = Construct.extend(
 						} else {
 							// we are rendering within the component so this element should
 							// use the same scope.
+							// lightTemplateData = contentTagData;
+
+							var vm;
+							var teardown = stacheBindings.behaviors.viewModel(el, contentTagData, function(initialData) {
+								return vm = compute(initialData["this"]);
+							});
+							
 							lightTemplateData = contentTagData;
+							lightTemplateData.scope.add(vm);
+
+							// var scope = expression.parse(componentTagData.scope, { baseMethodType: "Call" });
+							// lightTemplateData.scope = scope;
+							// return parentExpression.value(scope, new Scope.Options({}));
 						}
 
 						if (contentTagData.parentNodeList) {

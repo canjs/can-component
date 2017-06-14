@@ -155,3 +155,76 @@ test("<can-slot> Works with default content", function() {
 
 	equal(testView.firstChild.childNodes[0].textContent, 'Default Content');
 });
+
+test("<can-slot> Context one-way binding works", function() {
+	/*Passing in a custom context like <can-slot name='subject' {context}='value' />*/
+
+	var ViewModel = DefineMap.extend({
+		subject: {
+			value:"Hello World"
+		}
+	});
+
+	Component.extend({
+		tag : 'my-email',
+		view : stache(
+			'<can-slot name="subject" {this}="subject" />'
+		),
+		ViewModel,
+		leakScope: false
+	});
+
+	var renderer = stache(
+		'<my-email>' +
+			'<can-template name="subject"><span>{{subject}}</span></can-template>' + 
+		'</my-email>'
+	);
+
+	var frag = renderer();
+	
+	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
+
+	viewModel(frag.firstChild).subject = "Later Gator";
+
+	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
+});
+
+test("<can-slot> Context two-way binding works", function() {
+	/*Passing in a custom context like <can-slot name='subject' {context}='value' />*/
+
+	var ViewModel = DefineMap.extend({
+		subject: {
+			value:"Hello World"
+		}
+	});
+
+	Component.extend({
+		tag : 'my-email',
+		view : stache(
+			'<can-slot name="subject" {(this)}="subject" />'
+		),
+		ViewModel
+	});
+
+	var renderer = stache(
+		'<my-email>' +
+			'<can-template name="subject"><span>{{subject}}</span></can-template>' + 
+		'</my-email>'
+	);
+
+	var frag = renderer();
+
+	var vm = viewModel(frag.firstChild);
+
+	debugger;
+	
+	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
+
+	vm.subject = "Later Gator";
+
+	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
+
+	frag.firstChild.firstChild.innerHTML = "After while crocodile";
+
+	equal(vm.subject, "After while crocodile");
+});
