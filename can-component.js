@@ -37,6 +37,26 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
+function getThis(el, tagData){
+	// TODO: check attribute exists or this actually happened!
+	domData.set.call(el, "preventDataBindings", true);
+	var vm, gotThis;
+	var teardown = stacheBindings.behaviors.viewModel(el, contentTagData, function(initialData) {
+		gotThis =  initialData.hasOwnProperty("this");
+		return vm = compute(initialData["this"]);
+	});
+	if(!gotThis) {
+		teardown();
+		return {tagData: tagData, teardown: null};
+	}
+
+	return {
+		scope: tagData.scope.add(vm),
+		options: tagData.options
+	};
+						
+};
+
 /**
  * @add Component
  */
@@ -258,8 +278,12 @@ var Component = Construct.extend(
 			var makeHookup = function(tagName, getPrimaryTemplate) {
 				return function hookupFunction(el, contentTagData) {
 					domData.set.call(el, "preventDataBindings", true);
-					var subtemplate = getPrimaryTemplate(el) || contentTagData.subtemplate,
-						renderingLightContent = subtemplate === componentTagData.subtemplate;
+					var template = getPrimaryTemplate(el, contentTagData),
+						renderingLightContent = template === componentTagData.subtemplate;
+
+					// var userRenderer = getPrimaryTemplate(el),
+					// subtemplate = userRenderer || contentTagData.subtemplate;
+					// renderingLightContent = !!userRenderer;
 
 					if (subtemplate) {
 
@@ -331,14 +355,13 @@ var Component = Construct.extend(
 
 				if (!isEmptyObject(templates)) {
 					// TODO: check for passed scope
-
-					options.tags['can-slot'] = makeHookup('can-slot', function(el) {
-						return componentTagData.templates[el.getAttribute("name")];
+					options.tags['can-slot'] = makeHookup('can-slot', function(el, contentTagData) {
+						return componentTagData.templates[el.getAttribute("name")] || contentTagData.templates[el.getAttribute("name")];
 					});
 				}
 				else {
-					options.tags.content = makeHookup('content', function() {
-						return componentTagData.subtemplate;
+					options.tags.content = makeHookup('content', function(el, contentTagData) {
+						return componentTagData.subtemplate || contentTagData.subtemplate;
 					});
 				}
 

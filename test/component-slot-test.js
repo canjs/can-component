@@ -52,11 +52,11 @@ test("<can-slot> Works", function() {
 
 	var testView = renderer();
 	
-	equal(testView.firstChild.childNodes[0].textContent, 'Hello World');
-	equal(testView.firstChild.childNodes[1].textContent, 'Later Gator');
+	equal(testView.firstChild.childNodes[0].nodeValue, 'Hello World');
+	equal(testView.firstChild.childNodes[1].nodeValue, 'Later Gator');
 });
 
-test("<can-slot> Works without leakScope", function() {
+test("<can-slot> leakScope false acts as expected", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
@@ -87,10 +87,13 @@ test("<can-slot> Works without leakScope", function() {
 		'</my-email>'
 	);
 
-	var testView = renderer();
+	var testView = renderer({
+		subject: 'foo',
+		body: 'bar'
+	});
 	
-	equal(testView.firstChild.childNodes[0].textContent, 'Hello World');
-	equal(testView.firstChild.childNodes[1].textContent, 'Later Gator');
+	equal(testView.firstChild.childNodes[0].nodeValue, 'foo');
+	equal(testView.firstChild.childNodes[1].nodeValue, 'bar');
 });
 
 test("<can-slot> Re-use templates", function() {
@@ -125,8 +128,8 @@ test("<can-slot> Re-use templates", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.childNodes[0].textContent, 'Hello World');
-	equal(testView.firstChild.childNodes[1].textContent, 'Hello World');
+	equal(testView.firstChild.childNodes[0].nodeValue, 'Hello World');
+	equal(testView.firstChild.childNodes[1].nodeValue, 'Hello World');
 });
 
 test("<can-slot> Works with default content", function() {
@@ -153,7 +156,7 @@ test("<can-slot> Works with default content", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.childNodes[0].textContent, 'Default Content');
+	equal(testView.firstChild.childNodes[0].nodeValue, 'Default Content');
 });
 
 test("<can-slot> Context one-way binding works", function() {
@@ -171,7 +174,7 @@ test("<can-slot> Context one-way binding works", function() {
 			'<can-slot name="subject" {this}="subject" />'
 		),
 		ViewModel,
-		leakScope: false
+		leakScope: true
 	});
 
 	var renderer = stache(
@@ -203,7 +206,8 @@ test("<can-slot> Context two-way binding works", function() {
 		view : stache(
 			'<can-slot name="subject" {(this)}="subject" />'
 		),
-		ViewModel
+		ViewModel,
+		leakScope: true
 	});
 
 	var renderer = stache(
@@ -215,8 +219,6 @@ test("<can-slot> Context two-way binding works", function() {
 	var frag = renderer();
 
 	var vm = viewModel(frag.firstChild);
-
-	debugger;
 	
 	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
 
