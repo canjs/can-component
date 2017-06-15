@@ -285,7 +285,7 @@ var Component = Construct.extend(
 					// subtemplate = userRenderer || contentTagData.subtemplate;
 					// renderingLightContent = !!userRenderer;
 
-					if (subtemplate) {
+					if (template) {
 
 						// However, `_tags.[tagName]` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
@@ -334,10 +334,10 @@ var Component = Construct.extend(
 						}
 
 						if (contentTagData.parentNodeList) {
-							var frag = subtemplate(lightTemplateData.scope, lightTemplateData.options, contentTagData.parentNodeList);
+							var frag = template(lightTemplateData.scope, lightTemplateData.options, contentTagData.parentNodeList);
 							nodeLists.replace([el], frag);
 						} else {
-							nodeLists.replace([el], subtemplate(lightTemplateData.scope, lightTemplateData.options));
+							nodeLists.replace([el], template(lightTemplateData.scope, lightTemplateData.options));
 						}
 
 						// Restore the proper tag function so it could potentially be used again (as in lists)
