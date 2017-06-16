@@ -173,8 +173,7 @@ test("<can-slot> Context one-way binding works", function() {
 		view : stache(
 			'<can-slot name="subject" {this}="subject" />'
 		),
-		ViewModel,
-		leakScope: true
+		ViewModel
 	});
 
 	var renderer = stache(

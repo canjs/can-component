@@ -37,11 +37,11 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
-function getThis(el, tagData){
+function addContext(el, tagData) {
 	// TODO: check attribute exists or this actually happened!
 	domData.set.call(el, "preventDataBindings", true);
 	var vm, gotThis;
-	var teardown = stacheBindings.behaviors.viewModel(el, contentTagData, function(initialData) {
+	var teardown = stacheBindings.behaviors.viewModel(el, tagData, function(initialData) {
 		gotThis =  initialData.hasOwnProperty("this");
 		return vm = compute(initialData["this"]);
 	});
@@ -298,7 +298,17 @@ var Component = Construct.extend(
 						if (!renderingDefaultContent) {
 							if (lexicalContent) {
 								// render with the same scope the component was found within.
-								tagData = componentTagData;
+								// tagData = componentTagData;
+
+								// var vm;
+								// var teardown = stacheBindings.behaviors.viewModel(el, defaultTagData, function(initialData) {
+								// 	return vm = compute(initialData["this"]);
+								// });
+								
+								// tagData = componentTagData;
+								// tagData.scope.add(vm);
+
+								addContext(el, componentTagData);
 							} else {
 								// render with the component's viewModel mixed in, however
 								// we still want the outer refs to be used, NOT the component's refs
