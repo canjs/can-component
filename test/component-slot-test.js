@@ -32,7 +32,7 @@ test("<can-slot> Works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="subject" />' +
+			'<can-slot name="subject">Some Default Content</can-slot>' +
 			'<can-slot name="body" />'
 		),
 		ViewModel,

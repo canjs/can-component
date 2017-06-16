@@ -168,7 +168,6 @@ var Component = Construct.extend(
 			var viewModel, frag;
 
 			// Capture any can-slot templates
-			// TODO: setup scope for can-slots
 			var templates = componentTagData.templates;
 
 			// ## Scope
@@ -274,19 +273,17 @@ var Component = Construct.extend(
 				nodeLists.unregister(nodeList);
 			});
 
-			// Returns a hookupFuction that gets the proper template, renders it, and adds it to nodeLists
+			// Returns a hookupFuction that gets the proper tagData in a template, renders it, and adds it to nodeLists
 			var makeHookup = function(tagName, getPrimaryTemplate) {
-				return function hookupFunction(el, contentTagData) {
-					domData.set.call(el, "preventDataBindings", true);
-					var template = getPrimaryTemplate(el, contentTagData),
-						renderingLightContent = template === componentTagData.subtemplate;
+				return function hookupFunction(el, defaultTagData) {
+					var template = getPrimaryTemplate(el) || defaultTagData.subtemplate,
+						renderingDefaultContent = template === defaultTagData.subtemplate;
 
 					// var userRenderer = getPrimaryTemplate(el),
 					// subtemplate = userRenderer || contentTagData.subtemplate;
 					// renderingLightContent = !!userRenderer;
 
 					if (template) {
-
 						// However, `_tags.[tagName]` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
 						delete options.tags[tagName];
@@ -297,11 +294,11 @@ var Component = Construct.extend(
 						// the component will have access to the
 						// internal viewModel. This can be overridden to be
 						// lexical with the leakScope option.
-						var lightTemplateData;
-						if (renderingLightContent) {
+						var tagData;
+						if (!renderingDefaultContent) {
 							if (lexicalContent) {
 								// render with the same scope the component was found within.
-								lightTemplateData = componentTagData;
+								tagData = componentTagData;
 							} else {
 								// render with the component's viewModel mixed in, however
 								// we still want the outer refs to be used, NOT the component's refs
@@ -309,9 +306,9 @@ var Component = Construct.extend(
 								// To fix this, we
 								// walk down the scope to the component's ref, clone scopes from that point up
 								// use that as the new scope.
-								lightTemplateData = {
-									scope: contentTagData.scope.cloneFromRef(),
-									options: contentTagData.options
+								tagData = {
+									scope: defaultTagData.scope.cloneFromRef(),
+									options: defaultTagData.options
 								};
 							}
 
@@ -321,23 +318,23 @@ var Component = Construct.extend(
 							// lightTemplateData = contentTagData;
 
 							var vm;
-							var teardown = stacheBindings.behaviors.viewModel(el, contentTagData, function(initialData) {
+							var teardown = stacheBindings.behaviors.viewModel(el, defaultTagData, function(initialData) {
 								return vm = compute(initialData["this"]);
 							});
 							
-							lightTemplateData = contentTagData;
-							lightTemplateData.scope.add(vm);
+							tagData = defaultTagData;
+							tagData.scope.add(vm);
 
 							// var scope = expression.parse(componentTagData.scope, { baseMethodType: "Call" });
 							// lightTemplateData.scope = scope;
 							// return parentExpression.value(scope, new Scope.Options({}));
 						}
 
-						if (contentTagData.parentNodeList) {
-							var frag = template(lightTemplateData.scope, lightTemplateData.options, contentTagData.parentNodeList);
+						if (defaultTagData.parentNodeList) {
+							var frag = template(tagData.scope, tagData.options, defaultTagData.parentNodeList);
 							nodeLists.replace([el], frag);
 						} else {
-							nodeLists.replace([el], template(lightTemplateData.scope, lightTemplateData.options));
+							nodeLists.replace([el], template(tagData.scope, tagData.options));
 						}
 
 						// Restore the proper tag function so it could potentially be used again (as in lists)
@@ -354,14 +351,13 @@ var Component = Construct.extend(
 				}
 
 				if (!isEmptyObject(templates)) {
-					// TODO: check for passed scope
-					options.tags['can-slot'] = makeHookup('can-slot', function(el, contentTagData) {
-						return componentTagData.templates[el.getAttribute("name")] || contentTagData.templates[el.getAttribute("name")];
+					options.tags['can-slot'] = makeHookup('can-slot', function(el) {
+						return templates[el.getAttribute("name")];
 					});
 				}
 				else {
-					options.tags.content = makeHookup('content', function(el, contentTagData) {
-						return componentTagData.subtemplate || contentTagData.subtemplate;
+					options.tags.content = makeHookup('content', function() {
+						return componentTagData.subtemplate;
 					});
 				}
 
