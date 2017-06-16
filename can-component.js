@@ -45,10 +45,10 @@ function addContext(el, tagData) {
 		gotThis =  initialData.hasOwnProperty("this");
 		return vm = compute(initialData["this"]);
 	});
-	if(!gotThis) {
-		teardown();
-		return {tagData: tagData, teardown: null};
-	}
+	// if(!gotThis) {
+	// 	teardown();
+	// 	return {tagData: tagData, teardown: null};
+	// }
 
 	return {
 		scope: tagData.scope.add(vm),
@@ -276,6 +276,7 @@ var Component = Construct.extend(
 			// Returns a hookupFuction that gets the proper tagData in a template, renders it, and adds it to nodeLists
 			var makeHookup = function(tagName, getPrimaryTemplate) {
 				return function hookupFunction(el, defaultTagData) {
+					domData.set.call(el, "preventDataBindings", true);
 					var template = getPrimaryTemplate(el) || defaultTagData.subtemplate,
 						renderingDefaultContent = template === defaultTagData.subtemplate;
 
@@ -298,17 +299,19 @@ var Component = Construct.extend(
 						if (!renderingDefaultContent) {
 							if (lexicalContent) {
 								// render with the same scope the component was found within.
-								// tagData = componentTagData;
-
-								// var vm;
-								// var teardown = stacheBindings.behaviors.viewModel(el, defaultTagData, function(initialData) {
-								// 	return vm = compute(initialData["this"]);
-								// });
+								var vm;
+								var teardown = stacheBindings.behaviors.viewModel(el, defaultTagData, function(initialData) {
+									return vm = compute(initialData);
+								});
 								
-								// tagData = componentTagData;
-								// tagData.scope.add(vm);
+								// vm = vm();
+								// var scopeObject = {};
+								// scopeObject[vm.name] = vm['this'];
+								tagData = componentTagData;
+								tagData.scope = tagData.scope.add(vm);
 
-								addContext(el, componentTagData);
+								debugger;
+
 							} else {
 								// render with the component's viewModel mixed in, however
 								// we still want the outer refs to be used, NOT the component's refs
@@ -332,9 +335,7 @@ var Component = Construct.extend(
 								return vm = compute(initialData["this"]);
 							});
 							
-							tagData = defaultTagData;
-							tagData.scope.add(vm);
-
+							
 							// var scope = expression.parse(componentTagData.scope, { baseMethodType: "Call" });
 							// lightTemplateData.scope = scope;
 							// return parentExpression.value(scope, new Scope.Options({}));

@@ -32,7 +32,7 @@ test("<can-slot> Works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="subject">Some Default Content</can-slot>' +
+			'<can-slot name="subject" />' +
 			'<can-slot name="body" />'
 		),
 		ViewModel,
@@ -171,22 +171,25 @@ test("<can-slot> Context one-way binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="subject" {this}="subject" />'
+			'<can-slot name="foo" {this}="subject" />'
 		),
 		ViewModel
 	});
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject"><span>{{subject}}</span></can-template>' + 
+			'<can-template name="foo"><span>{{subject}}</span></can-template>' + 
 		'</my-email>'
 	);
 
 	var frag = renderer();
+	var vm = viewModel(frag.firstChild);
 	
 	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
 
-	viewModel(frag.firstChild).subject = "Later Gator";
+	debugger;
+
+	vm.subject = "Later Gator";
 
 	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
 });
@@ -205,8 +208,7 @@ test("<can-slot> Context two-way binding works", function() {
 		view : stache(
 			'<can-slot name="subject" {(this)}="subject" />'
 		),
-		ViewModel,
-		leakScope: true
+		ViewModel
 	});
 
 	var renderer = stache(
