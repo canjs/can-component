@@ -178,7 +178,7 @@ test("<can-slot> Context one-way binding works", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><span>{{subject}}</span></can-template>' + 
+			'<can-template name="foo"><span>{{this}}</span></can-template>' + 
 		'</my-email>'
 	);
 
@@ -186,8 +186,6 @@ test("<can-slot> Context one-way binding works", function() {
 	var vm = viewModel(frag.firstChild);
 	
 	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
-
-	debugger;
 
 	vm.subject = "Later Gator";
 
