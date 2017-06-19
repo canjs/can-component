@@ -298,7 +298,7 @@ test("<can-slot> Works alongside <content>", function() {
 		tag : 'my-email',
 		view : stache(
 			'<can-slot name="subject" />' +
-			'Some content'
+			'<content />'
 		),
 		ViewModel,
 		leakScope: true
@@ -307,14 +307,50 @@ test("<can-slot> Works alongside <content>", function() {
 	var renderer = stache(
 		'<my-email>' +
 			'<can-template name="subject">' +
-				'{{subject}}' +
+				'<p>{{subject}}</p>' +
 			'</can-template>' +
-			'<content />' +
+			'<span>Some content</span>' +
 		'</my-email>'
 	);
 
 	var testView = renderer();
 	
-	equal(testView.firstChild.childNodes[0].nodeValue, 'Hello World');
-	equal(testView.firstChild.childNodes[1].nodeValue, 'Some content');
+	equal(testView.firstChild.childNodes[0].firstChild.nodeValue, 'Hello World');
+	equal(testView.firstChild.childNodes[1].firstChild.nodeValue, 'Some content');
+});
+
+test("<can-slot> Works alongside <content> with default content", function() {
+	/*Will still render <content> in the right place*/
+
+	var ViewModel = DefineMap.extend({
+		subject: {
+			value:"Hello World"
+		},
+		body: {
+			value: "Later Gator"
+		}
+	});
+
+	Component.extend({
+		tag : 'my-email',
+		view : stache(
+			'<can-slot name="subject" />' +
+			'<content>Default content</content>'
+		),
+		ViewModel,
+		leakScope: true
+	});
+
+	var renderer = stache(
+		'<my-email>' +
+			'<can-template name="subject">' +
+				'<p>{{subject}}</p>' +
+			'</can-template>' +
+		'</my-email>'
+	);
+
+	var testView = renderer();
+	
+	equal(testView.firstChild.childNodes[0].firstChild.nodeValue, 'Hello World');
+	equal(testView.firstChild.childNodes[1].nodeValue, 'Default content');
 });
