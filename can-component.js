@@ -39,10 +39,19 @@ function addContext(el, tagData, defaultTagData) {
 	domData.set.call(el, "preventDataBindings", true);
 
 	var newContext, 
-		gotContext = !!(el.getAttribute('{context}') || el.getAttribute('{(context)}'));
+		contextPattern = /.*context.*/,
+		contextIndex,
+		gotContext = false;
+		
+	for (var i = 0; i < el.attributes.length; i++) {
+		if (contextPattern.test(el.attributes[i].name)) {
+			gotContext = true;
+			contextIndex = i;
+		}
+	}
 
 	if (gotContext) {
-		var key = el.getAttribute('{context}') ? el.getAttribute('{context}') : el.getAttribute('{(context)}');
+		var key = el.attributes[contextIndex].nodeValue;
 		if (key && defaultTagData.scope._context[key]) {
 			// tagData.scope._context[key] = defaultTagData.scope._context[key];
 			tagData.scope = tagData.scope.add(defaultTagData.scope._context);

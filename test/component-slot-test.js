@@ -57,6 +57,7 @@ test("<can-slot> Works", function() {
 });
 
 test("<can-slot> leakScope false acts as expected", function() {
+	/*The <can-slot> elements don't have access to component viewModel without leakScope*/
 
 	var ViewModel = DefineMap.extend({
 		subject: {
@@ -133,7 +134,7 @@ test("<can-slot> Re-use templates", function() {
 });
 
 test("<can-slot> Works with default content", function() {
-	/*The <can-slot> elements can reuse a template*/
+	/*The <can-slot> elements will render default content if no template renderer is present*/
 
 	var ViewModel = DefineMap.extend({});
 
@@ -192,7 +193,7 @@ test("<can-slot> Context one-way binding works", function() {
 });
 
 test("<can-slot> Context two-way binding works", function() {
-	/*Passing in a custom context like <can-slot name='subject' {context}='value' />*/
+	/*Passing in a custom context like <can-slot name='subject' {(context)}='value' />*/
 
 	var ViewModel = DefineMap.extend({
 		subject: {
@@ -235,4 +236,85 @@ test("<can-slot> Context two-way binding works", function() {
 	childVM.context = "After a while crocodile";
 
 	equal(vm.subject, "After a while crocodile");
+});
+
+test("<can-slot> Context child-to-parent binding works", function() {
+	/*Passing in a custom context like <can-slot name='subject' {^context}='value' />*/
+
+	var ViewModel = DefineMap.extend({
+		subject: {
+			value: "Hello World"
+		}
+	});
+
+	Component.extend({
+		tag : 'my-email',
+		view : stache(
+			'<can-slot name="foo" {^context}="subject" />'
+		),
+		ViewModel
+	});
+
+	Component.extend({
+		tag : 'my-subject',
+		view : stache(
+			'{{subject}}'
+		),
+		viewModel: {}
+	});
+
+	var renderer = stache(
+		'<my-email>' +
+			'<can-template name="foo"><my-subject {(subject)}="subject" /></can-template>' + 
+		'</my-email>'
+	);
+
+	var frag = renderer();
+	var vm = viewModel(frag.firstChild);
+	var childVM = viewModel(frag.firstChild.firstChild);
+	
+	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
+
+	childVM.subject = "bar";
+
+	equal(frag.firstChild.firstChild.innerHTML, 'bar');
+
+	equal(vm.subject, "bar");
+});
+
+test("<can-slot> Works alongside <content>", function() {
+	/*Will still render <content> in the right place*/
+
+	var ViewModel = DefineMap.extend({
+		subject: {
+			value:"Hello World"
+		},
+		body: {
+			value: "Later Gator"
+		}
+	});
+
+	Component.extend({
+		tag : 'my-email',
+		view : stache(
+			'<can-slot name="subject" />' +
+			'Some content'
+		),
+		ViewModel,
+		leakScope: true
+	});
+
+	var renderer = stache(
+		'<my-email>' +
+			'<can-template name="subject">' +
+				'{{subject}}' +
+			'</can-template>' +
+			'<content />' +
+		'</my-email>'
+	);
+
+	var testView = renderer();
+	
+	equal(testView.firstChild.childNodes[0].nodeValue, 'Hello World');
+	equal(testView.firstChild.childNodes[1].nodeValue, 'Some content');
 });
