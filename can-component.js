@@ -18,8 +18,6 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 
-//TODO: Change can-stache from devDeps to Deps
-var expression = require('can-stache/src/expression');
 var compute = require('can-compute');
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
@@ -31,7 +29,6 @@ var canReflect = require("can-reflect");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
-var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
 var canLog = require('can-util/js/log/log');
 
 require('can-util/dom/events/inserted/inserted');
@@ -66,9 +63,15 @@ function addContext(el, tagData, defaultTagData) {
 		// vm.set('context', initialData.subject);
 		return vm;
 	});
+
+	if(!gotContext) {
+		teardown();
+		return tagData;
+	}
+
 	tagData.scope = tagData.scope.add(newContext);
 	return tagData;
-};
+}
 
 /**
  * @add Component
