@@ -38,24 +38,36 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
-function addContext(el, tagData) {
-	// TODO: check attribute exists or this actually happened!
+function addContext(el, tagData, defaultTagData) {
 	domData.set.call(el, "preventDataBindings", true);
-	var vm, gotThis;
-	var teardown = stacheBindings.behaviors.viewModel(el, tagData, function(initialData) {
-		gotThis =  initialData.hasOwnProperty("this");
-		return vm = compute(initialData["this"]);
-	});
-	// if(!gotThis) {
-	// 	teardown();
-	// 	return {tagData: tagData, teardown: null};
-	// }
 
-	return {
-		scope: tagData.scope.add(vm),
-		options: tagData.options
-	};
-						
+	var newContext, 
+		gotContext = !!(el.getAttribute('{context}') || el.getAttribute('{(context)}'));
+
+	if (gotContext) {
+		var key = el.getAttribute('{context}') ? el.getAttribute('{context}') : el.getAttribute('{(context)}');
+		if (key && defaultTagData.scope._context[key]) {
+			// tagData.scope._context[key] = defaultTagData.scope._context[key];
+			tagData.scope = tagData.scope.add(defaultTagData.scope._context);
+			// tagData.scope._context = new types.DefaultMap(tagData.scope._context);
+			// tagData.scope._context.context = defaultTagData.scope._context[key];
+			// tagData.options = tagData.options.add(defaultTagData.options._context);
+		}
+	}
+
+	var teardown = stacheBindings.behaviors.viewModel(el, tagData, function(initialData) {
+		var vm = new types.DefaultMap(initialData);
+		newContext = compute(function(value) {
+			if (arguments.length) {
+				vm.set('context', value);
+			}
+			return vm;
+		});
+		// vm.set('context', initialData.subject);
+		return vm;
+	});
+	tagData.scope = tagData.scope.add(newContext);
+	return tagData;
 };
 
 /**
@@ -277,14 +289,12 @@ var Component = Construct.extend(
 			// Returns a hookupFuction that gets the proper tagData in a template, renders it, and adds it to nodeLists
 			var makeHookup = function(tagName, getPrimaryTemplate) {
 				return function hookupFunction(el, defaultTagData) {
-					domData.set.call(el, "preventDataBindings", true);
 					var template = getPrimaryTemplate(el) || defaultTagData.subtemplate,
 						renderingDefaultContent = template === defaultTagData.subtemplate;
 
 					// var userRenderer = getPrimaryTemplate(el),
 					// subtemplate = userRenderer || contentTagData.subtemplate;
 					// renderingLightContent = !!userRenderer;
-
 					if (template) {
 						// However, `_tags.[tagName]` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
@@ -300,61 +310,25 @@ var Component = Construct.extend(
 						if (!renderingDefaultContent) {
 							if (lexicalContent) {
 								// render with the same scope the component was found within.
-								// var newContext;
-								var vm;
-								var teardown = stacheBindings.behaviors.viewModel(el, defaultTagData, function(initialData) {
-
-									// var contextName = initialData['name'];
-									// var contextValue = initialData['this'];
-									// var newContext = new types.DefaultMap();
-									// newContext['this'] = contextValue;
-									// return vm = compute(newContext);
-									// return vm = newContext;
-
-									var newContext = new types.DefaultMap(initialData);
-									vm = compute(function(value) {
-										if (arguments.length) {
-											newContext.set('this', value)
-										}
-									});
-									return vm(newContext['this']);
-
-								});
-								
-								// vm = vm();
-								// var scopeObject = {};
-								// scopeObject[vm.name] = vm['this'];
-								tagData = componentTagData;
-								tagData.scope = tagData.scope.add(vm);
-								tagData.scope = tagData.scope.add({ this: "Hello World" });
-
-							} else {
+								tagData = addContext(el, componentTagData, defaultTagData);
+							}
+							else {
 								// render with the component's viewModel mixed in, however
 								// we still want the outer refs to be used, NOT the component's refs
 								// <component> {{some value }} </component>
 								// To fix this, we
 								// walk down the scope to the component's ref, clone scopes from that point up
 								// use that as the new scope.
+								
 								tagData = {
 									scope: defaultTagData.scope.cloneFromRef(),
 									options: defaultTagData.options
 								};
 							}
-
 						} else {
 							// we are rendering within the component so this element should
 							// use the same scope.
-							// lightTemplateData = contentTagData;
-
-							var vm;
-							var teardown = stacheBindings.behaviors.viewModel(el, defaultTagData, function(initialData) {
-								return vm = compute(initialData["this"]);
-							});
-							
-							
-							// var scope = expression.parse(componentTagData.scope, { baseMethodType: "Call" });
-							// lightTemplateData.scope = scope;
-							// return parentExpression.value(scope, new Scope.Options({}));
+							tagData = defaultTagData;
 						}
 
 						if (defaultTagData.parentNodeList) {
@@ -377,16 +351,24 @@ var Component = Construct.extend(
 					options.tags = {};
 				}
 
-				if (!isEmptyObject(templates)) {
-					options.tags['can-slot'] = makeHookup('can-slot', function(el) {
-						return templates[el.getAttribute("name")];
-					});
-				}
-				else {
-					options.tags.content = makeHookup('content', function() {
-						return componentTagData.subtemplate;
-					});
-				}
+				// if (!isEmptyObject(templates)) {
+				// 	options.tags['can-slot'] = makeHookup('can-slot', function(el) {
+				// 		return templates[el.getAttribute("name")];
+				// 	});
+				// }
+				// else {
+				// 	options.tags.content = makeHookup('content', function() {
+				// 		return componentTagData.subtemplate;
+				// 	});
+				// }
+
+				options.tags['can-slot'] = makeHookup('can-slot', function(el) {
+					return templates[el.getAttribute("name")];
+				});
+
+				options.tags.content = makeHookup('content', function() {
+					return componentTagData.subtemplate;
+				});
 
 				// Render the component's view
 				frag = this.constructor.renderer(shadowScope, componentTagData.options.add(options), nodeList);

@@ -144,8 +144,7 @@ test("<can-slot> Works with default content", function() {
 				'Default Content' + 
 			'</can-slot>'
 		),
-		ViewModel,
-		leakScope: true
+		ViewModel
 	});
 
 	var renderer = stache(
@@ -156,7 +155,7 @@ test("<can-slot> Works with default content", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.childNodes[0].nodeValue, 'Default Content');
+	equal(testView.firstChild.innerHTML, 'Default Content');
 });
 
 test("<can-slot> Context one-way binding works", function() {
@@ -164,21 +163,21 @@ test("<can-slot> Context one-way binding works", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			value:"Hello World"
+			value: "Hello World"
 		}
 	});
 
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {this}="subject" />'
+			'<can-slot name="foo" {context}="subject" />'
 		),
 		ViewModel
 	});
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><span>{{this}}</span></can-template>' + 
+			'<can-template name="foo"><span>{{context}}</span></can-template>' + 
 		'</my-email>'
 	);
 
@@ -197,27 +196,35 @@ test("<can-slot> Context two-way binding works", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			value:"Hello World"
+			value: "Hello World"
 		}
 	});
 
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="subject" {(this)}="subject" />'
+			'<can-slot name="foo" {(context)}="subject" />'
 		),
 		ViewModel
 	});
 
+	Component.extend({
+		tag : 'my-subject',
+		view : stache(
+			'{{context}}'
+		),
+		viewModel: {}
+	});
+
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject"><span>{{subject}}</span></can-template>' + 
+			'<can-template name="foo"><my-subject {(context)}="context" /></can-template>' + 
 		'</my-email>'
 	);
 
 	var frag = renderer();
-
 	var vm = viewModel(frag.firstChild);
+	var childVM = viewModel(frag.firstChild.firstChild);
 	
 	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
 
@@ -225,7 +232,7 @@ test("<can-slot> Context two-way binding works", function() {
 
 	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
 
-	frag.firstChild.firstChild.innerHTML = "After while crocodile";
+	childVM.context = "After a while crocodile";
 
-	equal(vm.subject, "After while crocodile");
+	equal(vm.subject, "After a while crocodile");
 });
