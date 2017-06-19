@@ -42,8 +42,9 @@ function addContext(el, tagData, defaultTagData) {
 		contextPattern = /.*context.*/,
 		contextIndex,
 		gotContext = false;
-		
+
 	for (var i = 0; i < el.attributes.length; i++) {
+		// Check to see if we got any kind of context attribute and record it's index
 		if (contextPattern.test(el.attributes[i].name)) {
 			gotContext = true;
 			contextIndex = i;
@@ -53,27 +54,26 @@ function addContext(el, tagData, defaultTagData) {
 	if (gotContext) {
 		var key = el.attributes[contextIndex].nodeValue;
 		if (key && defaultTagData.scope._context[key]) {
-			// tagData.scope._context[key] = defaultTagData.scope._context[key];
+			// We found a matching property so we will add the defaultTagData context to the scope
 			tagData.scope = tagData.scope.add(defaultTagData.scope._context);
-			// tagData.scope._context = new types.DefaultMap(tagData.scope._context);
-			// tagData.scope._context.context = defaultTagData.scope._context[key];
-			// tagData.options = tagData.options.add(defaultTagData.options._context);
 		}
 	}
 
 	var teardown = stacheBindings.behaviors.viewModel(el, tagData, function(initialData) {
+		// Create a DefineMap out of the passed in data
 		var vm = new types.DefaultMap(initialData);
+		// Create a compute responsible for keeping the vm up-to-date
 		newContext = compute(function(value) {
 			if (arguments.length) {
 				vm.set('context', value);
 			}
 			return vm;
 		});
-		// vm.set('context', initialData.subject);
 		return vm;
 	});
 
 	if(!gotContext) {
+		// If we didn't get a context run the teardown for memory safety
 		teardown();
 		return tagData;
 	}
@@ -304,9 +304,6 @@ var Component = Construct.extend(
 					var template = getPrimaryTemplate(el) || defaultTagData.subtemplate,
 						renderingDefaultContent = template === defaultTagData.subtemplate;
 
-					// var userRenderer = getPrimaryTemplate(el),
-					// subtemplate = userRenderer || contentTagData.subtemplate;
-					// renderingLightContent = !!userRenderer;
 					if (template) {
 						// However, `_tags.[tagName]` is going to point to this current content callback.  We need to
 						// remove that so it will walk up the chain
@@ -319,28 +316,16 @@ var Component = Construct.extend(
 						// internal viewModel. This can be overridden to be
 						// lexical with the leakScope option.
 						var tagData;
-						if (!renderingDefaultContent) {
-							if (lexicalContent) {
-								// render with the same scope the component was found within.
-								tagData = addContext(el, componentTagData, defaultTagData);
-							}
-							else {
-								// render with the component's viewModel mixed in, however
-								// we still want the outer refs to be used, NOT the component's refs
-								// <component> {{some value }} </component>
-								// To fix this, we
-								// walk down the scope to the component's ref, clone scopes from that point up
-								// use that as the new scope.
-								
-								tagData = {
-									scope: defaultTagData.scope.cloneFromRef(),
-									options: defaultTagData.options
-								};
-							}
-						} else {
-							// we are rendering within the component so this element should
-							// use the same scope.
-							tagData = defaultTagData;
+						if (!renderingDefaultContent && lexicalContent) {
+							// render with the same scope the component was found within.
+							tagData = addContext(el, componentTagData, defaultTagData);
+						}
+						else {
+							// render with the component's viewModel mixed in, however
+							// we still want the outer refs to be used, NOT the component's refs
+							// <component> {{some value }} </component>
+
+							tagData = addContext(el, defaultTagData, componentTagData);
 						}
 
 						if (defaultTagData.parentNodeList) {
@@ -363,21 +348,12 @@ var Component = Construct.extend(
 					options.tags = {};
 				}
 
-				// if (!isEmptyObject(templates)) {
-				// 	options.tags['can-slot'] = makeHookup('can-slot', function(el) {
-				// 		return templates[el.getAttribute("name")];
-				// 	});
-				// }
-				// else {
-				// 	options.tags.content = makeHookup('content', function() {
-				// 		return componentTagData.subtemplate;
-				// 	});
-				// }
-
+				// Add a hookup for each <can-slot>
 				options.tags['can-slot'] = makeHookup('can-slot', function(el) {
 					return templates[el.getAttribute("name")];
 				});
 
+				// Add a hookup for <content>
 				options.tags.content = makeHookup('content', function() {
 					return componentTagData.subtemplate;
 				});
