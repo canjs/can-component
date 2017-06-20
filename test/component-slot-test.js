@@ -171,14 +171,14 @@ test("<can-slot> Context one-way binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {context}="subject" />'
+			'<can-slot name="foo" {this}="subject" />'
 		),
 		ViewModel
 	});
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><span>{{context}}</span></can-template>' + 
+			'<can-template name="foo"><span>{{this}}</span></can-template>' + 
 		'</my-email>'
 	);
 
@@ -195,7 +195,7 @@ test("<can-slot> Context one-way binding works", function() {
 test("<can-slot> Context two-way binding works", function() {
 	/*Passing in a custom context like <can-slot name='subject' {(context)}='value' />*/
 
-	var ViewModel = DefineMap.extend({
+	var ViewModel = DefineMap.extend('MyEmailVM', {}, {
 		subject: {
 			value: "Hello World"
 		}
@@ -204,7 +204,7 @@ test("<can-slot> Context two-way binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {(context)}="subject" />'
+			'<can-slot name="foo" {(this)}="subject" />'
 		),
 		ViewModel
 	});
@@ -212,14 +212,14 @@ test("<can-slot> Context two-way binding works", function() {
 	Component.extend({
 		tag : 'my-subject',
 		view : stache(
-			'{{context}}'
+			'{{subject}}'
 		),
 		viewModel: {}
 	});
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject {(context)}="context" /></can-template>' + 
+			'<can-template name="foo"><my-subject {(this)}="subject" /></can-template>' + 
 		'</my-email>'
 	);
 
@@ -233,7 +233,7 @@ test("<can-slot> Context two-way binding works", function() {
 
 	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
 
-	childVM.context = "After a while crocodile";
+	childVM.subject = "After a while crocodile";
 
 	equal(vm.subject, "After a while crocodile");
 });
@@ -320,7 +320,7 @@ test("<can-slot> Works alongside <content>", function() {
 });
 
 test("<can-slot> Works alongside <content> with default content", function() {
-	/*Will still render <content> in the right place*/
+	/*Will still render default <content> in the right place*/
 
 	var ViewModel = DefineMap.extend({
 		subject: {

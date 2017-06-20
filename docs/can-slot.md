@@ -1,7 +1,7 @@
-@typedef {can-stache.sectionRenderer} can-component/can-slot <can-slot>
+@typedef {can-stache.sectionRenderer} can-component.can-slot <can-slot>
 @parent can-component.elements
 
-@description Position the content of [can-component.can-slot <can-template>] elements
+@description Position the content of [can-component.can-slot] elements
 
 @signature `<can-slot name='TEMPLATE_NAME'>DEFAULT_CONTENT</can-slot>`
 

@@ -35,11 +35,10 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
+var contextPattern = /.*this.*/;
 function addContext(el, tagData, defaultTagData) {
-	domData.set.call(el, "preventDataBindings", true);
 
-	var newContext, 
-		contextPattern = /.*context.*/,
+	var newContext,
 		contextIndex,
 		gotContext = false;
 
@@ -65,9 +64,11 @@ function addContext(el, tagData, defaultTagData) {
 		// Create a compute responsible for keeping the vm up-to-date
 		newContext = compute(function(value) {
 			if (arguments.length) {
-				vm.set('context', value);
+				vm.set('this', value);
 			}
-			return vm;
+			else {
+				return vm.get('this');
+			}
 		});
 		return vm;
 	});
