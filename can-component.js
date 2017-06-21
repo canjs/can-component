@@ -37,7 +37,6 @@ require('can-view-model');
 
 var contextPattern = /.*this.*/;
 function addContext(el, tagData, defaultTagData) {
-	debugger;
 	var vm,
 		contextIndex,
 		gotContext = false;
@@ -308,20 +307,24 @@ var Component = Construct.extend(
 						// the component will have access to the
 						// internal viewModel. This can be overridden to be
 						// lexical with the leakScope option.
-						var tagData;
+						var tagData, teardown, addedContext;
 						if (!renderingDefaultContent && lexicalContent) {
 							// render with the same scope the component was found within.
-							tagData = addContext(el, componentTagData, defaultTagData);
+							addedContext = addContext(el, componentTagData, defaultTagData);
+							tagData = addedContext.tagData;
+							teardown = addContext.teardown;
 						}
 						else {
 							// render with the component's viewModel mixed in, however
 							// we still want the outer refs to be used, NOT the component's refs
 							// <component> {{some value }} </component>
 
-							tagData = addContext(el, defaultTagData, componentTagData);
+							addedContext = addContext(el, defaultTagData, componentTagData);
+							tagData = addedContext.tagData;
+							teardown = addContext.teardown;
 						}
 						var nodeList = nodeLists.register([el], function() {
-							teardown()
+							teardown();
 						}, defaultTagData.parentNodeList || true, false);
 
 						//if (defaultTagData.parentNodeList) {
