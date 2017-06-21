@@ -173,7 +173,7 @@ test("<can-slot> Context one-way binding works", function() {
 		view : stache(
 			'<can-slot name="foo" {this}="subject" />'
 		),
-		ViewModel
+		ViewModel: ViewModel
 	});
 
 	var renderer = stache(
@@ -213,13 +213,15 @@ test("<can-slot> Context two-way binding works", function() {
 		tag : 'my-subject',
 		view : stache(
 			'{{subject}}'
-		),
-		viewModel: {}
+		)
 	});
+
+	var vm = {};
+	vm = "Hello World"
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject {(this)}="subject" /></can-template>' + 
+			'<can-template name="foo"><my-subject {(subject)}="this" /></can-template>' + 
 		'</my-email>'
 	);
 
@@ -250,9 +252,9 @@ test("<can-slot> Context child-to-parent binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {^context}="subject" />'
+			'<can-slot name="foo" {^this}="subject" />'
 		),
-		ViewModel
+		ViewModel: ViewModel
 	});
 
 	Component.extend({
@@ -260,12 +262,16 @@ test("<can-slot> Context child-to-parent binding works", function() {
 		view : stache(
 			'{{subject}}'
 		),
-		viewModel: {}
+		ViewModel: DefineMap.extend({
+			subject: {
+				value: 'Yo'
+			}
+		})
 	});
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject {(subject)}="subject" /></can-template>' + 
+			'<can-template name="foo"><my-subject {^subject}="this" /></can-template>' + 
 		'</my-email>'
 	);
 
@@ -273,7 +279,7 @@ test("<can-slot> Context child-to-parent binding works", function() {
 	var vm = viewModel(frag.firstChild);
 	var childVM = viewModel(frag.firstChild.firstChild);
 	
-	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
+	equal(frag.firstChild.firstChild.innerHTML, 'Yo');
 
 	childVM.subject = "bar";
 
@@ -353,4 +359,53 @@ test("<can-slot> Works alongside <content> with default content", function() {
 	
 	equal(testView.firstChild.childNodes[0].firstChild.nodeValue, 'Hello World');
 	equal(testView.firstChild.childNodes[1].nodeValue, 'Default content');
+});
+
+test("<can-slot> Can be used conditionally", function() {
+	/*Can be used conditionally and will remove bindings upon being removed*/
+
+	var ViewModel = DefineMap.extend({
+		subject: {
+			value: "Hello World"
+		},
+		showSubject: {
+			value: true
+		}
+	});
+
+	Component.extend({
+		tag : 'my-email',
+		view : stache(
+			'{{#if showSubject}}<can-slot name="subject" {this}="subject" />{{/if}}'
+		),
+		ViewModel
+	});
+
+	var renderer = stache(
+		'<my-email>' +
+			'<can-template name="subject">' +
+				'<p>{{subject}}</p>' +
+			'</can-template>' +
+		'</my-email>'
+	);
+
+	var testView = renderer();
+	
+	equal(testView.firstChild.firstChild.firstChild.nodeValue, 'Hello World');
+
+	var vm = viewModel(testView.firstChild);
+
+	debugger;
+	vm.showSubject = false;
+
+	QUnit.stop();
+
+	QUnit.equal(testView.firstChild.children.length, 0);
+	// vm.__bindings.subject.handlers
+
+	setTimeout(function() {
+		debugger;
+		QUnit.equal(vm.__bindEvents.subject.length, 0);
+		QUnit.start();
+	},50);
 });

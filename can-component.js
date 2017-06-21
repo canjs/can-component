@@ -37,10 +37,12 @@ require('can-view-model');
 
 var contextPattern = /.*this.*/;
 function addContext(el, tagData, defaultTagData) {
-
-	var newContext,
+	debugger;
+	var vm,
 		contextIndex,
 		gotContext = false;
+
+	domData.set.call(el, "preventDataBindings", true);
 
 	for (var i = 0; i < el.attributes.length; i++) {
 		// Check to see if we got any kind of context attribute and record it's index
@@ -59,18 +61,8 @@ function addContext(el, tagData, defaultTagData) {
 	}
 
 	var teardown = stacheBindings.behaviors.viewModel(el, tagData, function(initialData) {
-		// Create a DefineMap out of the passed in data
-		var vm = new types.DefaultMap(initialData);
 		// Create a compute responsible for keeping the vm up-to-date
-		newContext = compute(function(value) {
-			if (arguments.length) {
-				vm.set('this', value);
-			}
-			else {
-				return vm.get('this');
-			}
-		});
-		return vm;
+		return vm = compute(initialData);
 	});
 
 	if(!gotContext) {
@@ -79,8 +71,8 @@ function addContext(el, tagData, defaultTagData) {
 		return tagData;
 	}
 
-	tagData.scope = tagData.scope.add(newContext);
-	return tagData;
+	tagData.scope = tagData.scope.add(vm);
+	return {tagData: tagData, teardown: teardown};
 }
 
 /**
@@ -328,13 +320,16 @@ var Component = Construct.extend(
 
 							tagData = addContext(el, defaultTagData, componentTagData);
 						}
+						var nodeList = nodeLists.register([el], function() {
+							teardown()
+						}, defaultTagData.parentNodeList || true, false);
 
-						if (defaultTagData.parentNodeList) {
-							var frag = template(tagData.scope, tagData.options, defaultTagData.parentNodeList);
-							nodeLists.replace([el], frag);
-						} else {
-							nodeLists.replace([el], template(tagData.scope, tagData.options));
-						}
+						//if (defaultTagData.parentNodeList) {
+							var frag = template(tagData.scope, tagData.options, nodeList);
+							nodeLists.replace(nodeList, frag);
+						//} else {
+						//	nodeLists.replace([el], template(tagData.scope, tagData.options));
+						//}
 
 						// Restore the proper tag function so it could potentially be used again (as in lists)
 						options.tags[tagName] = hookupFunction;
