@@ -24,6 +24,7 @@ var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
 var types = require("can-types");
 var string = require("can-util/js/string/string");
+var canReflect = require("can-reflect");
 
 var canEach = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
@@ -72,13 +73,13 @@ var Component = Construct.extend(
 
 					if(protoViewModel) {
 						if(typeof protoViewModel === "function") {
-							if(types.isMapLike(protoViewModel.prototype)) {
+							if(canReflect.isObservableLike(protoViewModel.prototype) && canReflect.isMapLike(protoViewModel.prototype)) {
 								this.ViewModel = protoViewModel;
 							} else {
 								this.viewModelHandler = protoViewModel;
 							}
 						} else {
-							if(types.isMapLike(protoViewModel)) {
+							if(canReflect.isObservableLike(protoViewModel) && canReflect.isMapLike(protoViewModel)) {
 								//!steal-remove-start
 								canLog.warn("can-component: "+this.prototype.tag+" is sharing a single map across all component instances");
 								//!steal-remove-end
@@ -149,10 +150,10 @@ var Component = Construct.extend(
 
 					if(viewModelHandler) {
 						var scopeResult = viewModelHandler.call(component, initialViewModelData, componentTagData.scope, el);
-						if (types.isMapLike( scopeResult ) ) {
+						if (canReflect.isObservableLike(scopeResult) && canReflect.isMapLike(scopeResult) ) {
 							// If the function returns a can.Map, use that as the viewModel
 							viewModelInstance = scopeResult;
-						} else if ( types.isMapLike(scopeResult.prototype) ) {
+						} else if (canReflect.isObservableLike(scopeResult.prototype) && canReflect.isMapLike(scopeResult.prototype)) {
 							// If `scopeResult` is of a `can.Map` type, use it to wrap the `initialViewModelData`
 							ViewModel = scopeResult;
 						} else {
