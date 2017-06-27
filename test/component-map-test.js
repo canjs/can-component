@@ -82,8 +82,6 @@ function makeTest(name, doc, mutObs) {
 				DOCUMENT(DOC);
 				MUTATION_OBSERVER(MUT_OBS);
 			}, 100);
-
-
 		}
 	});
 
@@ -190,6 +188,7 @@ function makeTest(name, doc, mutObs) {
 	});
 
 	test("treecombo", function () {
+
 		var TreeComboViewModel = CanMap.extend({
 			items: [],
 			breadcrumb: [],
@@ -1185,6 +1184,7 @@ function makeTest(name, doc, mutObs) {
 		var res = stached({
 			Constructed: Constructed
 		});
+
 		equal(innerHTML(res.firstChild), "bar");
 
 
