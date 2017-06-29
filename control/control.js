@@ -3,7 +3,7 @@ var Control = require("can-control");
 var canEach = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
 var canCompute = require("can-compute");
-var observeReader = require('can-observation/reader/reader');
+var observeReader = require('can-stache-key');
 
 // ## Helpers
 // Attribute names to ignore for setting viewModel values.
