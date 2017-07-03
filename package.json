@@ -49,7 +49,7 @@
     "can-simple-map": "^3.3.0-pre.2",
     "can-stache-bindings": "^3.4.0-pre.0",
     "can-types": "^1.1.0-pre.0",
-    "can-util": "^3.9.0-pre.2",
+    "can-util": "^3.9.5",
     "can-view-callbacks": "^3.2.0-pre.0",
     "can-view-model": "^3.4.0-pre.0",
     "can-view-nodelist": "^3.1.0-pre.0",
