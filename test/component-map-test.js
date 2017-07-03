@@ -1031,11 +1031,17 @@ function makeTest(name, doc, mutObs) {
 
 		domMutate.appendChild.call(this.fixture, frag);
 		stop();
-		setTimeout(function(){
-			equal(inited, 1, "inited");
-			equal(inserted, 1, "inserted");
-			start();
-		}, 100);
+		function checkCount(){
+			if(inserted >= 1) {
+				equal(inited, 1, "inited");
+				equal(inserted, 1, "inserted");
+				start();
+			} else {
+				setTimeout(checkCount,30);
+			}
+		}
+
+		checkCount();
 	});
 
 
