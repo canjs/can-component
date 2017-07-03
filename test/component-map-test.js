@@ -1583,7 +1583,7 @@ function makeTest(name, doc, mutObs) {
 			if(index < threads.length) {
 				threads[index]();
 				index++;
-				setTimeout(next, 100);
+				setTimeout(next, 150);
 			} else {
 				start();
 			}
