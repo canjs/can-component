@@ -36,8 +36,7 @@
   "system": {
     "configDependencies": [
       "live-reload"
-    ],
-    "npmAlgorithm": "flat"
+    ]
   },
   "dependencies": {
     "can-compute": "^3.1.0-pre.7",
