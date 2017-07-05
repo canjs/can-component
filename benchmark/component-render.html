@@ -43,7 +43,7 @@
 <body>
 <button id='start'>Start</button>
 <button id='stop'>Stop</button>
-<div id='timing'></div>
+<div id='timing'>Last ~45.58 on Justin's computer</div>
 
 <script id="complex-component-template" type='text/stache'>
 <child-component {first-name}="first" {last-name}="last">
@@ -119,7 +119,7 @@
 	document.getElementById("start").addEventListener("click", function(){
 		loopCount = 0;
 		totalTime = 0;
-		console.profile("loops");
+		//console.profile("loops");
 		benchmarkLoop(run);
 	});
 
@@ -142,7 +142,7 @@
 		    	benchmarkLoop(fn);
 		    },1);
 	    } else {
-	    	console.profileEnd("loops");
+	    	//console.profileEnd("loops");
 	    }
 
 	};
