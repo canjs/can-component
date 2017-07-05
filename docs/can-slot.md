@@ -5,8 +5,8 @@
 
 @signature `<can-slot name='TEMPLATE_NAME'>DEFAULT_CONTENT</can-slot>`
 
-Replaces any `<can-slot name='TEMPLATE_NAME' />` element found in a component's view with the rendered contents 
-of the `<can-template />` element from the `LIGHT_DOM` that has a matching [TEMPLATE_NAME] attribute. Uses the scope of 
+Replaces any `<can-slot name='TEMPLATE_NAME' />` element found in a component's view with the rendered contents
+of the `<can-template />` element from the `LIGHT_DOM` that has a matching [TEMPLATE_NAME] attribute. Uses the scope of
 the `LIGHT_DOM` by default.
 
 ```js
@@ -33,17 +33,17 @@ renderer({
 
 @param {String} [TEMPLATE_NAME] The name of the template to match and replace itself with
 
-@param {can-stache.sectionRenderer} [DEFAULT_CONTENT] The content that should be 
+@param {can-stache.sectionRenderer} [DEFAULT_CONTENT] The content that should be
 used if there is no content in the matching `<can-template>`.
 
 @body
 
 ## Use
 
-To use <can-slot> we can create a Component that has <can-slot> elements in it's view 
+To use `<can-slot>` we can create a Component that has `<can-slot>` elements in it's view
 and render that component with <can-template> elements in the `LIGHT_DOM`.
 
-Any <can-slot> that has a name attribute matching the name attribute of a <can-template> will be 
+Any `<can-slot>` that has a name attribute matching the name attribute of a `<can-template>` will be
 replaced by the rendered inner contents of the <can-template>.
 
 ```js
@@ -176,8 +176,8 @@ var testView = renderer({
 
 ### Default content
 
-Default content can be specified to be used if there is no matching <can-template> 
-or the matching <can-template> has no inner content.
+Default content can be specified to be used if there is no matching `<can-template>`
+or the matching `<can-template>` has no inner content.
 
 ```js
 
@@ -185,7 +185,7 @@ Component.extend({
 	tag : 'my-email',
 	view : stache(
 		'<can-slot name="subject">' +
-			'<p>This is the default {{subject}}</p>' + 
+			'<p>This is the default {{subject}}</p>' +
 		'</can-slot>'
 	)
 });
