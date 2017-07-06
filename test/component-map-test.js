@@ -82,8 +82,6 @@ function makeTest(name, doc, mutObs) {
 				DOCUMENT(DOC);
 				MUTATION_OBSERVER(MUT_OBS);
 			}, 100);
-
-
 		}
 	});
 
@@ -190,6 +188,7 @@ function makeTest(name, doc, mutObs) {
 	});
 
 	test("treecombo", function () {
+
 		var TreeComboViewModel = CanMap.extend({
 			items: [],
 			breadcrumb: [],
@@ -681,6 +680,7 @@ function makeTest(name, doc, mutObs) {
 				}
 			}
 		});
+
 		var renderer = stache("<my-app>" +
 			'{{^visible}}<button can-click="show">show</button>{{/visible}}' +
 			'<my-toggler {(visible)}="visible">' +
@@ -1031,11 +1031,17 @@ function makeTest(name, doc, mutObs) {
 
 		domMutate.appendChild.call(this.fixture, frag);
 		stop();
-		setTimeout(function(){
-			equal(inited, 1, "inited");
-			equal(inserted, 1, "inserted");
-			start();
-		}, 100);
+		function checkCount(){
+			if(inserted >= 1) {
+				equal(inited, 1, "inited");
+				equal(inserted, 1, "inserted");
+				start();
+			} else {
+				setTimeout(checkCount,30);
+			}
+		}
+
+		checkCount();
 	});
 
 
@@ -1184,6 +1190,7 @@ function makeTest(name, doc, mutObs) {
 		var res = stached({
 			Constructed: Constructed
 		});
+
 		equal(innerHTML(res.firstChild), "bar");
 
 
@@ -1577,7 +1584,7 @@ function makeTest(name, doc, mutObs) {
 			if(index < threads.length) {
 				threads[index]();
 				index++;
-				setTimeout(next, 100);
+				setTimeout(next, 150);
 			} else {
 				start();
 			}
