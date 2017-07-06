@@ -1,50 +1,54 @@
 @typedef {can-stache.sectionRenderer} can-component/can-template <can-template>
 @parent can-component.elements
 
-@description Create reusable templates that replace `<can-slot>` elements.
+@description Pass templates declaratively to components.
 
-@signature `<can-template name='TEMPLATE_NAME' />`
+@signature `<can-template name='NAME'/>`
 
-When a <can-slot> with matching [TEMPLATE_NAME] is found in a component's view 
-<can-template> inner contents are rendered and replace the <can-slot> element.
+When building widget-like components, it's often useful to allow the consumer of the
+component to customize parts of the widget's layout.  These components can accept
+templates passed to them using `<can-template>` and render these templates with
+[can-component/can-slot].  The `name` attribute of a `<can-template>`
+corresponds to the `name` attribute of a `<can-slot>`.
+
+For example, the following passes a `<my-modal>` component a `<can-template>`
+of the modal content:
 
 ```js
-var ViewModel = DefineMap.extend({
-	subject: {
-		value:"Hello World"
-	}
-});
-
 Component.extend({
-	tag : 'my-email',
+	tag : 'my-modal',
 	view : stache(
-		'<can-slot name="subject" />'
-	),
-	ViewModel
+		'<div class="wrapper"><can-slot name="modal-content" /></div>'
+	)
 });
 
 var renderer = stache(
-	'<my-email>' +
-		'<can-template name="subject">' +
-			'{{subject}}' +
+	'<my-modal>' +
+		'<can-template name="modal-content">' +
+			'Hello World!' +
 		'</can-template>' +
-	'</my-email>'
+	'</my-modal>'
 );
 
-renderer() //-> <my-email>Hello World</my-email>
+renderer() //-> <my-modal><div class="wrapper">Hello World!</div></my-modal>
 ```
 
-@param {String} [TEMPLATE_NAME] The name of the template to match and replace itself with
+By default, `<can-template>` is rendered with the surrounding scope
+like `<content>`. A different context ([can-stache/keys/this]) can be added
+to that scope with bindings.  Read [can-component/can-slot] for more information.
+
+@param {String} [NAME] The name of the template that will be rendered by a corresponding
+[can-component/can-slot].
 
 @body
 
 ## Use
 
-To use <can-template> elements we can create a Component that has <can-slot> elements in it's view 
-and render that component with <can-template> elements in the `LIGHT_DOM`.
+To use `<can-template>` elements we can create a Component that has `<can-slot>` elements in it's view
+and render that component with `<can-template>` elements in the `LIGHT_DOM`.
 
-Any <can-template> that has a name attribute matching the name attribute of a <can-slot> will 
-have it's inner contents rendered and replace the <can-slot>.
+Any `<can-template>` that has a name attribute matching the name attribute of a `<can-slot>` will
+have it's inner contents rendered and replace the `<can-slot>`.
 
 ```js
 Component.extend({

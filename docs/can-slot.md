@@ -1,11 +1,11 @@
-@typedef {can-stache.sectionRenderer} can-component.can-slot <can-slot>
+@typedef {can-stache.sectionRenderer} can-component/can-slot <can-slot>
 @parent can-component.elements
 
-@description Position the content of [can-component.can-slot] elements
+@description Position the content of [can-component/can-template] elements.
 
-@signature `<can-slot name='TEMPLATE_NAME'>DEFAULT_CONTENT</can-slot>`
+@signature `<can-slot name='NAME' BINDING>DEFAULT_CONTENT</can-slot>`
 
-Replaces any `<can-slot name='TEMPLATE_NAME' />` element found in a component's view with the rendered contents
+Replaces any `<can-slot name='NAME' />` element found in a component's view with the rendered contents
 of the `<can-template />` element from the `LIGHT_DOM` that has a matching [TEMPLATE_NAME] attribute. Uses the scope of
 the `LIGHT_DOM` by default.
 
@@ -31,7 +31,18 @@ renderer({
 //-> <my-email>Hello World</my-email>
 ```
 
-@param {String} [TEMPLATE_NAME] The name of the template to match and replace itself with
+@param {String} NAME The name of the [can-component/can-template] to render in place of the `<can-slot>`.
+
+@param {can-stache-bindings} BINDING You can bind to the context (also known as [can-stache/keys/this])
+of of the corresponding [can-component/can-template].  This lets you pass data to the
+template. The following passes `user` as `this` to the corresponding `<can-template name="user-details">`:
+
+```html
+<can-slot name="user-details" {this}="user">
+```
+
+[can-stache-bindings.toChild], [can-stache-bindings.toParent] and [can-stache-bindings.twoWay] with `this`
+all work.
 
 @param {can-stache.sectionRenderer} [DEFAULT_CONTENT] The content that should be
 used if there is no content in the matching `<can-template>`.
@@ -81,55 +92,11 @@ renderer({
 */
 ```
 
-### leakScope
-
-With leakScope set to true we can use the data from a component's viewModel
-
-```js
-var ViewModel = DefineMap.extend({
-	subject: {
-		value:"Hello World"
-	},
-	body: {
-		value: "Later Gator"
-	}
-});
-
-Component.extend({
-	tag : 'my-email',
-	view : stache(
-		'<can-slot name="subject" />' +
-		'<can-slot name="body" />'
-	),
-	ViewModel,
-	// This allows us to use the viewModel data
-	leakScope: true
-});
-
-var renderer = stache(
-	'<my-email>' +
-		'<can-template name="subject">' +
-			'<h1>{{subject}}</h1>' +
-		'</can-template>' +
-		'<can-template name="body">' +
-			'<p>{{body}}</p>' +
-		'</can-template>' +
-	'</my-email>'
-);
-
-var testView = renderer();
-
-/*
-<my-email>
-	<h1>Hello World</h1>
-	<p>Later Gator</p>
-</my-email>
-*/
-```
-
 ### Passing context
 
-Context can be bound to and passed to a slot
+Context ([can-stache/keys/this]) can be bound to and passed to a template. The following
+passes `<my-email>`'s `subject` and `body` to the `subject` and `body` templates.  Notice
+how `subject` and `body` are read by `{{this}}`.
 
 ```js
 var ViewModel = DefineMap.extend({
@@ -144,8 +111,8 @@ var ViewModel = DefineMap.extend({
 Component.extend({
 	tag : 'my-email',
 	view : stache(
-		'<can-slot name="subject" {context}="subject" />' +
-		'<can-slot name="body" />'
+		'<can-slot name="subject" {this}="subject"/>' +
+		'<can-slot name="body" {this}="body"/>'
 	),
 	ViewModel
 });
@@ -153,23 +120,23 @@ Component.extend({
 var renderer = stache(
 	'<my-email>' +
 		'<can-template name="subject">' +
-			'<h1>{{subject}}</h1>' +
+			'<h1>{{this}}</h1>' +
 		'</can-template>' +
 		'<can-template name="body">' +
-			'<p>{{body}}</p>' +
+			'<p>{{this}}</p>' +
 		'</can-template>' +
 	'</my-email>'
 );
 
 var testView = renderer({
-	subject: 'foo',
-	body: 'bar'
+	subject: 'Hello World',
+	body: 'This is a greeting.'
 });
 
 /*
 <my-email>
 	<h1>Hello World</h1>
-	<p>bar</p>
+	<p>This is a greeting.</p>
 </my-email>
 */
 ```
