@@ -24,7 +24,6 @@
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
     "build": "node build.js",
-    "document": "bit-docs",
     "develop": "done-serve --static --develop --port 8080"
   },
   "main": "can-component",
