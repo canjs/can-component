@@ -1,17 +1,17 @@
 @property {Boolean} can-component.prototype.leakScope leakScope
 @parent can-component.prototype
 
-@description Allow reading the outer scope values from a component’s template and
+@description Allow reading the outer scope values from a component’s view and
 a component’s viewModel values in the user content.
 
 @option {Boolean}  `false` limits reading to:
 
-- the component’s viewModel from the component’s template, and
+- the component’s viewModel from the component’s view, and
 - the outer scope values from the user content.
 
 `true` adds the ability to read:
 
-- the outer [can-view-scope scope] values from the component’s template, and
+- the outer [can-view-scope scope] values from the component’s view, and
 - the component’s [can-component.prototype.ViewModel] values from the user content.
 
 The default value is `false`.
@@ -36,12 +36,12 @@ based on some value in the component’s ViewModel.
 ## Use
 
 A component’s [can-component::leakScope leakScope] option controls if a
-component’s template can access the component’s outer scope and the
+component’s view can access the component’s outer scope and the
 user content can read the component’s view model.
 
-Let’s define what __outer scope__, __component’s template__ and __user content__ mean.
+Let’s define what __outer scope__, __component’s view__ and __user content__ mean.
 
-If I have a `<hello-world>` component in a template like:
+If I have a `<hello-world>` component in a view like:
 
 ```
 {{#data}}
@@ -50,7 +50,7 @@ If I have a `<hello-world>` component in a template like:
 ```
 
 The __outer scope__ of `<hello-world>` has `data` as its context.  The __user content__ of
-`<hello-world>` is the template between its tags.  In this case, the __user content__
+`<hello-world>` is the view between its tags.  In this case, the __user content__
 is `{{subject}}`.
 
 Finally, if `<hello-world>` is defined like:
@@ -62,11 +62,11 @@ Component.extend({
 })
 ```
 
-`{{greeting}} <content/>{{exclamation}}` represents the __component’s template__.
+`{{greeting}} <content/>{{exclamation}}` represents the __component’s view__.
 
-## Using outer scope in component template
+## Using outer scope in component view
 
-If `leakScope` is `true`, the __component’s template__ can read the data in the outer scope and will
+If `leakScope` is `true`, the __component’s view__ can read the data in the outer scope and will
 see `name: "John"` overwriting `name: "World"` in the component’s viewModel instance in the following example.
 
 If the following component is defined:

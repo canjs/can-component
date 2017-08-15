@@ -82,8 +82,6 @@ function makeTest(name, doc, mutObs) {
 				DOCUMENT(DOC);
 				MUTATION_OBSERVER(MUT_OBS);
 			}, 100);
-
-
 		}
 	});
 
@@ -133,15 +131,15 @@ function makeTest(name, doc, mutObs) {
 	test("lexical scoping", function() {
 		Component.extend({
 			tag: "hello-world",
-			template: stache("{{greeting}} <content>World</content>{{exclamation}}"),
+			view: stache("{{greeting}} <content>World</content>{{exclamation}}"),
 			viewModel: {
 				greeting: "Hello"
 			}
 		});
-		var template = stache("<hello-world>{{greeting}}</hello-world>");
+		var renderer = stache("<hello-world>{{greeting}}</hello-world>");
 
 
-		var frag = template({
+		var frag = renderer({
 			greeting: "World",
 			exclamation: "!"
 		});
@@ -155,9 +153,9 @@ function makeTest(name, doc, mutObs) {
 			leakScope: false,
 			viewModel: {greeting: "Hello"}
 		});
-		template = stache("<hello-world-no-template>{{greeting}}</hello-world-no-template>");
+		renderer = stache("<hello-world-no-template>{{greeting}}</hello-world-no-template>");
 
-		frag = template({
+		frag = renderer({
 			greeting: "World",
 			exclamation: "!"
 		});
@@ -165,7 +163,7 @@ function makeTest(name, doc, mutObs) {
 		hello = frag.firstChild;
 
 		equal(innerHTML(hello).trim(), "Hello",
-			  "If no template is provided to Component, treat <content> bindings as dynamic.");
+			  "If no view is provided to Component, treat <content> bindings as dynamic.");
 	});
 
 	test("dynamic scoping", function() {
@@ -173,12 +171,12 @@ function makeTest(name, doc, mutObs) {
 		Component.extend({
 			tag: "hello-world",
 			leakScope: true,
-			template: stache("{{greeting}} <content>World</content>{{exclamation}}"),
+			view: stache("{{greeting}} <content>World</content>{{exclamation}}"),
 			viewModel: {greeting: "Hello"}
 		});
 
-		var template = stache("<hello-world>{{greeting}}</hello-world>");
-		var frag = template({
+		var renderer = stache("<hello-world>{{greeting}}</hello-world>");
+		var frag = renderer({
 			greeting: "World",
 			exclamation: "!"
 		});
@@ -190,6 +188,7 @@ function makeTest(name, doc, mutObs) {
 	});
 
 	test("treecombo", function () {
+
 		var TreeComboViewModel = CanMap.extend({
 			items: [],
 			breadcrumb: [],
@@ -238,7 +237,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "treecombo",
-			template: stache("<ul class='breadcrumb'>" +
+			view: stache("<ul class='breadcrumb'>" +
 				"<li can-click='emptyBreadcrumb'>{{title}}</li>" +
 				"{{#each breadcrumb}}" +
 				"<li can-click='updateBreadcrumb'>{{title}}</li>" +
@@ -260,11 +259,11 @@ function makeTest(name, doc, mutObs) {
 			ViewModel: TreeComboViewModel
 		});
 
-		var template = stache("<treecombo {(items)}='locations' title='Locations'></treecombo>");
+		var renderer = stache("<treecombo {(items)}='locations' title='Locations'></treecombo>");
 
 		var base = new CanMap({});
 
-		var frag = template(base);
+		var frag = renderer(base);
 		var root = doc.createElement("div");
 		root.appendChild(frag);
 
@@ -413,7 +412,7 @@ function makeTest(name, doc, mutObs) {
 		Component.extend({
 			tag: "grid",
 			ViewModel: GridViewModel,
-			template: stache("<table><tbody><content></content></tbody></table>"),
+			view: stache("<table><tbody><content></content></tbody></table>"),
 			leakScope: true,
 			events: {
 				init: function () {
@@ -472,7 +471,7 @@ function makeTest(name, doc, mutObs) {
 		});
 		var viewModel = new SimulatedScope();
 
-		var template = stache("<grid {(deferreddata)}='viewModel.deferredData'>" +
+		var renderer = stache("<grid {(deferreddata)}='viewModel.deferredData'>" +
 			"{{#each items}}" +
 			"<tr>" +
 			"<td width='40%'>{{first}}</td>" +
@@ -481,7 +480,7 @@ function makeTest(name, doc, mutObs) {
 			"{{/each}}" +
 			"</grid>");
 
-		domMutate.appendChild.call(this.fixture, template({
+		domMutate.appendChild.call(this.fixture, renderer({
 			viewModel: viewModel
 		}));
 
@@ -522,7 +521,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "next-prev",
-			template: stache(
+			view: stache(
 				'<a href="javascript://"' +
 				'class="prev {{#paginate.canPrev}}enabled{{/paginate.canPrev}}" ($click)="paginate.prev()">Prev</a>' +
 				'<a href="javascript://"' +
@@ -534,9 +533,9 @@ function makeTest(name, doc, mutObs) {
 			offset: 0,
 			count: 100
 		});
-		var template = stache("<next-prev {(paginate)}='paginator'></next-prev>");
+		var renderer = stache("<next-prev {(paginate)}='paginator'></next-prev>");
 
-		var frag = template({
+		var frag = renderer({
 			paginator: paginator
 		});
 		var nextPrev = frag.firstChild;
@@ -555,7 +554,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "page-count",
-			template: stache('Page <span>{{page}}</span>.')
+			view: stache('Page <span>{{page}}</span>.')
 		});
 
 		var paginator = new Paginate({
@@ -564,9 +563,9 @@ function makeTest(name, doc, mutObs) {
 			count: 100
 		});
 
-		var template = stache("<page-count {(page)}='paginator.page'></page-count>");
+		var renderer = stache("<page-count {(page)}='paginator.page'></page-count>");
 
-		var frag = template( new CanMap({
+		var frag = renderer( new CanMap({
 			paginator: paginator
 		}) );
 
@@ -584,7 +583,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "hello-world",
-			template: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
+			view: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
 			viewModel: {
 				visible: false,
 				message: "Hello There!"
@@ -596,8 +595,8 @@ function makeTest(name, doc, mutObs) {
 			}
 		});
 
-		var template = stache("  <hello-world></hello-world>  ");
-		var frag = template({});
+		var renderer = stache("  <hello-world></hello-world>  ");
+		var frag = renderer({});
 
 		var helloWorld = frag.childNodes.item(1);
 
@@ -611,15 +610,15 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			"tag": "my-greeting",
-			template: stache("<h1><content/></h1>"),
+			view: stache("<h1><content/></h1>"),
 			viewModel: {
 				title: "Component"
 			}
 		});
 
-		var template = stache("<my-greeting><span>{{site}} - {{title}}</span></my-greeting>");
+		var renderer = stache("<my-greeting><span>{{site}} - {{title}}</span></my-greeting>");
 
-		var frag = template({
+		var frag = renderer({
 			site: "CanJS"
 		});
 
@@ -630,7 +629,7 @@ function makeTest(name, doc, mutObs) {
 	test("canViewModel utility", function() {
 		Component({
 			tag: "my-taggy-tag",
-			template: stache("<h1>hello</h1>"),
+			view: stache("<h1>hello</h1>"),
 			viewModel: {
 				foo: "bar"
 			}
@@ -659,7 +658,7 @@ function makeTest(name, doc, mutObs) {
 	test('setting passed variables - two way binding', function () {
 		Component.extend({
 			tag: "my-toggler",
-			template: stache("{{#if visible}}<content/>{{/if}}"),
+			view: stache("{{#if visible}}<content/>{{/if}}"),
 			leakScope: true,
 			viewModel: {
 				visible: true,
@@ -681,7 +680,8 @@ function makeTest(name, doc, mutObs) {
 				}
 			}
 		});
-		var template = stache("<my-app>" +
+
+		var renderer = stache("<my-app>" +
 			'{{^visible}}<button can-click="show">show</button>{{/visible}}' +
 			'<my-toggler {(visible)}="visible">' +
 			'content' +
@@ -689,7 +689,7 @@ function makeTest(name, doc, mutObs) {
 			'</my-toggler>' +
 			'</my-app>');
 
-		var frag = template({});
+		var frag = renderer({});
 
 		var myApp = frag.firstChild,
 			buttons = myApp.getElementsByTagName("button");
@@ -714,7 +714,7 @@ function makeTest(name, doc, mutObs) {
 		expect(2);
 		Component({
 			tag: 'my-text',
-			template: stache('<p>{{valueHelper}}</p>'),
+			view: stache('<p>{{valueHelper}}</p>'),
 			helpers: {
 				valueHelper: function () {
 					return this.attr('value');
@@ -722,9 +722,9 @@ function makeTest(name, doc, mutObs) {
 			}
 		});
 
-		var template = stache('<my-text value="value1"></my-text><my-text value="value2"></my-text>');
+		var renderer = stache('<my-text value="value1"></my-text><my-text value="value2"></my-text>');
 
-		var frag = template({});
+		var frag = renderer({});
 
 		equal(frag.firstChild.firstChild.firstChild.nodeValue, 'value1');
 		equal(frag.lastChild.firstChild.firstChild.nodeValue, 'value2');
@@ -733,7 +733,7 @@ function makeTest(name, doc, mutObs) {
 	test('access hypenated attributes via camelCase or hypenated', function () {
 		Component({
 			tag: 'hyphen',
-			template: stache('<p>{{valueHelper}}</p>'),
+			view: stache('<p>{{valueHelper}}</p>'),
 			helpers: {
 				valueHelper: function () {
 					return this.attr('camelCase');
@@ -741,8 +741,8 @@ function makeTest(name, doc, mutObs) {
 			}
 		});
 
-		var template = stache('<hyphen camel-case="value1"></hyphen>');
-		var frag = template({});
+		var renderer = stache('<hyphen camel-case="value1"></hyphen>');
+		var frag = renderer({});
 
 
 		equal(frag.firstChild.firstChild.firstChild.nodeValue, 'value1');
@@ -757,12 +757,12 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: 'my-viewmodel',
-			template: stache("{{name}}}"),
+			view: stache("{{name}}}"),
 			viewModel: me
 		});
 
-		var template = stache('<my-viewmodel></my-viewmodel>');
-		equal(template().firstChild.firstChild.nodeValue, "Justin");
+		var renderer = stache('<my-viewmodel></my-viewmodel>');
+		equal(renderer().firstChild.firstChild.nodeValue, "Justin");
 
 	});
 
@@ -773,12 +773,12 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "can-map-viewmodel",
-			template: stache("{{name}}"),
+			view: stache("{{name}}"),
 			viewModel: MyMap
 		});
 
-		var template = stache("<can-map-viewmodel></can-map-viewmodel>");
-		equal(template().firstChild.firstChild.nodeValue, "Matthew");
+		var renderer = stache("<can-map-viewmodel></can-map-viewmodel>");
+		equal(renderer().firstChild.firstChild.nodeValue, "Matthew");
 	});
 
 	test("a CanMap constructor as scope", function() {
@@ -788,29 +788,29 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "can-map-viewmodel",
-			template: stache("{{name}}"),
+			view: stache("{{name}}"),
 			scope: MyMap
 		});
 
-		var template = stache("<can-map-viewmodel></can-map-viewmodel>");
-		equal(template().firstChild.firstChild.nodeValue, "Matthew");
+		var renderer = stache("<can-map-viewmodel></can-map-viewmodel>");
+		equal(renderer().firstChild.firstChild.nodeValue, "Matthew");
 	});
 
 	test("an object is turned into a CanMap as viewModel", function() {
 		Component.extend({
 			tag: "can-map-viewmodel",
-			template: stache("{{name}}"),
+			view: stache("{{name}}"),
 			viewModel: {
 				name: "Matthew"
 			}
 		});
 
-		var template = stache("<can-map-viewmodel></can-map-viewmodel>");
+		var renderer = stache("<can-map-viewmodel></can-map-viewmodel>");
 
-		var fragOne = template();
+		var fragOne = renderer();
 		var vmOne = canViewModel(fragOne.firstChild);
 
-		var fragTwo = template();
+		var fragTwo = renderer();
 		var vmTwo = canViewModel(fragTwo.firstChild);
 
 		vmOne.attr("name", "Wilbur");
@@ -823,7 +823,7 @@ function makeTest(name, doc, mutObs) {
 		try {
 			Component.extend({
 				tag: "viewmodel-test",
-				template: stache("<div></div>"),
+				view: stache("<div></div>"),
 				viewModel: {},
 				ViewModel: CanMap.extend({})
 			});
@@ -835,11 +835,11 @@ function makeTest(name, doc, mutObs) {
 	});
 
 	test("content in a list", function () {
-		var template = stache('<my-list>{{name}}</my-list>');
+		var renderer = stache('<my-list>{{name}}</my-list>');
 
 		Component.extend({
 			tag: "my-list",
-			template: stache("{{#each items}}<li><content/></li>{{/each}}"),
+			view: stache("{{#each items}}<li><content/></li>{{/each}}"),
 			leakScope: true,
 			viewModel: {
 				items: new CanList([{
@@ -850,7 +850,7 @@ function makeTest(name, doc, mutObs) {
 			}
 		});
 
-		var lis = template()
+		var lis = renderer()
 			.firstChild.getElementsByTagName("li");
 
 		equal(innerHTML(lis[0]), "one", "first li has correct content");
@@ -885,9 +885,9 @@ function makeTest(name, doc, mutObs) {
 			tag: "age-er"
 		});
 
-		var template = stache("<age-er {(years)}='age'></age-er>");
+		var renderer = stache("<age-er {(years)}='age'></age-er>");
 
-		template({
+		renderer({
 			age: age
 		});
 
@@ -903,12 +903,12 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "my-component",
-			template: stache("<span>{{blocks}}</span>")
+			view: stache("<span>{{blocks}}</span>")
 		});
 
-		var template = stache("<my-component {(blocks)}='compute'></my-component>");
+		var renderer = stache("<my-component {(blocks)}='compute'></my-component>");
 
-		var frag = template(data);
+		var frag = renderer(data);
 
 		equal( innerHTML(frag.firstChild.firstChild), "30");
 
@@ -925,13 +925,13 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "my-helloworld",
-			template: stache("<h1>{{#if visible}}visible{{else}}invisible{{/if}}</h1>"),
+			view: stache("<h1>{{#if visible}}visible{{else}}invisible{{/if}}</h1>"),
 			ViewModel: HelloWorldModel
 		});
 
-		var template = stache("<my-helloworld></my-helloworld>");
+		var renderer = stache("<my-helloworld></my-helloworld>");
 
-		var frag = template({});
+		var frag = renderer({});
 
 		equal( innerHTML(frag.firstChild.firstChild), "visible");
 	});
@@ -949,9 +949,9 @@ function makeTest(name, doc, mutObs) {
 			}
 		});
 
-		var template = stache("<viewmodel-rebinder></viewmodel-rebinder>");
+		var renderer = stache("<viewmodel-rebinder></viewmodel-rebinder>");
 
-		var frag = template();
+		var frag = renderer();
 		var viewModel = canViewModel(frag.firstChild);
 
 		var n1 = canCompute(),
@@ -973,20 +973,20 @@ function makeTest(name, doc, mutObs) {
 
 		Component({
 			tag: 'outer-tag',
-			template: stache('<inner-tag>inner-tag CONTENT <content/></inner-tag>')
+			view: stache('<inner-tag>inner-tag CONTENT <content/></inner-tag>')
 		});
 
 		Component({
 			tag: 'inner-tag',
-			template: stache('inner-tag TEMPLATE <content/>')
+			view: stache('inner-tag TEMPLATE <content/>')
 		});
 
 		// currently causes Maximum call stack size exceeded
-		var template = stache("<outer-tag>outer-tag CONTENT</outer-tag>");
+		var renderer = stache("<outer-tag>outer-tag CONTENT</outer-tag>");
 
 		// RESULT = <outer-tag><inner-tag>inner-tag TEMPLATE inner-tag CONTENT outer-tag CONTENT</inner-tag></outer-tag>
 
-		var frag = template();
+		var frag = renderer();
 
 		equal( innerHTML(frag.firstChild.firstChild), 'inner-tag TEMPLATE inner-tag CONTENT outer-tag CONTENT');
 
@@ -1015,7 +1015,7 @@ function makeTest(name, doc, mutObs) {
 		Component.extend({
 			tag: 'parent-tag',
 
-			template: stache('{{#shown}}<child-tag></child-tag>{{/shown}}'),
+			view: stache('{{#shown}}<child-tag></child-tag>{{/shown}}'),
 
 			viewModel: {
 				shown: false
@@ -1031,11 +1031,17 @@ function makeTest(name, doc, mutObs) {
 
 		domMutate.appendChild.call(this.fixture, frag);
 		stop();
-		setTimeout(function(){
-			equal(inited, 1, "inited");
-			equal(inserted, 1, "inserted");
-			start();
-		}, 100);
+		function checkCount(){
+			if(inserted >= 1) {
+				equal(inited, 1, "inited");
+				equal(inserted, 1, "inserted");
+				start();
+			} else {
+				setTimeout(checkCount,30);
+			}
+		}
+
+		checkCount();
 	});
 
 
@@ -1043,7 +1049,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "attr-fun",
-			template: stache("<h1>{{fullName}}</h1>"),
+			view: stache("<h1>{{fullName}}</h1>"),
 			ViewModel: CanMap.extend({
 				fullName: function () {
 					return this.attr("firstName") + " " + this.attr("lastName");
@@ -1109,7 +1115,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "parent-tag",
-			template: stache('<child-tag can-click="method"></child-tag>'),
+			view: stache('<child-tag can-click="method"></child-tag>'),
 			viewModel: {
 				method: function () {
 					called = true;
@@ -1126,21 +1132,21 @@ function makeTest(name, doc, mutObs) {
 	test('Same component tag nested', function () {
 		Component({
 			'tag': 'my-tag',
-			template: stache('<p><content/></p>')
+			view: stache('<p><content/></p>')
 		});
 		//simplest case
-		var template = stache('<div><my-tag>Outter<my-tag>Inner</my-tag></my-tag></div>');
+		var renderer = stache('<div><my-tag>Outter<my-tag>Inner</my-tag></my-tag></div>');
 		//complex case
-		var template2 = stache('<div><my-tag>3<my-tag>2<my-tag>1<my-tag>0</my-tag></my-tag></my-tag></my-tag></div>');
+		var renderer2 = stache('<div><my-tag>3<my-tag>2<my-tag>1<my-tag>0</my-tag></my-tag></my-tag></my-tag></div>');
 		//edge case for new logic (same custom tag at same depth as one previously encountered)
-		var template3 = stache('<div><my-tag>First</my-tag><my-tag>Second</my-tag></div>');
+		var renderer3 = stache('<div><my-tag>First</my-tag><my-tag>Second</my-tag></div>');
 
 
-		equal( template({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
+		equal( renderer({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
 
-		equal( template2({}).firstChild.getElementsByTagName('p').length, 4, 'proper number of p tags');
+		equal( renderer2({}).firstChild.getElementsByTagName('p').length, 4, 'proper number of p tags');
 
-		equal( template3({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
+		equal( renderer3({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
 
 	});
 
@@ -1156,9 +1162,9 @@ function makeTest(name, doc, mutObs) {
 			}
 		});
 
-		var template = stache('<window-events></window-events>');
+		var renderer = stache('<window-events></window-events>');
 
-		template();
+		renderer();
 
 		window.tempMap.attr("prop","value");
 
@@ -1176,7 +1182,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "con-struct",
-			template: stache("{{con.foo}}")
+			view: stache("{{con.foo}}")
 		});
 
 		var stached = stache("<con-struct {(con)}='Constructed'></con-struct>");
@@ -1184,6 +1190,7 @@ function makeTest(name, doc, mutObs) {
 		var res = stached({
 			Constructed: Constructed
 		});
+
 		equal(innerHTML(res.firstChild), "bar");
 
 
@@ -1194,10 +1201,10 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: 'my-thing',
-			template: stache('hello')
+			view: stache('hello')
 		});
-		var template = stache("<my-thing {(id)}='productId'></my-tagged>");
-		var frag = template(new CanMap({productId: 123}));
+		var renderer = stache("<my-thing {(id)}='productId'></my-tagged>");
+		var frag = renderer(new CanMap({productId: 123}));
 		equal( canViewModel(frag.firstChild).attr("id"), 123);
 	});
 
@@ -1210,7 +1217,7 @@ function makeTest(name, doc, mutObs) {
 			viewModel: {
 				shown: true
 			},
-			template: stache("{{#if shown}}<can-child></can-child>{{/if}}")
+			view: stache("{{#if shown}}<can-child></can-child>{{/if}}")
 		});
 		Component.extend({
 			tag: "can-child",
@@ -1221,9 +1228,9 @@ function makeTest(name, doc, mutObs) {
 			}
 		});
 
-		var template = stache("<can-parent-stache></can-parent-stache>");
+		var renderer = stache("<can-parent-stache></can-parent-stache>");
 
-		domMutate.appendChild.call(this.fixture, template());
+		domMutate.appendChild.call(this.fixture, renderer());
 		stop();
 		setTimeout(start, 100);
 	});
@@ -1231,15 +1238,15 @@ function makeTest(name, doc, mutObs) {
 	test("hyphen-less tag names", function () {
 		Component.extend({
 			tag: "foobar",
-			template: stache("<div>{{name}}</div>"),
+			view: stache("<div>{{name}}</div>"),
 			viewModel: {
 				name: "Brian"
 			}
 		});
 
-		var template = stache('<span></span><foobar></foobar>');
+		var renderer = stache('<span></span><foobar></foobar>');
 
-		var frag = template();
+		var frag = renderer();
 
 		equal(frag.lastChild.firstChild.firstChild.nodeValue, "Brian");
 
@@ -1248,7 +1255,7 @@ function makeTest(name, doc, mutObs) {
 	test('nested component within an #if is not live bound(#1025)', function() {
 		Component.extend({
 			tag: 'parent-component',
-			template: stache('{{#if shown}}<child-component></child-component>{{/if}}'),
+			view: stache('{{#if shown}}<child-component></child-component>{{/if}}'),
 			viewModel: {
 				shown: false
 			}
@@ -1256,11 +1263,11 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: 'child-component',
-			template: stache('Hello world.')
+			view: stache('Hello world.')
 		});
 
-		var template = stache('<parent-component></parent-component>');
-		var frag = template({});
+		var renderer = stache('<parent-component></parent-component>');
+		var frag = renderer({});
 
 		equal( innerHTML(frag.firstChild), '', 'child component is not inserted');
 		canViewModel(frag.firstChild).attr('shown', true);
@@ -1390,7 +1397,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: 'product-swatch',
-			template: stache('<product-swatch-color {(variations)}="variations"></product-swatch-color>'),
+			view: stache('<product-swatch-color {(variations)}="variations"></product-swatch-color>'),
 			ViewModel: CanMap.extend({
 				tag: "product-swatch",
 				define: {
@@ -1420,7 +1427,7 @@ function makeTest(name, doc, mutObs) {
 
 	test("references scopes are available to bindings nested in components (#2029)", function(){
 
-		var template = stache('<export-er {^value}="*reference" />'+
+		var renderer = stache('<export-er {^value}="*reference" />'+
 			'<wrap-er><simple-example {key}="*reference"/></wrap-er>');
 
 		Component.extend({
@@ -1447,10 +1454,10 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag : "simple-example",
-			template : stache("{{key}}"),
+			view : stache("{{key}}"),
 			viewModel : {}
 		});
-		var frag = template({});
+		var frag = renderer({});
 
 	});
 
@@ -1459,7 +1466,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag : 'pa-rent',
-			template: stache('<chi-ld child-prop="{parentProp}" />')
+			view: stache('<chi-ld child-prop="{parentProp}" />')
 		});
 
 		Component.extend({
@@ -1493,7 +1500,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag : 'pa-rent',
-			template: stache('<chi-ld {(child-prop)}="parentProp" />')
+			view: stache('<chi-ld {(child-prop)}="parentProp" />')
 		});
 
 		Component.extend({
@@ -1526,7 +1533,7 @@ function makeTest(name, doc, mutObs) {
 		Component.extend({
 			tag: 'some-comp'
 		});
-		var template = stache("<some-comp "+
+		var renderer = stache("<some-comp "+
 			"{{#if preview}}{next}='nextPage'{{/if}} "+
 			"{swap}='{{swapName}}' "+
 			"{{#preview}}checked{{/preview}} "+
@@ -1537,7 +1544,7 @@ function makeTest(name, doc, mutObs) {
 			nextPage: 2,
 			swapName: "preview"
 		});
-		var frag = template(map);
+		var frag = renderer(map);
 
 		var vm = canViewModel(frag.firstChild);
 
@@ -1577,7 +1584,7 @@ function makeTest(name, doc, mutObs) {
 			if(index < threads.length) {
 				threads[index]();
 				index++;
-				setTimeout(next, 100);
+				setTimeout(next, 150);
 			} else {
 				start();
 			}
@@ -1600,7 +1607,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag : 'list-items',
-			template : stache("<ul>"+
+			view : stache("<ul>"+
 				"{{#items}}"+
 					"{{#if render}}"+
 						"<li><content /></li>"+
@@ -1613,12 +1620,12 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag : 'list-item',
-			template : stache("{{item.context}}")
+			view : stache("{{item.context}}")
 		});
 
-		var template = stache("<list-items><list-item item='{.}'/></list-items>");
+		var renderer = stache("<list-items><list-item item='{.}'/></list-items>");
 
-		var frag = template();
+		var frag = renderer();
 
 		canBatch.start();
 		canViewModel(frag.firstChild).attr('items').each(function(item, index) {
@@ -1632,7 +1639,7 @@ function makeTest(name, doc, mutObs) {
 
 	});
 
-	test("one-way - child to parent - parent that does not leak scope, but has no template", function(){
+	test("one-way - child to parent - parent that does not leak scope, but has no view", function(){
 		Component.extend({
 			tag: "outer-noleak",
 			viewModel: {
@@ -1649,8 +1656,8 @@ function makeTest(name, doc, mutObs) {
 		});
 
 
-		var template = stache("<outer-noleak><my-child {^.}='myChild'/></outer-noleak>");
-		var frag = template();
+		var renderer = stache("<outer-noleak><my-child {^.}='myChild'/></outer-noleak>");
+		var frag = renderer();
 		var vm = canViewModel(frag.firstChild);
 		ok(vm.attr("myChild") instanceof CanMap, "got instance");
 
@@ -1689,7 +1696,7 @@ function makeTest(name, doc, mutObs) {
 
 	test("custom renderer can provide setupBindings", function(){
 		DOCUMENT(document);
-		var renderer = function(tmpl){
+		var rendererFactory = function(tmpl){
 			var frag = getFragment(tmpl);
 			return function(scope, options){
 				scope = scope || new Scope();
@@ -1717,12 +1724,12 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "custom-renderer",
-			template: renderer("<div>{{foo}}</div>"),
+			view: rendererFactory("<div>{{foo}}</div>"),
 			ViewModel: CanMap.extend({})
 		});
 
-		var template = renderer("<custom-renderer foo='bar'></custom-renderer>");
-		var frag = template();
+		var renderer = rendererFactory("<custom-renderer foo='bar'></custom-renderer>");
+		var frag = renderer();
 
 		var tn = frag.firstChild.firstChild.firstChild;
 		equal(tn.nodeValue, "qux", "was bound!");
@@ -1779,7 +1786,7 @@ if(System.env !== 'canjs-test') {
 			Component.extend({
 				tag: "tabs",
 				ViewModel: TabsViewModel,
-				template: stache("<ul>" +
+				view: stache("<ul>" +
 					"{{#panels}}" +
 					"<li {{#isActive(.)}}class='active'{{/isActive}} can-click='makeActive'>{{title}}</li>" +
 					"{{/panels}}" +
@@ -1789,7 +1796,7 @@ if(System.env !== 'canjs-test') {
 
 			Component.extend({
 				// make sure <content/> works
-				template: stache("{{#if active}}<content></content>{{/if}}"),
+				view: stache("{{#if active}}<content></content>{{/if}}"),
 				tag: "panel",
 				ViewModel: CanMap.extend({
 					active: false
@@ -1809,7 +1816,7 @@ if(System.env !== 'canjs-test') {
 				}
 			});
 
-			var template = stache("<tabs>{{#each foodTypes}}<panel title='{{title}}'>{{content}}</panel>{{/each}}</tabs>");
+			var renderer = stache("<tabs>{{#each foodTypes}}<panel title='{{title}}'>{{content}}</panel>{{/each}}</tabs>");
 
 			var foodTypes = new CanList([{
 				title: "Fruits",
@@ -1822,7 +1829,7 @@ if(System.env !== 'canjs-test') {
 				content: "ice cream, candy"
 			}]);
 
-			var frag = template({
+			var frag = renderer({
 				foodTypes: foodTypes
 			});
 
@@ -1888,7 +1895,7 @@ if(System.env !== 'canjs-test') {
 			]);
 		});
 
-		test('DOM trees not releasing when referencing CanMap inside CanMap in template (#1593)', function() {
+		test('DOM trees not releasing when referencing CanMap inside CanMap in view (#1593)', function() {
 			var baseTemplate = stache('{{#if show}}<my-outside></my-outside>{{/if}}'),
 				show = canCompute(true),
 				state = new CanMap({
@@ -1909,7 +1916,7 @@ if(System.env !== 'canjs-test') {
 
 			Component.extend({
 				tag: 'my-outside',
-				template: stache('{{#if state.inner}}<my-inside></my-inside>{{/if}}'),
+				view: stache('{{#if state.inner}}<my-inside></my-inside>{{/if}}'),
 				leakScope: true
 			});
 
