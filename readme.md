@@ -1,5 +1,7 @@
 # can-component
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-component.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/canjs/can-component.png?branch=master)](https://travis-ci.org/canjs/can-component)
 
 Custom elements for CanJS.
