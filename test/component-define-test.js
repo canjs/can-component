@@ -7,6 +7,7 @@ var DefineMap = require("can-define/map/map");
 
 var viewModel = require("can-view-model");
 var types = require("can-types");
+var canDev = require("can-util/js/dev/dev");
 
 QUnit.module("can-component with can-define");
 
@@ -87,3 +88,28 @@ QUnit.test('33 - works when instantiated with an object for ViewModel', function
 	renderer();
 
 });
+
+if(System.env.indexOf("production") < 0) {
+	QUnit.test('warn if viewModel is assigned a DefineMap (#14)', function() {
+		QUnit.expect(1);
+		var oldwarn = canDev.warn;
+		canDev.warn = function(mesg) {
+			QUnit.equal(mesg, "Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html", "Warning is expected message");
+		};
+
+		// should issue a warning
+		var VM = DefineMap.extend({});
+		Component.extend({
+			tag: 'can-vm1-test-component',
+			viewModel: VM
+		});
+
+		// should not issue a warning
+		Component.extend({
+			tag: 'can-vm2-test-component',
+			viewModel: function(){}
+		});
+
+		canDev.warn = oldwarn;
+	});
+}

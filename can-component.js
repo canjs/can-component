@@ -31,6 +31,7 @@ var canEach = require('can-util/js/each/each');
 var assign = require('can-util/js/assign/assign');
 var isFunction = require('can-util/js/is-function/is-function');
 var canLog = require('can-util/js/log/log');
+var canDev = require("can-util/js/dev/dev");
 var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 
@@ -161,6 +162,12 @@ var Component = Construct.extend(
 					this.Control = ComponentControl.extend(this.prototype.events);
 				}
 
+				//!steal-remove-start
+				// If a constructor is assigned to the viewModel, give a warning
+				if (this.prototype.viewModel && canReflect.isConstructorLike(this.prototype.viewModel)) {
+					canDev.warn("Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html");
+				}
+				//!steal-remove-end
 
 				// Look at viewModel, scope, and ViewModel properties and set one of:
 				//  - this.viewModelHandler
