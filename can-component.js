@@ -165,7 +165,7 @@ var Component = Construct.extend(
 				//!steal-remove-start
 				// If a constructor is assigned to the viewModel, give a warning
 				if (this.prototype.viewModel && canReflect.isConstructorLike(this.prototype.viewModel)) {
-					canDev.warn("Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html");
+					canDev.warn("can-component: Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html");
 				}
 				//!steal-remove-end
 

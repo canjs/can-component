@@ -94,7 +94,7 @@ if(System.env.indexOf("production") < 0) {
 		QUnit.expect(1);
 		var oldwarn = canDev.warn;
 		canDev.warn = function(mesg) {
-			QUnit.equal(mesg, "Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html", "Warning is expected message");
+			QUnit.equal(mesg, "can-component: Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html", "Warning is expected message");
 		};
 
 		// should issue a warning
