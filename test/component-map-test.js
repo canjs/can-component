@@ -23,17 +23,17 @@ var types = require("can-types");
 
 var isPromise = require('can-util/js/is-promise/is-promise');
 
+var globals = require('can-globals');
 var makeDocument = require('can-vdom/make-document/make-document');
-var MUTATION_OBSERVER = require('can-util/dom/mutation-observer/mutation-observer');
-var DOCUMENT = require("can-util/dom/document/document");
+var getDocument = require("can-globals/document/document");
 var getFragment = require("can-util/dom/fragment/fragment");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var canLog = require("can-util/js/log/log");
 
 
-var DOC = DOCUMENT();
-var MUT_OBS = MUTATION_OBSERVER();
+var DOC = getDocument();
+var MUT_OBS = globals.getKeyValue('MutationObserver');
 makeTest("can-component - map - dom", document, MUT_OBS);
 makeTest("can-component - map - vdom", makeDocument(), null);
 
@@ -60,8 +60,10 @@ function makeTest(name, doc, mutObs) {
 	var oldDoc, oldDefaultMap;
 	QUnit.module(name, {
 		setup: function () {
-			DOCUMENT(doc);
-			MUTATION_OBSERVER(mutObs);
+			getDocument(doc);
+			if(!mutObs){
+				globals.setKeyValue('MutationObserver', mutObs);
+			}
 
 			oldDefaultMap = types.DefaultMap;
 			types.DefaultMap = CanMap;
@@ -79,8 +81,8 @@ function makeTest(name, doc, mutObs) {
 			setTimeout(function(){
 				types.DefaultMap = oldDefaultMap;
 				start();
-				DOCUMENT(DOC);
-				MUTATION_OBSERVER(MUT_OBS);
+				getDocument(DOC);
+				globals.deleteKeyValue('MutationObserver');
 			}, 100);
 		}
 	});
@@ -1695,7 +1697,7 @@ function makeTest(name, doc, mutObs) {
 	});
 
 	test("custom renderer can provide setupBindings", function(){
-		DOCUMENT(document);
+		getDocument(document);
 		var rendererFactory = function(tmpl){
 			var frag = getFragment(tmpl);
 			return function(scope, options){
