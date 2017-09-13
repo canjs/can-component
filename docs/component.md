@@ -23,7 +23,7 @@ The following creates a `my-autocomplete` element and passes the `my-autocomplet
 a [can-component/can-template] that is used to render the search results:
 
 ```html
-<my-autocomplete {source}="Search">
+<my-autocomplete source:from="Search">
   <can-template name="search-results">
     <li>{{name}}</li>
   </can-template>
@@ -50,10 +50,10 @@ a [can-component/can-template] that is used to render the search results:
    Example:
 
    ```
-   <my-tag {to-child}="expression"
-           {^to-parent}="expression"
-           {(two-way)}="expression"
-           (event)="callExpression()"></my-tag>
+   <my-tag get-child:from="expression"
+           set-parent:to="expression"
+           two-way:bind="expression"
+           on:event="callExpression()"></my-tag>
    ```
 
    @param {can-stache.sectionRenderer} [TEMPLATES] Between the starting and ending tag
@@ -66,7 +66,7 @@ a [can-component/can-template] that is used to render the search results:
    the source is unable to request data:
 
    ```html
-   <my-autocomplete {source}="Search">
+   <my-autocomplete source:from="Search">
      <can-template name="search-results">
        <li>{{name}}</li>
      </can-template>
@@ -135,7 +135,7 @@ Typically, you do not append a single component at a time.  Instead,
 you'll render a view with many custom tags like:
 
     <srchr-app>
-      <srchr-search {models}="models">
+      <srchr-search models:from="models">
         <input name="search"/>
       </srchr-search>
       <ui-panel>
@@ -214,7 +214,7 @@ The following component:
 
 Changes the following rendered view:
 
-    var renderer = stache("<hello-world {message}='greeting'/>");
+    var renderer = stache("<hello-world message:from='greeting'/>");
     renderer({
       greeting: "Salutations"
     })
@@ -421,7 +421,7 @@ The `my-app` component passes paginate, paginate’s values, and websitesPromise
 its sub-components:
 
     <my-app>
-      <my-grid {promise-data}='websitesPromise'>
+      <my-grid promise-data:from='websitesPromise'>
         {{#each items}}
           <tr>
             <td width='40%'>{{name}}</td>
@@ -429,6 +429,6 @@ its sub-components:
           </tr>
         {{/each}}
       </my-grid>
-      <next-prev {paginate}='paginate'></next-prev>
-      <page-count {page}='paginate.page' {count}='paginate.pageCount'/>
+      <next-prev paginate:from='paginate'></next-prev>
+      <page-count page:from='paginate.page' count:from='paginate.pageCount'/>
     </my-app>
