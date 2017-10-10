@@ -302,8 +302,6 @@ var Component = Construct.extend(
 					options.helpers[prop] = val.bind(viewModel);
 				}
 			});
-			var optionsScopeWithHelpers = componentTagData.options.add(options);
-
 
 			// ## `events` control
 
@@ -339,7 +337,7 @@ var Component = Construct.extend(
 						scope: componentTagData.scope.add(new Scope.Refs()).add(this.viewModel, {
 							viewModel: true
 						}),
-						options: optionsScopeWithHelpers
+						options: componentTagData.options.add(options)
 					};
 
 				} else { // lexical
@@ -348,7 +346,7 @@ var Component = Construct.extend(
 						scope: Scope.refsScope().add(this.viewModel, {
 							viewModel: true
 						}),
-						options: optionsScopeWithHelpers
+						options: new Scope.Options(options)
 					};
 				}
 
@@ -372,7 +370,7 @@ var Component = Construct.extend(
 					scope: componentTagData.scope.add(this.viewModel, {
 						viewModel: true
 					}),
-					options: optionsScopeWithHelpers
+					options: componentTagData.options.add(options)
 				};
 				betweenTagsTagData = lightTemplateTagData;
 				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
