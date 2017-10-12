@@ -71,7 +71,7 @@ QUnit.test('scope method works', function () {
 });
 
 QUnit.test('33 - works when instantiated with an object for ViewModel', function () {
-	
+
 	Component.extend({
 		tag: "test-element",
 		view: stache("{{someMethod}}"),
@@ -81,12 +81,59 @@ QUnit.test('33 - works when instantiated with an object for ViewModel', function
 				return true;
 			}
 		}
-		
 	});
-	
+
 	var renderer = stache("<test-element>");
 	renderer();
 
+});
+
+QUnit.test("helpers do not leak when leakscope is false (#77)", function () {
+	var called = 0;
+	var inner = Component.extend({
+		tag: "inner-el",
+		view: stache("inner{{test}}"),
+		leakScope: false
+	});
+	var outer = Component.extend({
+		tag: "outer-el",
+		view: stache("outer:<inner-el>"),
+		helpers: {
+			test: function () {
+				called++;
+				return "heyo";
+			}
+		}
+	});
+
+	var renderer = stache("<outer-el>");
+
+	renderer();
+	QUnit.equal(called, 0, "Outer helper not called");
+});
+
+QUnit.test("helpers do leak when leakscope is true (#77)", function () {
+	var called = 0;
+	var inner = Component.extend({
+		tag: "inner-el",
+		view: stache("inner{{test}}"),
+		leakScope: true
+	});
+	var outer = Component.extend({
+		tag: "outer-el",
+		view: stache("outer:<inner-el>"),
+		helpers: {
+			test: function () {
+				called++;
+				return "heyo";
+			}
+		}
+	});
+
+	var renderer = stache("<outer-el>");
+
+	renderer();
+	QUnit.equal(called, 1, "Outer helper called once");
 });
 
 if(System.env.indexOf("production") < 0) {
