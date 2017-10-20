@@ -1,6 +1,9 @@
 var MUTATION_OBSERVER = require('can-util/dom/mutation-observer/mutation-observer');
 var DOCUMENT = require("can-util/dom/document/document");
 var makeDocument = require('can-vdom/make-document/make-document');
+var domMutate = require('can-util/dom/mutate/mutate');
+var domEvents = require('can-util/dom/events/events');
+var globals = require('can-globals');
 
 var helpers = {
     runTasks: function(tasks){
@@ -15,7 +18,7 @@ var helpers = {
     	};
     	setTimeout(nextTask, 100);
     },
-    makeTest: function(name, doc, mutObs, test) {
+    makeTest: function(name, doc, mutObs, test, qUnitTest) {
         var DOC = DOCUMENT();
         var MUT_OBS = MUTATION_OBSERVER();
 
@@ -42,12 +45,24 @@ var helpers = {
     			}, 100);
     		}
     	});
-        test(doc);
+        test(doc, qUnitTest);
     },
     makeTests: function(name, test) {
 
-        helpers.makeTest(name+" - dom", document, MUTATION_OBSERVER(), test);
-        helpers.makeTest(name+" - vdom", makeDocument(), null, test);
+        helpers.makeTest(name+" - dom", document, MUTATION_OBSERVER(), test, QUnit.test);
+        helpers.makeTest(name+" - vdom", makeDocument(), null, test, function(){});
+    },
+    afterMutation: function(cb) {
+    	var doc = globals.getKeyValue('document');
+    	var div = doc.createElement("div");
+    	domEvents.addEventListener.call(div, "inserted", function(){
+    		doc.body.removeChild(div);
+    		setTimeout(cb, 5);
+    	});
+        setTimeout(function(){
+            domMutate.appendChild.call(doc.body, div);
+        },10);
+
     }
 };
 module.exports = helpers;

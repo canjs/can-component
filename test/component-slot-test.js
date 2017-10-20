@@ -4,6 +4,7 @@ var QUnit = require("steal-qunit");
 var DefineMap = require('can-define/map/map');
 
 var viewModel = require("can-view-model");
+var canSymbol = require("can-symbol");
 
 
 QUnit.module("can-components - can-slots");
@@ -165,7 +166,7 @@ test("<can-slot> Context one-way binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {this}="subject" />'
+			'<can-slot name="foo" this:from="subject" />'
 		),
 		ViewModel: ViewModel
 	});
@@ -185,6 +186,7 @@ test("<can-slot> Context one-way binding works", function() {
 
 	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
 });
+var queues = require("can-queues");
 
 test("<can-slot> Context two-way binding works", function() {
 	/*Passing in a custom context like <can-slot name='subject' {(context)}='value' />*/
@@ -198,7 +200,7 @@ test("<can-slot> Context two-way binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {(this)}="subject" />'
+			'<can-slot name="foo" this:bind="subject" />'
 		),
 		ViewModel: ViewModel
 	});
@@ -207,19 +209,18 @@ test("<can-slot> Context two-way binding works", function() {
 		tag : 'my-subject',
 		view : stache(
 			'{{subject}}'
-		)
+		),
+		ViewModel: DefineMap.extend("SubjectVM")
 	});
-
-	var vm = "Hello World";
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject {(subject)}="this" /></can-template>' +
+			'<can-template name="foo"><my-subject subject:bind="this" /></can-template>' +
 		'</my-email>'
 	);
 
 	var frag = renderer();
-	vm = viewModel(frag.firstChild);
+	var vm = viewModel(frag.firstChild);
 	var childVM = viewModel(frag.firstChild.firstChild);
 
 	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
@@ -245,7 +246,7 @@ test("<can-slot> Context child-to-parent binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {^this}="subject" />'
+			'<can-slot name="foo" this:to="subject" />'
 		),
 		ViewModel: ViewModel
 	});
@@ -264,7 +265,7 @@ test("<can-slot> Context child-to-parent binding works", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject {^subject}="this" /></can-template>' +
+			'<can-template name="foo"><my-subject subject:to="this" /></can-template>' +
 		'</my-email>'
 	);
 
@@ -368,7 +369,7 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'{{#if showSubject}}<can-slot name="subject" {this}="subject" />{{/if}}'
+			'{{#if showSubject}}<can-slot name="subject" this:from="subject" />{{/if}}'
 		),
 		ViewModel: ViewModel
 	});
@@ -395,7 +396,9 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 	// vm.__bindings.subject.handlers
 
 	setTimeout(function() {
-		QUnit.equal(vm.__bindEvents.subject.length, 0);
+
+		var handlers = vm[canSymbol.for('can.meta')].handlers;
+		QUnit.equal(handlers.get(['subject']).length, 0);
 		QUnit.start();
 	},50);
 });

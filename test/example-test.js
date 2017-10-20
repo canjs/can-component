@@ -10,23 +10,31 @@ var DefineMap = require("can-define/map/map");
 var domEvents = require('can-util/dom/events/events');
 var canViewModel = require("can-view-model");
 var domMutate = require('can-util/dom/mutate/mutate');
+var canLog = require("can-util/js/log/log");
+var queues = require("can-queues");
 
-var innerHTML = function(el){
-    return el && el.innerHTML;
+var innerHTML = function(el) {
+	return el && el.innerHTML;
 };
 
-helpers.makeTests("can-component viewModels", function(doc){
+helpers.makeTests("can-component examples", function(doc) {
 
-    var Paginate = DefineMap.extend({
-        count: {value: Infinity},
-        offset: {value: 0},
-        limit: {value: 100},
+	var Paginate = DefineMap.extend({
+		count: {
+			value: Infinity
+		},
+		offset: {
+			value: 0
+		},
+		limit: {
+			value: 100
+		},
 		// Prevent negative counts
-		setCount: function (newCount, success, error) {
+		setCount: function(newCount, success, error) {
 			return newCount < 0 ? 0 : newCount;
 		},
 		// Prevent negative offsets
-		setOffset: function (newOffset) {
+		setOffset: function(newOffset) {
 			return newOffset < 0 ?
 				0 :
 				Math.min(newOffset, !isNaN(this.count - 1) ?
@@ -34,40 +42,46 @@ helpers.makeTests("can-component viewModels", function(doc){
 					Infinity);
 		},
 		// move next
-		next: function () {
+		next: function() {
 			this.set('offset', this.offset + this.limit);
 		},
-		prev: function () {
+		prev: function() {
 			this.set('offset', this.offset - this.limit);
 		},
-		canNext: function () {
+		canNext: function() {
 			return this.get('offset') < this.get('count') -
 				this.get('limit');
 		},
-		canPrev: function () {
+		canPrev: function() {
 			return this.get('offset') > 0;
 		},
-		page: function (newVal) {
+		page: function(newVal) {
 			if (newVal === undefined) {
 				return Math.floor(this.get('offset') / this.get('limit')) + 1;
 			} else {
 				this.set('offset', (parseInt(newVal) - 1) * this.get('limit'));
 			}
 		},
-		pageCount: function () {
+		pageCount: function() {
 			return this.get('count') ?
 				Math.ceil(this.get('count') / this.get('limit')) : null;
 		}
 	});
 
 
-    test("treecombo", function () {
+	test("treecombo", function() {
 
 		var TreeComboViewModel = DefineMap.extend({
-            items: {Value: DefineList},
-            breadcrumb: {Value: DefineList},
-            selected: {Value: DefineList},
-			selectableItems: function () {
+			items: {
+				Value: DefineList
+			},
+			breadcrumb: {
+				Value: DefineList
+			},
+			selected: {
+				Value: DefineList
+			},
+			selectableItems: function() {
 				var breadcrumb = this.get("breadcrumb");
 
 				// if there's an item in the breadcrumb
@@ -81,21 +95,21 @@ helpers.makeTests("can-component viewModels", function(doc){
 					return this.get('items');
 				}
 			},
-			showChildren: function (item, ev) {
+			showChildren: function(item, ev) {
 				ev.stopPropagation();
 				this.get('breadcrumb')
 					.push(item);
 			},
-			emptyBreadcrumb: function () {
+			emptyBreadcrumb: function() {
 				this.get("breadcrumb")
 					.update([]);
 			},
-			updateBreadcrumb: function (item) {
+			updateBreadcrumb: function(item) {
 				var breadcrumb = this.get("breadcrumb"),
 					index = breadcrumb.indexOf(item);
 				breadcrumb.splice(index + 1, breadcrumb.length - index - 1);
 			},
-			toggle: function (item) {
+			toggle: function(item) {
 				var selected = this.get('selected'),
 					index = selected.indexOf(item);
 				if (index === -1) {
@@ -104,7 +118,7 @@ helpers.makeTests("can-component viewModels", function(doc){
 					selected.splice(index, 1);
 				}
 			},
-			isSelected: function (item) {
+			isSelected: function(item) {
 				return this.get("selected").indexOf(item) > -1;
 			}
 		});
@@ -205,7 +219,7 @@ helpers.makeTests("can-component viewModels", function(doc){
 
 		stop();
 
-		setTimeout(function () {
+		setTimeout(function() {
 
 			base.set('locations', items);
 
@@ -214,19 +228,19 @@ helpers.makeTests("can-component viewModels", function(doc){
 			// check that the DOM is right
 			var treecombo = root.firstChild,
 				breadcrumb = treecombo.firstChild,
-				breadcrumbLIs = function(){
+				breadcrumbLIs = function() {
 					return breadcrumb.getElementsByTagName('li');
 				},
 				options = treecombo.lastChild,
-				optionsLis = function(){
+				optionsLis = function() {
 					return options.getElementsByTagName('li');
 				};
 
 			equal(breadcrumbLIs().length, 1, "Only the default title is shown");
 
-			equal( breadcrumbLIs()[0].innerHTML , "Locations", "The correct title from the attribute is shown");
+			equal(breadcrumbLIs()[0].innerHTML, "Locations", "The correct title from the attribute is shown");
 
-			equal( itemsList.length, optionsLis().length, "first level items are displayed");
+			equal(itemsList.length, optionsLis().length, "first level items are displayed");
 
 			// Test toggling selected, first by clicking
 			domEvents.dispatch.call(optionsLis()[0], "click");
@@ -248,23 +262,23 @@ helpers.makeTests("can-component viewModels", function(doc){
 			domEvents.dispatch.call(optionsLis()[0].getElementsByTagName('button')[0], "click");
 			equal(breadcrumbLIs().length, 2, "Only the default title is shown");
 			equal(breadcrumbLIs()[1].innerHTML, "Midwest", "The breadcrumb has an item in it");
-			ok(/Illinois/.test( optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
+			ok(/Illinois/.test(optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
 
 			// Test going in a location without children
 			domEvents.dispatch.call(optionsLis()[0].getElementsByTagName('button')[0], "click");
-			ok(/Chicago/.test(  optionsLis()[0].innerHTML  ), "A child of the top breadcrumb is displayed");
+			ok(/Chicago/.test(optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
 			ok(!optionsLis()[0].getElementsByTagName('button')
 				.length, "no show children button");
 
 			// Test poping off breadcrumb
 			domEvents.dispatch.call(breadcrumbLIs()[1], "click");
 			equal(innerHTML(breadcrumbLIs()[1]), "Midwest", "The breadcrumb has an item in it");
-			ok(/Illinois/.test( innerHTML( optionsLis()[0])), "A child of the top breadcrumb is displayed");
+			ok(/Illinois/.test(innerHTML(optionsLis()[0])), "A child of the top breadcrumb is displayed");
 
 			// Test removing everything
 			domEvents.dispatch.call(breadcrumbLIs()[0], "click");
 			equal(breadcrumbLIs().length, 1, "Only the default title is shown");
-			equal( innerHTML(breadcrumbLIs()[0]), "Locations", "The correct title from the attribute is shown");
+			equal(innerHTML(breadcrumbLIs()[0]), "Locations", "The correct title from the attribute is shown");
 
 			start();
 
@@ -272,7 +286,7 @@ helpers.makeTests("can-component viewModels", function(doc){
 
 	});
 
-	test("deferred grid", function () {
+	test("deferred grid", function() {
 
 		// This test simulates a grid that reads a `deferreddata` property for
 		// items and displays them.
@@ -280,8 +294,12 @@ helpers.makeTests("can-component viewModels", function(doc){
 		// The grid also has a `waiting` property that is true while the deferred is being resolved.
 
 		var GridViewModel = DefineMap.extend({
-			items: {Value: DefineList},
-			waiting: {value:true}
+			items: {
+				Value: DefineList
+			},
+			waiting: {
+				value: true
+			}
 		});
 
 		Component.extend({
@@ -290,27 +308,27 @@ helpers.makeTests("can-component viewModels", function(doc){
 			view: stache("<table><tbody><content></content></tbody></table>"),
 			leakScope: true,
 			events: {
-				init: function () {
+				init: function() {
 					this.update();
 				},
 				"{viewModel} deferreddata": "update",
-				update: function () {
-					var deferred = this.viewModel.attr('deferreddata'),
+				update: function() {
+					var deferred = this.viewModel.get('deferreddata'),
 						viewModel = this.viewModel;
 
 					if (deferred && deferred.then) {
 						this.viewModel.set("waiting", true);
-						deferred.then(function (items) {
+						deferred.then(function(items) {
 							viewModel.get('items')
-								.set(items, true);
+								.update(items);
 						});
 					} else {
-						viewModel.attr('items')
-							.attr(deferred, true);
+						viewModel.get('items')
+							.update(deferred);
 					}
 				},
-				"{items} change": function () {
-					this.viewModel.attr("waiting", false);
+				"{items} length": function() {
+					this.viewModel.set("waiting", false);
 				}
 			}
 		});
@@ -318,23 +336,25 @@ helpers.makeTests("can-component viewModels", function(doc){
 		// The context object has a `set` property and a
 		// deferredData property that reads from it and returns a new deferred.
 		var SimulatedScope = DefineMap.extend({
-			set: 0,
-			deferredData: function () {
+			set: {
+				value: 0
+			},
+			deferredData: function() {
 				var deferred = {};
-				var promise = new Promise(function(resolve, reject){
+				var promise = new Promise(function(resolve, reject) {
 					deferred.resolve = resolve;
 					deferred.reject = reject;
 				});
-				var set = this.attr('set');
+				var set = this.get('set');
 				if (set === 0) {
-					setTimeout(function () {
+					setTimeout(function() {
 						deferred.resolve([{
 							first: "Justin",
 							last: "Meyer"
 						}]);
 					}, 100);
 				} else if (set === 1) {
-					setTimeout(function () {
+					setTimeout(function() {
 						deferred.resolve([{
 							first: "Brian",
 							last: "Moschel"
@@ -369,13 +389,14 @@ helpers.makeTests("can-component viewModels", function(doc){
 		var waitingHandler = function() {
 			gridScope.off('waiting', waitingHandler);
 
-			setTimeout(function () {
+			setTimeout(function() {
 				var tds = self.fixture.getElementsByTagName("td");
 				equal(tds.length, 2, "there are 2 tds");
 
-				gridScope.bind("waiting", function (ev, newVal) {
+				gridScope.on("waiting", function(ev, newVal) {
 					if (newVal === false) {
-						setTimeout(function () {
+						setTimeout(function() {
+							tds = self.fixture.getElementsByTagName("td");
 							equal(innerHTML(tds[0]), "Brian", "td changed to brian");
 							start();
 						}, 100);
@@ -384,7 +405,7 @@ helpers.makeTests("can-component viewModels", function(doc){
 				});
 
 				// update set to change the deferred.
-				viewModel.set("set", 1);
+				viewModel.set = 1;
 
 			}, 100);
 		};
@@ -392,15 +413,15 @@ helpers.makeTests("can-component viewModels", function(doc){
 		gridScope.on('waiting', waitingHandler);
 	});
 
-	test("nextprev", function () {
+	test("nextprev", function() {
 
 		Component.extend({
 			tag: "next-prev",
 			view: stache(
 				'<a href="javascript://"' +
-				'class="prev {{#paginate.canPrev}}enabled{{/paginate.canPrev}}" on:click="paginate.prev()">Prev</a>' +
+				'class="prev {{#paginate.canPrev()}}enabled{{/paginate.canPrev}}" on:click="paginate.prev()">Prev</a>' +
 				'<a href="javascript://"' +
-				'class="next {{#paginate.canNext}}enabled{{/paginate.canNext}}" on:click="paginate.next()">Next</a>')
+				'class="next {{#paginate.canNext()}}enabled{{/paginate.canNext}}" on:click="paginate.next()">Next</a>')
 		});
 
 		var paginator = new Paginate({
@@ -418,14 +439,14 @@ helpers.makeTests("can-component viewModels", function(doc){
 		var prev = nextPrev.firstChild,
 			next = nextPrev.lastChild;
 
-		ok(!/enabled/.test( prev.className ), "prev is not enabled");
-		ok(/enabled/.test( next.className ), "next is  enabled");
+		ok(!/enabled/.test(prev.className), "prev is not enabled");
+		ok(/enabled/.test(next.className), "next is  enabled");
 
 		domEvents.dispatch.call(next, "click");
-		ok(/enabled/.test( prev.className ), "prev is enabled");
+		ok(/enabled/.test(prev.className), "prev is enabled");
 	});
 
-	test("page-count", function () {
+	test("page-count", function() {
 
 		Component.extend({
 			tag: "page-count",
@@ -438,11 +459,11 @@ helpers.makeTests("can-component viewModels", function(doc){
 			count: 100
 		});
 
-		var renderer = stache("<page-count on:page='paginator.page'></page-count>");
+		var renderer = stache("<page-count page:from='paginator.page'></page-count>");
 
-		var frag = renderer( new SimpleMap({
+		var frag = renderer(new SimpleMap({
 			paginator: paginator
-		}) );
+		}));
 
 		var span = frag.firstChild.getElementsByTagName("span")[0];
 
@@ -453,6 +474,164 @@ helpers.makeTests("can-component viewModels", function(doc){
 		equal(span.firstChild.nodeValue, "3");
 
 	});
+
+	if (System.env !== 'canjs-test') {
+		// Brittle in IE
+		test("basic tabs", function() {
+			var TabsViewModel = DefineMap.extend({
+                active: "any",
+                panels: {Value: DefineList},
+				addPanel: function(panel) {
+					if (this.panels.length === 0) {
+						this.makeActive(panel);
+					}
+					this.panels.push(panel);
+				},
+				removePanel: function(panel) {
+					var panels = this.panels;
+					queues.batch.start();
+					var index = panels.indexOf(panel);
+					canLog.log(index);
+					panels.splice(index, 1);
+					if (panel === this.active) {
+						if (panels.length) {
+							this.makeActive(panels[0]);
+						} else {
+							this.active = null;
+						}
+					}
+					queues.batch.stop();
+				},
+				makeActive: function(panel) {
+					this.active = panel;
+					this.panels.forEach(function(panel) {
+						panel.active = false;
+					});
+					panel.active = true;
+
+				},
+				// this is viewModel, not stache
+				// consider removing viewModel as arg
+				isActive: function(panel) {
+					return this.active === panel;
+				}
+			});
+
+			// new Tabs() ..
+			Component.extend({
+				tag: "tabs",
+				ViewModel: TabsViewModel,
+				view: stache("<ul>" +
+					"{{#panels}}" +
+					"<li {{#isActive(.)}}class='active'{{/isActive}} on:click='makeActive(this)'>{{title}}</li>" +
+					"{{/panels}}" +
+					"</ul>" +
+					"<content></content>")
+			});
+
+			Component.extend({
+				// make sure <content/> works
+				view: stache("{{#if active}}<content></content>{{/if}}"),
+				tag: "panel",
+				ViewModel: DefineMap.extend({
+					active: {value: false}
+				}),
+				events: {
+					" inserted": function() {
+						canViewModel(this.element.parentNode)
+							.addPanel(this.viewModel);
+
+					},
+
+					" beforeremove": function() {
+						canViewModel(this.element.parentNode)
+							.removePanel(this.viewModel);
+					}
+				}
+			});
+
+			var renderer = stache("<tabs>{{#each foodTypes}}<panel title:from='title'>{{content}}</panel>{{/each}}</tabs>");
+
+			var foodTypes = new DefineList([{
+				title: "Fruits",
+				content: "oranges, apples"
+			}, {
+				title: "Breads",
+				content: "pasta, cereal"
+			}, {
+				title: "Sweets",
+				content: "ice cream, candy"
+			}]);
+
+			var frag = renderer({
+				foodTypes: foodTypes
+			});
+
+			domMutate.appendChild.call(this.fixture, frag);
+
+			var testArea = this.fixture;
+
+			stop();
+
+			helpers.runTasks([
+				function() {
+					var lis = testArea.getElementsByTagName("li");
+
+					equal(lis.length, 3, "three lis added");
+
+					foodTypes.forEach(function(type, i) {
+						equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
+					});
+
+					foodTypes.push({
+						title: "Vegies",
+						content: "carrots, kale"
+					});
+				},
+				function() {
+					var lis = testArea.getElementsByTagName("li");
+
+					equal(lis.length, 4, "li added");
+
+
+					foodTypes.forEach(function(type, i) {
+						equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
+					});
+
+					equal(testArea.getElementsByTagName("panel")
+						.length, 4, "panel added");
+					canLog.log("SHIFTY");
+					foodTypes.shift();
+				},
+				function() {
+					var lis = testArea.getElementsByTagName("li");
+
+					equal(lis.length, 3, "removed li after shifting a foodType");
+					foodTypes.each(function(type, i) {
+						equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
+					});
+
+					// test changing the active element
+					var panels = testArea.getElementsByTagName("panel");
+
+					equal(lis[0].className, "active", "the first element is active");
+					equal(innerHTML(panels[0]), "pasta, cereal", "the first content is shown");
+					equal(innerHTML(panels[1]), "", "the second content is removed");
+
+					domEvents.dispatch.call(lis[1], "click");
+					lis = testArea.getElementsByTagName("li");
+
+					equal(lis[1].className, "active", "the second element is active");
+					equal(lis[0].className, "", "the first element is not active");
+
+					equal(innerHTML(panels[0]), "", "the second content is removed");
+					equal(innerHTML(panels[1]), "ice cream, candy", "the second content is shown");
+				}
+			]);
+		});
+
+
+	}
 
 
 });

@@ -4,8 +4,20 @@ var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
+var domEvents = require('can-util/dom/events/events');
+var domMutate = require('can-util/dom/mutate/mutate');
+var canViewModel = require('can-view-model');
+var DefineMap = require("can-define/map/map");
+var queues = require("can-queues");
+var getFragment = require("can-util/dom/fragment/fragment");
+var viewCallbacks = require("can-view-callbacks");
+var Scope = require("can-view-scope");
 
-helpers.makeTests("can-component views", function(){
+var innerHTML = function(el){
+    return el && el.innerHTML;
+};
+
+helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
     QUnit.test("lexical scoping", function() {
 		Component.extend({
@@ -71,4 +83,337 @@ helpers.makeTests("can-component views", function(){
 		equal( hello.innerHTML.trim() , "Hello Hello!");
 
 	});
+
+    QUnit.test("hello-world and whitespace around custom elements", function () {
+
+        Component.extend({
+            tag: "hello-world",
+            view: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
+            viewModel: function(){
+                return new SimpleMap({
+                    visible: false,
+                    message: "Hello There!"
+                });
+            },
+            events: {
+                click: function () {
+                    this.viewModel.attr("visible", true);
+                }
+            }
+        });
+
+        var renderer = stache("  <hello-world></hello-world>  ");
+        var frag = renderer({});
+
+        var helloWorld = frag.childNodes.item(1);
+
+        domEvents.dispatch.call(helloWorld, "click");
+
+        equal( helloWorld.innerHTML , "Hello There!");
+
+    });
+
+    QUnit.test("self closing content tags", function () {
+
+        Component.extend({
+            "tag": "my-greeting",
+            view: stache("<h1><content/></h1>"),
+            viewModel: function(){
+                return new SimpleMap({
+                    title: "Component"
+                });
+            }
+        });
+
+        var renderer = stache("<my-greeting><span>{{site}} - {{title}}</span></my-greeting>");
+
+        var frag = renderer({
+            site: "CanJS"
+        });
+
+        equal(frag.firstChild.getElementsByTagName("span")
+            .length, 1, "there is an h1");
+    });
+
+    QUnit.test("content extension stack overflow error", function () {
+
+        Component({
+            tag: 'outer-tag',
+            view: stache('<inner-tag>inner-tag CONTENT <content/></inner-tag>')
+        });
+
+        Component({
+            tag: 'inner-tag',
+            view: stache('inner-tag TEMPLATE <content/>')
+        });
+
+        // currently causes Maximum call stack size exceeded
+        var renderer = stache("<outer-tag>outer-tag CONTENT</outer-tag>");
+
+        // RESULT = <outer-tag><inner-tag>inner-tag TEMPLATE inner-tag CONTENT outer-tag CONTENT</inner-tag></outer-tag>
+
+        var frag = renderer();
+
+        equal( innerHTML(frag.firstChild.firstChild), 'inner-tag TEMPLATE inner-tag CONTENT outer-tag CONTENT');
+
+    });
+
+    QUnit.test("inserted event fires twice if component inside live binding block", function () {
+
+        var inited = 0,
+            inserted = 0;
+
+        Component.extend({
+            tag: 'child-tag',
+
+            ViewModel: SimpleMap.extend({
+                init: function () {
+                    inited++;
+                }
+            }),
+            events: {
+                ' inserted': function () {
+                    inserted++;
+                }
+            }
+        });
+
+        Component.extend({
+            tag: 'parent-tag',
+
+            view: stache('{{#shown}}<child-tag></child-tag>{{/shown}}'),
+
+            viewModel: {
+                shown: false
+            },
+            events: {
+                ' inserted': function () {
+                    this.viewModel.attr('shown', true);
+                }
+            }
+        });
+
+        var frag = stache("<parent-tag id='pt'></parent-tag>")({});
+
+        domMutate.appendChild.call(this.fixture, frag);
+        stop();
+        function checkCount(){
+            if(inserted >= 1) {
+                equal(inited, 1, "inited");
+                equal(inserted, 1, "inserted");
+                start();
+            } else {
+                setTimeout(checkCount,30);
+            }
+        }
+
+        checkCount();
+    });
+
+    QUnit.test('Same component tag nested', function () {
+        Component({
+            'tag': 'my-tag',
+            view: stache('<p><content/></p>')
+        });
+        //simplest case
+        var renderer = stache('<div><my-tag>Outter<my-tag>Inner</my-tag></my-tag></div>');
+        //complex case
+        var renderer2 = stache('<div><my-tag>3<my-tag>2<my-tag>1<my-tag>0</my-tag></my-tag></my-tag></my-tag></div>');
+        //edge case for new logic (same custom tag at same depth as one previously encountered)
+        var renderer3 = stache('<div><my-tag>First</my-tag><my-tag>Second</my-tag></div>');
+
+
+        equal( renderer({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
+
+        equal( renderer2({}).firstChild.getElementsByTagName('p').length, 4, 'proper number of p tags');
+
+        equal( renderer3({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
+
+    });
+
+    QUnit.test('nested component within an #if is not live bound(#1025)', function() {
+        Component.extend({
+            tag: 'parent-component',
+            view: stache('{{#if shown}}<child-component></child-component>{{/if}}'),
+            viewModel: function(){
+                return new SimpleMap({
+                    shown: false
+                });
+            }
+        });
+
+        Component.extend({
+            tag: 'child-component',
+            view: stache('Hello world.')
+        });
+
+        var renderer = stache('<parent-component></parent-component>');
+        var frag = renderer({});
+
+        equal( innerHTML(frag.firstChild), '', 'child component is not inserted');
+        canViewModel(frag.firstChild).attr('shown', true);
+
+        equal( innerHTML(frag.firstChild.firstChild), 'Hello world.', 'child component is inserted');
+        canViewModel(frag.firstChild).attr('shown', false);
+
+        equal( innerHTML(frag.firstChild), '', 'child component is removed');
+    });
+
+    var queues = require("can-queues");
+
+    QUnit.test("references scopes are available to bindings nested in components (#2029)", function(){
+
+        var renderer = stache('<export-er value:to="*reference" />'+
+            '<wrap-er><simple-example key:from="*reference"/></wrap-er>');
+
+        Component.extend({
+            tag : "wrap-er"
+        });
+        Component.extend({
+            tag : "export-er",
+            events : {
+                "init" : function() {
+                    var self = this.viewModel;
+                    stop();
+                    setTimeout(function() {
+                        self.set("value", 100);
+                        var wrapper = frag.lastChild,
+                            simpleExample = wrapper.firstChild,
+                            textNode = simpleExample.firstChild;
+                        equal(textNode.nodeValue, "100", "updated value with reference");
+                        start();
+                    }, 100);
+
+                }
+            }
+        });
+
+        Component.extend({
+            tag : "simple-example",
+            view : stache("{{key}}")
+        });
+        var frag = renderer({});
+
+    });
+
+    test("<content> (#2151)", function(){
+		var mapInstance = new DefineMap({
+			items:[{
+				id : 1,
+				context : 'Item 1',
+				render : false
+			}, {
+				id : 2,
+				context : 'Item 2',
+				render : false
+			}]
+		});
+
+		Component.extend({
+			tag : 'list-items',
+			view : stache("<ul>"+
+				"{{#items}}"+
+					"{{#if render}}"+
+						"<li><content /></li>"+
+					"{{/if}}"+
+					"{{/items}}"+
+				"</ul>"),
+			viewModel: mapInstance,
+			leakScope: true
+		});
+
+		Component.extend({
+			tag : 'list-item',
+			view : stache("{{item.context}}")
+		});
+
+		var renderer = stache("<list-items><list-item item:from='this'/></list-items>");
+
+		var frag = renderer();
+
+		queues.batch.start();
+		canViewModel(frag.firstChild).get('items').forEach(function(item, index) {
+			item.set('render', true);
+		});
+		queues.batch.stop();
+
+		var lis = frag.firstChild.getElementsByTagName("li");
+		ok( innerHTML(lis[0]).indexOf("Item 1") >= 0, "Item 1 written out");
+		ok( innerHTML(lis[1]).indexOf("Item 2") >= 0, "Item 2 written out");
+
+	});
+
+    QUnit.test('two-way - reference - with <content> tag', function(){
+		Component.extend({
+			tag: "other-export",
+			viewModel: function(){
+                return new SimpleMap({
+    				name: "OTHER-EXPORT"
+    			});
+            }
+		});
+
+		Component.extend({
+			tag: "ref-export",
+			view: stache('<other-export name:bind="*otherExport"/><content>{{*otherExport}}</content>')
+		});
+
+		// this should have otherExport name in the page
+		var t1 = stache("<ref-export></ref-export>");
+
+		// this should not have anything in 'one', but something in 'two'
+		//var t2 = stache("<form><other-export *other/><ref-export><b>{{*otherExport.name}}</b><label>{{*other.name}}</label></ref-export></form>");
+
+		var f1 = t1();
+		equal(canViewModel( f1.firstChild.firstChild ).get("name"), "OTHER-EXPORT", "viewModel set correctly");
+		equal(f1.firstChild.lastChild.nodeValue, "OTHER-EXPORT", "content");
+
+		/*var f2 = t2();
+		var one = f2.firstChild.getElementsByTagName('b')[0];
+		var two = f2.firstChild.getElementsByTagName('label')[0];
+
+		equal(one.firstChild.nodeValue, "", "external content, internal export");
+		equal(two.firstChild.nodeValue, "OTHER-EXPORT", "external content, external export");*/
+	});
+
+    runTestInOnlyDocument("custom renderer can provide setupBindings", function(){
+		var rendererFactory = function(tmpl){
+			var frag = getFragment(tmpl);
+			return function(scope, options){
+				scope = scope || new Scope();
+				options = options || new Scope.Options({});
+
+				if(frag.firstChild.nodeName === "CUSTOM-RENDERER") {
+					viewCallbacks.tagHandler(frag.firstChild, "custom-renderer", {
+						scope: scope,
+						options: options,
+						templateType: "my-renderer",
+						setupBindings: function(el, callback, data){
+							callback({
+								foo: "qux"
+							});
+						}
+					});
+				} else {
+					var tn = frag.firstChild.firstChild;
+					tn.nodeValue = scope.read("foo").value;
+				}
+
+				return frag;
+			};
+		};
+
+		Component.extend({
+			tag: "custom-renderer",
+			view: rendererFactory("<div>{{foo}}</div>"),
+			ViewModel: SimpleMap.extend({})
+		});
+
+		var renderer = rendererFactory("<custom-renderer foo='bar'></custom-renderer>");
+		var frag = renderer();
+
+		var tn = frag.firstChild.firstChild.firstChild;
+		equal(tn.nodeValue, "qux", "was bound!");
+	});
+
 });
