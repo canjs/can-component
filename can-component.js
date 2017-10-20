@@ -18,12 +18,10 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 
-var compute = require('can-compute');
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
-var types = require("can-types");
 var string = require("can-util/js/string/string");
 var canReflect = require("can-reflect");
 
@@ -34,6 +32,8 @@ var canLog = require('can-util/js/log/log');
 var canDev = require("can-util/js/dev/dev");
 var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
+var SimpleObservable = require("can-simple-observable");
+var SimpleMap = require("can-simple-map");
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
@@ -56,7 +56,7 @@ function addContext(el, tagData, insertionElementTagData) {
 	// it should be used for bindings
 	var teardown = stacheBindings.behaviors.viewModel(el, insertionElementTagData, function(initialData) {
 		// Create a compute responsible for keeping the vm up-to-date
-		return vm = compute(initialData);
+		return vm = new SimpleObservable(initialData);
 	}, undefined, true);
 
 
@@ -183,7 +183,7 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
-						this.ViewModel = types.DefaultMap.extend(vmName, this.prototype.ViewModel);
+						this.ViewModel = SimpleMap.extend(vmName, this.prototype.ViewModel);
 					}
 				} else {
 
@@ -201,11 +201,11 @@ var Component = Construct.extend(
 								//!steal-remove-end
 								this.viewModelInstance = protoViewModel;
 							} else {
-								this.ViewModel = types.DefaultMap.extend(vmName,protoViewModel);
+								this.ViewModel = SimpleMap.extend(vmName,protoViewModel);
 							}
 						}
 					} else {
-						this.ViewModel = types.DefaultMap.extend(vmName,{});
+						this.ViewModel = SimpleMap.extend(vmName,{});
 					}
 				}
 
@@ -271,8 +271,8 @@ var Component = Construct.extend(
 							// If `scopeResult` is of a `can.Map` type, use it to wrap the `initialViewModelData`
 							ViewModel = scopeResult;
 						} else {
-							// Otherwise extend `can.Map` with the `scopeResult` and initialize it with the `initialViewModelData`
-							ViewModel = types.DefaultMap.extend(scopeResult);
+							// Otherwise extend `SimpleMap` with the `scopeResult` and initialize it with the `initialViewModelData`
+							ViewModel = SimpleMap.extend(scopeResult);
 						}
 					}
 

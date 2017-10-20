@@ -1,0 +1,53 @@
+var MUTATION_OBSERVER = require('can-util/dom/mutation-observer/mutation-observer');
+var DOCUMENT = require("can-util/dom/document/document");
+var makeDocument = require('can-vdom/make-document/make-document');
+
+var helpers = {
+    runTasks: function(tasks){
+    	var nextTask = function(){
+    		var next = tasks.shift();
+    		next();
+    		if(tasks.length) {
+    			setTimeout(nextTask, 100);
+    		} else {
+    			start();
+    		}
+    	};
+    	setTimeout(nextTask, 100);
+    },
+    makeTest: function(name, doc, mutObs, test) {
+        var DOC = DOCUMENT();
+        var MUT_OBS = MUTATION_OBSERVER();
+
+    	QUnit.module(name, {
+    		setup: function () {
+    			DOCUMENT(doc);
+    			MUTATION_OBSERVER(mutObs);
+
+
+    			if(doc) {
+    				this.fixture = doc.createElement("div");
+    				doc.body.appendChild(this.fixture);
+    			} else {
+    				this.fixture = doc.getElementById("qunit-fixture");
+    			}
+    		},
+    		teardown: function(){
+    			doc.body.removeChild(this.fixture);
+    			stop();
+    			setTimeout(function(){
+    				start();
+    				DOCUMENT(DOC);
+    				MUTATION_OBSERVER(MUT_OBS);
+    			}, 100);
+    		}
+    	});
+        test(doc);
+    },
+    makeTests: function(name, test) {
+
+        helpers.makeTest(name+" - dom", document, MUTATION_OBSERVER(), test);
+        helpers.makeTest(name+" - vdom", makeDocument(), null, test);
+    }
+};
+module.exports = helpers;
