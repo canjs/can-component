@@ -1,5 +1,6 @@
 @property {Object.<String,can-stache.helper>} can-component.prototype.helpers helpers
-@parent can-component.prototype
+@parent can-views
+@collection can-component.prototype
 
 Helper functions used with the component’s view.
 

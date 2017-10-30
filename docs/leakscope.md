@@ -1,5 +1,6 @@
 @property {Boolean} can-component.prototype.leakScope leakScope
-@parent can-component.prototype
+@parent can-views
+@collection can-component.prototype
 
 @description Allow reading the outer scope values from a component’s view and
 a component’s viewModel values in the user content.

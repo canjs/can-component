@@ -1,5 +1,6 @@
 @property {String} can-component.prototype.tag tag
-@parent can-component.prototype
+@parent can-views
+@collection can-component.prototype
 
 Specifies the HTML tag (or node-name) the [can-component] will be created on.
 

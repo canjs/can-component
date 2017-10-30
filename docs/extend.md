@@ -1,5 +1,6 @@
 @function can-component.extend extend
-@parent can-component.static
+@parent can-views
+@collection can-component.static
 
 Define the behavior of a custom element.
 

@@ -1,5 +1,6 @@
 @typedef {can-stache.sectionRenderer} can-component/can-template <can-template>
-@parent can-component.elements
+@parent can-views
+@collection can-component.elements
 
 @description Pass templates declaratively to components.
 

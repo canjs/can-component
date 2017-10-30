@@ -1,7 +1,8 @@
 @module {constructor} can-component can-component
 @download can/component
 @test can/component/test.html
-@parent can-core
+@parent can-views
+@collection can-core
 @release 2.0
 @link ../docco/component/component.html docco
 @group can-component.static 0 static

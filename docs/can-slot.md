@@ -1,5 +1,6 @@
 @typedef {can-stache.sectionRenderer} can-component/can-slot <can-slot>
-@parent can-component.elements
+@parent can-views
+@collection can-component.elements
 
 @description Position the content of [can-component/can-template] elements.
 

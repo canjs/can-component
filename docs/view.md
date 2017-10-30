@@ -1,5 +1,6 @@
 @property {can-stache.renderer} [can-component.prototype.view] view
-@parent can-component.prototype
+@parent can-views
+@collection can-component.prototype
 
 Provides a view to render directly within the component’s element. The view is rendered with the
 component’s [can-component::ViewModel] instance.  `<content/>` elements within the view are replaced by the source elements within the component’s tag.
