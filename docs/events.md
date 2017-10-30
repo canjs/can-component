@@ -1,5 +1,6 @@
 @property {Object} can-component.prototype.events events
-@parent can-component.prototype
+@parent can-views
+@collection can-component.prototype
 
 Listen to events on elements and observables.
 

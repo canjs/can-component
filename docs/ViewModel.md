@@ -1,5 +1,6 @@
 @property {function} can-component.prototype.ViewModel ViewModel
-@parent can-component.prototype
+@parent can-views
+@collection can-component.prototype
 
 @description
 
