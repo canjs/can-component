@@ -138,9 +138,6 @@ function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leak
 	};
 }
 
-/**
- * @add Component
- */
 var Component = Construct.extend(
 
 	// ## Static
