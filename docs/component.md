@@ -50,9 +50,9 @@ a [can-component/can-template] that is used to render the search results:
    Example:
 
    ```
-   <my-tag get-child:from="expression"
-           set-parent:to="expression"
-           two-way:bind="expression"
+   <my-tag getChild:from="expression"
+           setParent:to="expression"
+           twoWay:bind="expression"
            on:event="callExpression()"></my-tag>
    ```
 
@@ -421,7 +421,7 @@ The `my-app` component passes paginate, paginate’s values, and websitesPromise
 its sub-components:
 
     <my-app>
-      <my-grid promise-data:from='websitesPromise'>
+      <my-grid promiseData:from='websitesPromise'>
         {{#each items}}
           <tr>
             <td width='40%'>{{name}}</td>
