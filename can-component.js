@@ -39,6 +39,7 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
+var DOCUMENT = require('can-globals/document/document')
 
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
@@ -224,6 +225,19 @@ var Component = Construct.extend(
 				viewCallbacks.tag(this.prototype.tag, function(el, options) {
 					new self(el, options);
 				});
+
+				if(this.prototype.autoMount) {
+					canEach( DOCUMENT().getElementsByTagName(this.prototype.tag), function(el){
+						if( ! domData.get.call(el, "viewModel") ) {
+							new self(el, {
+								scope: new Scope(),
+								options: new Scope.Options({}),
+								templates: {},
+								subtemplate: null
+							});
+						}
+					});
+				}
 			}
 
 		}
