@@ -39,7 +39,7 @@ require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
-var DOCUMENT = require('can-globals/document/document')
+var DOCUMENT = require('can-globals/document/document');
 
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
