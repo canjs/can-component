@@ -18,6 +18,7 @@ var canBatch = require("can-event/batch/batch");
 var attr = require("can-util/dom/attr/attr");
 var className = require("can-util/dom/class-name/class-name");
 var domMutate = require('can-util/dom/mutate/mutate');
+var domEvents = require('can-util/dom/events/events');
 var domData = require('can-util/dom/data/data');
 var types = require("can-types");
 
@@ -1531,7 +1532,8 @@ function makeTest(name, doc, mutObs) {
 		equal(childVM.attr('childProp'), 'baz', 'childProp is baz');
 	});
 
-	test("conditional attributes (#2077)", function(){
+	test("conditional attributes (#2077)", function (assert) {
+		var done = assert.async();
 		Component.extend({
 			tag: 'some-comp'
 		});
@@ -1547,51 +1549,44 @@ function makeTest(name, doc, mutObs) {
 			swapName: "preview"
 		});
 		var frag = renderer(map);
+		var componentElem = frag.firstChild;
+		var vm = canViewModel(componentElem);
+		var afterTick = function (callback) {
+			domEvents.addEventListener.call(componentElem, 'attributes', function onAttribute () {
+				domEvents.removeEventListener.call(componentElem, 'attributes', onAttribute);
+				setTimeout(callback, 150);
+			});
+		};
 
-		var vm = canViewModel(frag.firstChild);
+		afterTick(function () {
+			assert.equal(vm.attr("next"), 2, "has binidng");
+			assert.equal(vm.attr("swap"), true, "swap - has binding");
+			assert.equal(vm.attr("checked"), "", "attr - has binding");
+			map.attr("preview", false);
 
-		var threads = [
-			function(){
-
-				equal(vm.attr("next"), 2, "has binidng");
-				equal(vm.attr("swap"), true, "swap - has binding");
-				equal(vm.attr("checked"), "", "attr - has binding");
-				map.attr("preview", false);
-			},
-			function(){
-				equal(vm.attr("swap"), false, "swap - updated binidng");
-
-				ok(vm.attr("checked") === null, "attr - value set to null");
+			afterTick(function () {
+				assert.equal(vm.attr("swap"), false, "swap - updated binidng");
+				assert.ok(vm.attr("checked") === null, "attr - value set to null");
 
 				map.attr("nextPage", 3);
-				equal(vm.attr("next"), 2, "not updating after binding is torn down");
+				assert.equal(vm.attr("next"), 2, "not updating after binding is torn down");
 				map.attr("preview", true);
 
-			},
-			function(){
-				equal(vm.attr("next"), 3, "re-initialized with binding");
-				equal(vm.attr("swap"), true, "swap - updated binidng");
-				equal(vm.attr("checked"), "", "attr - has binding set again");
-				map.attr("swapName", "nextPage");
-			},
-			function(){
-				equal(vm.attr("swap"), 3, "swap - updated binding key");
-				map.attr("nextPage",4);
-				equal(vm.attr("swap"), 4, "swap - updated binding");
-			}
-		];
-		stop();
-		var index = 0;
-		var next = function(){
-			if(index < threads.length) {
-				threads[index]();
-				index++;
-				setTimeout(next, 150);
-			} else {
-				start();
-			}
-		};
-		setTimeout(next, 100);
+				afterTick(function () {
+					assert.equal(vm.attr("next"), 3, "re-initialized with binding");
+					assert.equal(vm.attr("swap"), true, "swap - updated binidng");
+					assert.equal(vm.attr("checked"), "", "attr - has binding set again");
+					map.attr("swapName", "nextPage");
+
+					afterTick(function () {
+						assert.equal(vm.attr("swap"), 3, "swap - updated binding key");
+						map.attr("nextPage",4);
+						assert.equal(vm.attr("swap"), 4, "swap - updated binding");
+						done();
+					});
+				});
+			});
+		});
 	});
 
 	test("<content> (#2151)", function(){
