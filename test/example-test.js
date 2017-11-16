@@ -138,7 +138,7 @@ helpers.makeTests("can-component examples", function(doc) {
 				"<input type='checkbox' {{#isSelected(.)}}checked{{/isSelected}}/>" +
 				"{{title}}" +
 				"{{#if children.length}}" +
-				"<button class='showChildren' on:click='showChildren(this, %event)'>+</button>" +
+				"<button class='showChildren' on:click='showChildren(this, scope.event)'>+</button>" +
 				"{{/if}}" +
 				"</li>" +
 				"{{/selectableItems}}" +
