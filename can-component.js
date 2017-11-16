@@ -345,18 +345,14 @@ var Component = Construct.extend(
 				if (leakScope.intoShadowContent) {
 					// Give access to the component's data and the VM
 					shadowTagData = {
-						scope: componentTagData.scope.add(new Scope.Refs()).add(this.viewModel, {
-							viewModel: true
-						}),
+						scope: componentTagData.scope.add(this.viewModel),
 						options: componentTagData.options.add(options)
 					};
 
 				} else { // lexical
 					// only give access to the VM
 					shadowTagData = {
-						scope: Scope.refsScope().add(this.viewModel, {
-							viewModel: true
-						}),
+						scope: new Scope(this.viewModel),
 						options: new Scope.Options(options)
 					};
 				}
