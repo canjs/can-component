@@ -66,7 +66,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 		Component.extend({
 			tag: "hello-world",
 			leakScope: true,
-			view: stache("{{greeting}} <content>World</content>{{exclamation}}"),
+			view: stache("{{greeting}} <content>World</content>{{../exclamation}}"),
 			viewModel: function(){
                 return new SimpleMap({greeting: "Hello"});
             }

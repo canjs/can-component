@@ -214,7 +214,7 @@ helpers.makeTests("can-component events", function(){
 
         Component.extend({
             tag: 'my-outside',
-            view: stache('{{#if state.inner}}<my-inside></my-inside>{{/if}}'),
+            view: stache('{{#if ../state.inner}}<my-inside></my-inside>{{/if}}'),
             leakScope: true
         });
 

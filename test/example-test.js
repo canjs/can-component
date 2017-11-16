@@ -128,17 +128,17 @@ helpers.makeTests("can-component examples", function(doc) {
 			view: stache("<ul class='breadcrumb'>" +
 				"<li on:click='emptyBreadcrumb()'>{{title}}</li>" +
 				"{{#each breadcrumb}}" +
-				"<li on:click='updateBreadcrumb(this)'>{{title}}</li>" +
+				"<li on:click='../updateBreadcrumb(this)'>{{title}}</li>" +
 				"{{/each}}" +
 				"</ul>" +
 				"<ul class='options'>" +
 				"<content>" +
 				"{{#selectableItems}}" +
-				"<li {{#isSelected(.)}}class='active'{{/isSelected}} on:click='toggle(this)'>" +
-				"<input type='checkbox' {{#isSelected(.)}}checked{{/isSelected}}/>" +
+				"<li {{#../isSelected(this)}}class='active'{{/../isSelected}} on:click='../toggle(this)'>" +
+				"<input type='checkbox' {{#../isSelected(.)}}checked{{/../isSelected}}/>" +
 				"{{title}}" +
 				"{{#if children.length}}" +
-				"<button class='showChildren' on:click='showChildren(this, scope.event)'>+</button>" +
+				"<button class='showChildren' on:click='../showChildren(this, scope.event)'>+</button>" +
 				"{{/if}}" +
 				"</li>" +
 				"{{/selectableItems}}" +
@@ -523,7 +523,7 @@ helpers.makeTests("can-component examples", function(doc) {
 				ViewModel: TabsViewModel,
 				view: stache("<ul>" +
 					"{{#panels}}" +
-					"<li {{#isActive(.)}}class='active'{{/isActive}} on:click='makeActive(this)'>{{title}}</li>" +
+					"<li {{#../isActive(this)}}class='active'{{/../isActive}} on:click='../makeActive(this)'>{{title}}</li>" +
 					"{{/panels}}" +
 					"</ul>" +
 					"<content></content>")
