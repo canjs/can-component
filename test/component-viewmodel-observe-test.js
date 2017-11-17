@@ -87,5 +87,4 @@ helpers.makeTests("can-component viewModels with observe", function(){
         });
     }
 
-
 });
