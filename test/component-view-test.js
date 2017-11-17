@@ -188,7 +188,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
             },
             events: {
                 ' inserted': function () {
-                    this.viewModel.attr('shown', true);
+                    this.viewModel.shown = true;
                 }
             }
         });
@@ -276,7 +276,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
                     var self = this.viewModel;
                     stop();
                     setTimeout(function() {
-                        self.set("value", 100);
+                        self.value = 100;
                         var wrapper = frag.lastChild,
                             simpleExample = wrapper.firstChild,
                             textNode = simpleExample.firstChild;
