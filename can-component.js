@@ -18,12 +18,10 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 
-var compute = require('can-compute');
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
-var types = require("can-types");
 var string = require("can-util/js/string/string");
 var canReflect = require("can-reflect");
 
@@ -34,11 +32,16 @@ var canLog = require('can-util/js/log/log');
 var canDev = require("can-util/js/dev/dev");
 var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
+var SimpleObservable = require("can-simple-observable");
+var SimpleMap = require("can-simple-map");
+var observe = require("can-observe");
+
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
 require('can-view-model');
 
+var DOCUMENT = require('can-globals/document/document');
 
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
@@ -56,7 +59,7 @@ function addContext(el, tagData, insertionElementTagData) {
 	// it should be used for bindings
 	var teardown = stacheBindings.behaviors.viewModel(el, insertionElementTagData, function(initialData) {
 		// Create a compute responsible for keeping the vm up-to-date
-		return vm = compute(initialData);
+		return vm = new SimpleObservable(initialData);
 	}, undefined, true);
 
 
@@ -180,7 +183,7 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
-						this.ViewModel = types.DefaultMap.extend(vmName, this.prototype.ViewModel);
+						this.ViewModel = observe.makeMapType(vmName,{},this.prototype.ViewModel);
 					}
 				} else {
 
@@ -198,11 +201,11 @@ var Component = Construct.extend(
 								//!steal-remove-end
 								this.viewModelInstance = protoViewModel;
 							} else {
-								this.ViewModel = types.DefaultMap.extend(vmName,protoViewModel);
+								this.ViewModel = observe.makeMapType(vmName,{},protoViewModel);
 							}
 						}
 					} else {
-						this.ViewModel = types.DefaultMap.extend(vmName,{});
+						this.ViewModel = observe.makeMapType(vmName,{},{});
 					}
 				}
 
@@ -221,6 +224,19 @@ var Component = Construct.extend(
 				viewCallbacks.tag(this.prototype.tag, function(el, options) {
 					new self(el, options);
 				});
+
+				if(this.prototype.autoMount) {
+					canEach( DOCUMENT().getElementsByTagName(this.prototype.tag), function(el){
+						if( ! domData.get.call(el, "viewModel") ) {
+							new self(el, {
+								scope: new Scope(),
+								options: new Scope.Options({}),
+								templates: {},
+								subtemplate: null
+							});
+						}
+					});
+				}
 			}
 
 		}
@@ -268,8 +284,8 @@ var Component = Construct.extend(
 							// If `scopeResult` is of a `can.Map` type, use it to wrap the `initialViewModelData`
 							ViewModel = scopeResult;
 						} else {
-							// Otherwise extend `can.Map` with the `scopeResult` and initialize it with the `initialViewModelData`
-							ViewModel = types.DefaultMap.extend(scopeResult);
+							// Otherwise extend `SimpleMap` with the `scopeResult` and initialize it with the `initialViewModelData`
+							ViewModel = SimpleMap.extend(scopeResult);
 						}
 					}
 
@@ -331,18 +347,14 @@ var Component = Construct.extend(
 				if (leakScope.intoShadowContent) {
 					// Give access to the component's data and the VM
 					shadowTagData = {
-						scope: componentTagData.scope.add(new Scope.Refs()).add(this.viewModel, {
-							viewModel: true
-						}),
+						scope: componentTagData.scope.add(this.viewModel),
 						options: componentTagData.options.add(options)
 					};
 
 				} else { // lexical
 					// only give access to the VM
 					shadowTagData = {
-						scope: Scope.refsScope().add(this.viewModel, {
-							viewModel: true
-						}),
+						scope: new Scope(this.viewModel),
 						options: new Scope.Options(options)
 					};
 				}

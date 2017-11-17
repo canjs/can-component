@@ -6,7 +6,6 @@ var define = require("can-define");
 var DefineMap = require("can-define/map/map");
 
 var viewModel = require("can-view-model");
-var types = require("can-types");
 var canDev = require("can-util/js/dev/dev");
 
 QUnit.module("can-component with can-define");
@@ -33,7 +32,7 @@ QUnit.test('Works with can-define', function () {
 		view: stache('Name: {{fullName}}')
 	});
 
-	var frag = stache('<can-define-component {first-name}="firstName" {last-name}="lastName" />')({
+	var frag = stache('<can-define-component firstName:from="firstName" lastName:from="lastName" />')({
 		firstName: 'Chris',
 		lastName: 'Gomez'
 	});
@@ -59,11 +58,11 @@ QUnit.test('scope method works', function () {
 		tag: "my-element",
 		viewModel: function(properties, scope, element){
 			QUnit.deepEqual(properties, {first: "Justin", last: "Meyer"});
-			return new types.DefaultMap(properties);
+			return new DefineMap(properties);
 		}
 	});
 
-	stache("<my-element {first}='firstName' last='Meyer'/>")({
+	stache("<my-element first:from='firstName' last:from='\"Meyer\"'/>")({
 	  firstName: "Justin",
 	  middleName: "Barry"
 	});
@@ -90,12 +89,12 @@ QUnit.test('33 - works when instantiated with an object for ViewModel', function
 
 QUnit.test("helpers do not leak when leakscope is false (#77)", function () {
 	var called = 0;
-	var inner = Component.extend({
+	Component.extend({
 		tag: "inner-el",
 		view: stache("inner{{test}}"),
 		leakScope: false
 	});
-	var outer = Component.extend({
+	Component.extend({
 		tag: "outer-el",
 		view: stache("outer:<inner-el>"),
 		helpers: {
@@ -114,14 +113,14 @@ QUnit.test("helpers do not leak when leakscope is false (#77)", function () {
 
 QUnit.test("helpers do leak when leakscope is true (#77)", function () {
 	var called = 0;
-	var inner = Component.extend({
+	Component.extend({
 		tag: "inner-el",
-		view: stache("inner{{test}}"),
+		view: stache("inner{{../test}}"),
 		leakScope: true
 	});
-	var outer = Component.extend({
+	Component.extend({
 		tag: "outer-el",
-		view: stache("outer:<inner-el>"),
+		view: stache("outer:<inner-el/>"),
 		helpers: {
 			test: function () {
 				called++;
@@ -130,7 +129,7 @@ QUnit.test("helpers do leak when leakscope is true (#77)", function () {
 		}
 	});
 
-	var renderer = stache("<outer-el>");
+	var renderer = stache("<outer-el/>");
 
 	renderer();
 	QUnit.equal(called, 1, "Outer helper called once");
