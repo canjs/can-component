@@ -187,7 +187,7 @@ var Component = Construct.extend(
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
 						var Type = function(props){
-							canReflect.assign(this, props || {})
+							canReflect.assign(this, props || {});
 						};
 						Type.prototype = this.prototype.ViewModel;
 						this.ViewModel = observe(Type);
