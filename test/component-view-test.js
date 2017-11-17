@@ -66,7 +66,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 		Component.extend({
 			tag: "hello-world",
 			leakScope: true,
-			view: stache("{{greeting}} <content>World</content>{{exclamation}}"),
+			view: stache("{{greeting}} <content>World</content>{{../exclamation}}"),
 			viewModel: function(){
                 return new SimpleMap({greeting: "Hello"});
             }
@@ -263,8 +263,8 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
     QUnit.test("references scopes are available to bindings nested in components (#2029)", function(){
 
-        var renderer = stache('<export-er value:to="*reference" />'+
-            '<wrap-er><simple-example key:from="*reference"/></wrap-er>');
+        var renderer = stache('<export-er value:to="scope.vars.reference" />'+
+            '<wrap-er><simple-example key:from="scope.vars.reference"/></wrap-er>');
 
         Component.extend({
             tag : "wrap-er"

@@ -115,12 +115,12 @@ QUnit.test("helpers do leak when leakscope is true (#77)", function () {
 	var called = 0;
 	Component.extend({
 		tag: "inner-el",
-		view: stache("inner{{test}}"),
+		view: stache("inner{{../test}}"),
 		leakScope: true
 	});
 	Component.extend({
 		tag: "outer-el",
-		view: stache("outer:<inner-el>"),
+		view: stache("outer:<inner-el/>"),
 		helpers: {
 			test: function () {
 				called++;
@@ -129,7 +129,7 @@ QUnit.test("helpers do leak when leakscope is true (#77)", function () {
 		}
 	});
 
-	var renderer = stache("<outer-el>");
+	var renderer = stache("<outer-el/>");
 
 	renderer();
 	QUnit.equal(called, 1, "Outer helper called once");
