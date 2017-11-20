@@ -1,6 +1,9 @@
 var Control = require("can-control");
+
 var canEach = require('can-util/js/each/each');
-var canReflect = require("can-reflect");
+var string = require('can-util/js/string/string');
+var canCompute = require("can-compute");
+var observeReader = require('can-stache-key');
 
 // ## Helpers
 // Attribute names to ignore for setting viewModel values.
@@ -53,7 +56,7 @@ var ComponentControl = Control.extend({
 			// unbind `change` event listeners set by the controller.
 			if (this._bindings) {
 				canEach(this._bindings.readyComputes || {}, function(value) {
-					canReflect.offValue(value.compute, value.handler);
+					value.compute.unbind("change", value.handler);
 				});
 			}
 			// Call `Control.prototype.off` function on this instance to cleanup the bindings.
