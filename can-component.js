@@ -34,6 +34,8 @@ var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
+var observe = require("can-observe");
+
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
@@ -181,7 +183,7 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
-						this.ViewModel = SimpleMap.extend(vmName, this.prototype.ViewModel);
+						this.ViewModel = observe.makeMapType(vmName,{},this.prototype.ViewModel);
 					}
 				} else {
 
@@ -199,11 +201,11 @@ var Component = Construct.extend(
 								//!steal-remove-end
 								this.viewModelInstance = protoViewModel;
 							} else {
-								this.ViewModel = SimpleMap.extend(vmName,protoViewModel);
+								this.ViewModel = observe.makeMapType(vmName,{},protoViewModel);
 							}
 						}
 					} else {
-						this.ViewModel = SimpleMap.extend(vmName,{});
+						this.ViewModel = observe.makeMapType(vmName,{},{});
 					}
 				}
 

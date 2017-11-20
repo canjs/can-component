@@ -34,11 +34,11 @@ helpers.makeTests("can-component events", function(){
         var n1 = new SimpleObservable(),
             n2 = new SimpleObservable();
 
-        viewModel.set("name", n1);
+        viewModel.name = n1;
 
         n1.set("updated");
 
-        viewModel.set("name", n2);
+        viewModel.name = n2;
 
         n2.set("updated");
 
@@ -119,12 +119,12 @@ helpers.makeTests("can-component events", function(){
 
         Component.extend({
             tag:'my-app',
-            viewModel: {
+            viewModel: SimpleMap.extend({
                 setup: function(props){
                     props.MyConstruct = Test;
                     return SimpleMap.prototype.setup.apply(this, arguments);
                 }
-            },
+            }),
             events: {
                 '{MyConstruct} something': function() {
                     ok(true, 'Event got triggered');
@@ -152,7 +152,7 @@ helpers.makeTests("can-component events", function(){
             tag: 'destroyable-component',
             events: {
                 destroy: function(){
-                    this.viewModel.set('product', null);
+                    this.viewModel.product = null;
                 }
             }
         });
@@ -175,7 +175,7 @@ helpers.makeTests("can-component events", function(){
 			tag: 'rebind-viewmodel',
 			events: {
 				init: function(){
-					this.viewModel.set('item', new SimpleMap({}));
+					this.viewModel.item = new SimpleMap({});
 				},
 				'{scope.item} name': function() {
 					ok(true, 'Change event on scope');
@@ -189,7 +189,7 @@ helpers.makeTests("can-component events", function(){
 		var rebind = frag.firstChild;
 		domMutate.appendChild.call(this.fixture, rebind);
 
-		canViewModel(rebind).get('item').set('name', 'CDN');
+		canViewModel(rebind).item.set('name', 'CDN');
 	});
 
 

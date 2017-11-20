@@ -75,15 +75,12 @@ helpers.makeTests("can-component viewModels", function(){
 		equal(renderer().firstChild.firstChild.nodeValue, "Matthew");
 	});
 
-	QUnit.test("an object is turned into a SimpleMap as viewModel", function() {
+	QUnit.test("an object is turned into a can-observe as viewModel", function() {
 		Component.extend({
 			tag: "can-map-viewmodel",
 			view: stache("{{name}}"),
 			viewModel: {
-                setup: function(props){
-                    props.name = "Matthew";
-                    return SimpleMap.prototype.setup.apply(this, arguments);
-                }
+                name: "Matthew"
 			}
 		});
 
@@ -94,7 +91,7 @@ helpers.makeTests("can-component viewModels", function(){
 
 		var fragTwo = renderer();
 
-		vmOne.set("name", "Wilbur");
+		vmOne.name = "Wilbur";
 
 		equal(fragOne.firstChild.firstChild.nodeValue, "Wilbur", "The first map changed values");
 		equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
@@ -254,11 +251,11 @@ helpers.makeTests("can-component viewModels", function(){
         var n1 = new SimpleObservable(),
             n2 = new SimpleObservable();
 
-        viewModel.set("name", n1);
+        viewModel.name = n1;
 
         n1.set("updated");
 
-        viewModel.set("name", n2);
+        viewModel.name = n2;
 
         n2.set("updated");
 
@@ -430,10 +427,7 @@ helpers.makeTests("can-component viewModels", function(){
 		Component.extend({
 			tag : 'chi-ld',
 			ViewModel: {
-                setup: function(props){
-                    props.childProp = 'bar';
-                    return SimpleMap.prototype.setup.apply(this, arguments);
-                }
+                childProp: 'bar'
             }
 		});
 
@@ -442,18 +436,18 @@ helpers.makeTests("can-component viewModels", function(){
 		var parentVM = canViewModel(frag.firstChild);
 		var childVM = canViewModel(frag.firstChild.firstChild);
 
-		equal(parentVM.get('parentProp'), 'bar', 'parentProp is bar');
-		equal(childVM.get('childProp'), 'bar', 'childProp is bar');
+		equal(parentVM.parentProp, 'bar', 'parentProp is bar');
+		equal(childVM.childProp, 'bar', 'childProp is bar');
 
-		parentVM.set('parentProp', 'foo');
+		parentVM.parentProp = 'foo';
 
-		equal(parentVM.get('parentProp'), 'foo', 'parentProp is foo');
-		equal(childVM.get('childProp'), 'foo', 'childProp is foo');
+		equal(parentVM.parentProp, 'foo', 'parentProp is foo');
+		equal(childVM.childProp, 'foo', 'childProp is foo');
 
-		childVM.set('childProp', 'baz');
+		childVM.childProp = 'baz';
 
-		equal(parentVM.get('parentProp'), 'baz', 'parentProp is baz');
-		equal(childVM.get('childProp'), 'baz', 'childProp is baz');
+		equal(parentVM.parentProp, 'baz', 'parentProp is baz');
+		equal(childVM.childProp, 'baz', 'childProp is baz');
 	});
 
 
@@ -479,31 +473,31 @@ helpers.makeTests("can-component viewModels", function(){
 		var threads = [
 			function(){
 
-				equal(vm.get("next"), 2, "has binidng");
-				equal(vm.get("swap"), true, "swap - has binding");
+				equal(vm.next, 2, "has binidng");
+				equal(vm.swap, true, "swap - has binding");
 				//equal(vm.get("checked"), "", "attr - has binding"); (commented out because we don't do this sort of binding)
-				map.attr("preview", false);
+                map.attr("preview", false);
 			},
 			function(){
-				equal(vm.get("swap"), false, "swap - updated binidng");
+				equal(vm.swap, false, "swap - updated binidng");
 
 				//ok(vm.get("checked") === null, "attr - value set to null");
 
 				map.attr("nextPage", 3);
-				equal(vm.get("next"), 2, "not updating after binding is torn down");
+				equal(vm.next, 2, "not updating after binding is torn down");
 				map.attr("preview", true);
 
 			},
 			function(){
-				equal(vm.get("next"), 3, "re-initialized with binding");
-				equal(vm.get("swap"), true, "swap - updated binidng");
+				equal(vm.next, 3, "re-initialized with binding");
+				equal(vm.swap, true, "swap - updated binidng");
 				//equal(vm.get("checked"), "", "attr - has binding set again");
 				map.attr("swapName", "nextPage");
 			},
 			function(){
-				equal(vm.get("swap"), 3, "swap - updated binding key");
+				equal(vm.swap, 3, "swap - updated binding key");
 				map.attr("nextPage",4);
-				equal(vm.get("swap"), 4, "swap - updated binding");
+				equal(vm.swap, 4, "swap - updated binding");
 			}
 		];
 		stop();
@@ -523,12 +517,16 @@ helpers.makeTests("can-component viewModels", function(){
     QUnit.test("one-way - child to parent - parent that does not leak scope, but has no view", function(){
         Component.extend({
             tag: "outer-noleak",
-            viewModel: {},
+            viewModel: {
+                name: "outer"
+            },
             leakScope: false
         });
         Component.extend({
             tag: "my-child",
-            viewModel : {},
+            viewModel : {
+                name: "inner"
+            },
             leakScope: false
         });
 
@@ -536,7 +534,7 @@ helpers.makeTests("can-component viewModels", function(){
         var renderer = stache("<outer-noleak><my-child this:to='myChild'/></outer-noleak>");
         var frag = renderer();
         var vm = canViewModel(frag.firstChild);
-        ok(vm.get("myChild") instanceof SimpleMap, "got instance");
+        QUnit.equal(vm.myChild.name,"inner", "got instance");
 
     });
 
