@@ -183,7 +183,7 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
-						this.ViewModel = observe.makeMapType(vmName,{},this.prototype.ViewModel);
+						this.ViewModel = observe.Object.extend(vmName,{},this.prototype.ViewModel);
 					}
 				} else {
 
@@ -201,11 +201,11 @@ var Component = Construct.extend(
 								//!steal-remove-end
 								this.viewModelInstance = protoViewModel;
 							} else {
-								this.ViewModel = observe.makeMapType(vmName,{},protoViewModel);
+								this.ViewModel = observe.Object.extend(vmName,{},protoViewModel);
 							}
 						}
 					} else {
-						this.ViewModel = observe.makeMapType(vmName,{},{});
+						this.ViewModel = observe.Object.extend(vmName,{},{});
 					}
 				}
 
