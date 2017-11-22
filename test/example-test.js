@@ -366,7 +366,7 @@ helpers.makeTests("can-component examples", function(doc) {
 		});
 		var viewModel = new SimulatedScope();
 
-		var renderer = stache("<grid deferreddata:bind='viewModel.deferredData'>" +
+		var renderer = stache("<grid deferreddata:bind='viewModel.deferredData()'>" +
 			"{{#each items}}" +
 			"<tr>" +
 			"<td width='40%'>{{first}}</td>" +
