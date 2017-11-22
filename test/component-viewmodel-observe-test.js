@@ -86,6 +86,34 @@ helpers.makeTests("can-component viewModels with observe", function(){
             QUnit.equal(spans[0].innerHTML, "1", "second value");
 
         });
+
+        QUnit.test("connectedCallback and disconnectedCallback", 2, function(){
+            QUnit.stop();
+
+            Component.extend({
+                tag: "connected-component",
+                ViewModel: class extends observe.Object {
+                    connectedCallback(element) {
+                        QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "connectedCallback");
+                        return function(){
+                            QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "disconnectedCallback");
+                        }
+                    }
+                }
+            });
+            var template = stache("<connected-component/>");
+            var frag = template();
+            var first = frag.firstChild;
+            domMutate.appendChild.call(this.fixture, frag);
+
+            helpers.afterMutation(function(){
+
+                domMutate.removeChild.call(first.parentNode, first);
+                helpers.afterMutation(function(){
+                    QUnit.start();
+                });
+            });
+        });
     }
 
 });

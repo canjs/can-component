@@ -35,7 +35,7 @@ var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
 var observe = require("can-observe");
-
+var domEvents = require("can-util/dom/events/events");
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
@@ -326,6 +326,8 @@ var Component = Construct.extend(
 					viewModel: this.viewModel,
 					destroy: callTeardownFunctions
 				});
+			} else {
+				domEvents.addEventListener.call(el, "removed", callTeardownFunctions);
 			}
 
 
@@ -385,17 +387,31 @@ var Component = Construct.extend(
 				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
 
+
+			var disconnectedCallback;
+			if(viewModel.connectedCallback) {
+				domEvents.addEventListener.call(el, "inserted", function connectedHandler(){
+					domEvents.removeEventListener.call(el, "inserted", connectedHandler);
+					disconnectedCallback = viewModel.connectedCallback(el);
+				});
+			}
+
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
 			var nodeList = nodeLists.register([], function() {
 				domDispatch.call(el, "beforeremove", [], false);
 				if(teardownBindings) {
 					teardownBindings();
 				}
+				if(disconnectedCallback) {
+					disconnectedCallback(el);
+				}
 			}, componentTagData.parentNodeList || true, false);
 			nodeList.expression = "<" + this.tag + ">";
 			teardownFunctions.push(function() {
 				nodeLists.unregister(nodeList);
 			});
+
+
 
 			frag = betweenTagsRenderer(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
 
