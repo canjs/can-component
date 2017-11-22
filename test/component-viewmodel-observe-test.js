@@ -59,8 +59,9 @@ helpers.makeTests("can-component viewModels with observe", function(){
     if(classSupport) {
         QUnit.test("ViewModel as observe(class)", function(){
 
-            class Add {
-                constructor() {
+            class Add extends observe.Object{
+                constructor(props) {
+                    super(props)
                     this.count = 0;
                 }
                 add(){
@@ -71,7 +72,7 @@ helpers.makeTests("can-component viewModels with observe", function(){
             Component.extend({
                 tag: "observe-class-add",
                 view: stache("<button on:click='add()'>+1</button><span>{{count}}</span>"),
-                ViewModel: observe(Add)
+                ViewModel: Add
             });
 
             var frag = stache("<observe-class-add/>")();

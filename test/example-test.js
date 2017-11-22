@@ -133,7 +133,7 @@ helpers.makeTests("can-component examples", function(doc) {
 				"</ul>" +
 				"<ul class='options'>" +
 				"<content>" +
-				"{{#selectableItems}}" +
+				"{{#selectableItems()}}" +
 				"<li {{#../isSelected(this)}}class='active'{{/../isSelected}} on:click='../toggle(this)'>" +
 				"<input type='checkbox' {{#../isSelected(.)}}checked{{/../isSelected}}/>" +
 				"{{title}}" +
