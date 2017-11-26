@@ -232,7 +232,8 @@ var Component = Construct.extend(
 								scope: new Scope(),
 								options: new Scope.Options({}),
 								templates: {},
-								subtemplate: null
+								subtemplate: null,
+								mounted: true
 							});
 						}
 					});
@@ -390,10 +391,15 @@ var Component = Construct.extend(
 
 			var disconnectedCallback;
 			if(viewModel.connectedCallback) {
-				domEvents.addEventListener.call(el, "inserted", function connectedHandler(){
-					domEvents.removeEventListener.call(el, "inserted", connectedHandler);
+				if(componentTagData.mounted === true) {
 					disconnectedCallback = viewModel.connectedCallback(el);
-				});
+				} else {
+					domEvents.addEventListener.call(el, "inserted", function connectedHandler(){
+						domEvents.removeEventListener.call(el, "inserted", connectedHandler);
+						disconnectedCallback = viewModel.connectedCallback(el);
+					});
+				}
+
 			}
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component

@@ -34,4 +34,29 @@ helpers.makeTests("can-component autoMount", function(doc){
         QUnit.equal( first.innerHTML, "Hello World" );
 
 	});
+
+
+    QUnit.test("autoMount and connectedCallback", function () {
+        QUnit.stop();
+        var first = doc.createElement("is-autorendered");
+        first.id = "first";
+
+        domMutate.appendChild.call(this.fixture, first);
+
+        Component.extend({
+            tag: "is-autorendered",
+            autoMount: true,
+            view: stache("Hello World"),
+            ViewModel: {
+                connectedCallback: function(){
+                    QUnit.ok(true, "called on automounted components");
+                    QUnit.start();
+                }
+            }
+        });
+
+        QUnit.equal( first.innerHTML, "Hello World" );
+
+
+	});
 });
