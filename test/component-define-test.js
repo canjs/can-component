@@ -111,7 +111,7 @@ QUnit.test("helpers do not leak when leakscope is false (#77)", function () {
 	QUnit.equal(called, 0, "Outer helper not called");
 });
 
-QUnit.test("helpers do leak when leakscope is true (#77)", function () {
+QUnit.skip("helpers do leak when leakscope is true (#77)", function () {
 	var called = 0;
 	Component.extend({
 		tag: "inner-el",
