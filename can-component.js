@@ -77,7 +77,7 @@ function addContext(el, tagData, insertionElementTagData) {
 
 // Returns a hookupFuction that gets the proper tagData in a template, renders it, and adds it to nodeLists
 function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leakScope, getPrimaryTemplate) {
-	var options = shadowTagData.options._context;
+	var options = shadowTagData.options;
 
 	return function hookupFunction(el, insertionElementTagData) {
 		var template = getPrimaryTemplate(el) || insertionElementTagData.subtemplate,
@@ -230,7 +230,7 @@ var Component = Construct.extend(
 						if( ! domData.get.call(el, "viewModel") ) {
 							new self(el, {
 								scope: new Scope(),
-								options: new Scope.Options({}),
+								options: {},
 								templates: {},
 								subtemplate: null,
 								mounted: true
@@ -351,14 +351,14 @@ var Component = Construct.extend(
 					// Give access to the component's data and the VM
 					shadowTagData = {
 						scope: componentTagData.scope.add(this.viewModel),
-						options: componentTagData.options.add(options)
+						options: assign(assign({}, componentTagData.options), options)
 					};
 
 				} else { // lexical
 					// only give access to the VM
 					shadowTagData = {
 						scope: new Scope(this.viewModel),
-						options: new Scope.Options(options)
+						options: options
 					};
 				}
 
@@ -382,7 +382,7 @@ var Component = Construct.extend(
 					scope: componentTagData.scope.add(this.viewModel, {
 						viewModel: true
 					}),
-					options: componentTagData.options.add(options)
+					options: assign(assign({}, componentTagData.options), options)
 				};
 				betweenTagsTagData = lightTemplateTagData;
 				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);

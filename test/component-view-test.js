@@ -381,7 +381,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 			var frag = getFragment(tmpl);
 			return function(scope, options){
 				scope = scope || new Scope();
-				options = options || new Scope.Options({});
+				options = options || {};
 
 				if(frag.firstChild.nodeName === "CUSTOM-RENDERER") {
 					viewCallbacks.tagHandler(frag.firstChild, "custom-renderer", {
