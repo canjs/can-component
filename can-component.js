@@ -351,7 +351,7 @@ var Component = Construct.extend(
 					// Give access to the component's data and the VM
 					shadowTagData = {
 						scope: componentTagData.scope.add(this.viewModel),
-						options: assign(assign({}, componentTagData.options), options)
+						options: options
 					};
 
 				} else { // lexical
@@ -382,7 +382,7 @@ var Component = Construct.extend(
 					scope: componentTagData.scope.add(this.viewModel, {
 						viewModel: true
 					}),
-					options: assign(assign({}, componentTagData.options), options)
+					options: options
 				};
 				betweenTagsTagData = lightTemplateTagData;
 				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
