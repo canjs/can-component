@@ -42,7 +42,6 @@
     "can-globals": "<2.0.0",
     "can-namespace": "1.0.0",
     "can-observation": "^4.0.0-pre.22",
-    "can-observe": "^2.0.0-pre.14",
     "can-queues": "<2.0.0",
     "can-reflect": "^1.6.0",
     "can-simple-map": "^4.0.0-pre.13",
@@ -56,6 +55,7 @@
     "can-view-scope": "^4.0.0-pre.34"
   },
   "devDependencies": {
+    "can-observe": "^2.0.0-pre.15",
     "can-define": "^2.0.0-pre.18",
     "can-stache": "^4.0.0-pre.21",
     "can-symbol": "^1.4.1",

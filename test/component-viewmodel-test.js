@@ -15,6 +15,7 @@ var attr = require("can-util/dom/attr/attr");
 var canReflect = require("can-reflect");
 var domMutate = require('can-util/dom/mutate/mutate');
 var Construct = require("can-construct");
+var observe = require("can-observe");
 
 var innerHTML = function(el){
     return el && el.innerHTML;
@@ -75,7 +76,7 @@ helpers.makeTests("can-component viewModels", function(){
 		equal(renderer().firstChild.firstChild.nodeValue, "Matthew");
 	});
 
-	QUnit.test("an object is turned into a can-observe as viewModel", function() {
+	QUnit.test("an object is turned into a SimpleMap as viewModel", function() {
 		Component.extend({
 			tag: "can-map-viewmodel",
 			view: stache("{{name}}"),
@@ -91,7 +92,7 @@ helpers.makeTests("can-component viewModels", function(){
 
 		var fragTwo = renderer();
 
-		vmOne.name = "Wilbur";
+		vmOne.set("name", "Wilbur");
 
 		equal(fragOne.firstChild.firstChild.nodeValue, "Wilbur", "The first map changed values");
 		equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
@@ -251,11 +252,11 @@ helpers.makeTests("can-component viewModels", function(){
         var n1 = new SimpleObservable(),
             n2 = new SimpleObservable();
 
-        viewModel.name = n1;
+        viewModel.set("name", n1);
 
         n1.set("updated");
 
-        viewModel.name = n2;
+        viewModel.set("name", n2);
 
         n2.set("updated");
 
@@ -436,24 +437,25 @@ helpers.makeTests("can-component viewModels", function(){
 		var parentVM = canViewModel(frag.firstChild);
 		var childVM = canViewModel(frag.firstChild.firstChild);
 
-		equal(parentVM.parentProp, 'bar', 'parentProp is bar');
-		equal(childVM.childProp, 'bar', 'childProp is bar');
+		equal(parentVM.get("parentProp"), 'bar', 'parentProp is bar');
+		equal(childVM.get("childProp"), 'bar', 'childProp is bar');
 
-		parentVM.parentProp = 'foo';
+		parentVM.set("parentProp",'foo');
 
-		equal(parentVM.parentProp, 'foo', 'parentProp is foo');
-		equal(childVM.childProp, 'foo', 'childProp is foo');
+		equal(parentVM.get("parentProp"), 'foo', 'parentProp is foo');
+		equal(childVM.get("childProp"), 'foo', 'childProp is foo');
 
-		childVM.childProp = 'baz';
+		childVM.set("childProp",'baz');
 
-		equal(parentVM.parentProp, 'baz', 'parentProp is baz');
-		equal(childVM.childProp, 'baz', 'childProp is baz');
+		equal(parentVM.get("parentProp"), 'baz', 'parentProp is baz');
+		equal(childVM.get("childProp"), 'baz', 'childProp is baz');
 	});
 
 
 	test("conditional attributes (#2077)", function(){
 		Component.extend({
-			tag: 'some-comp'
+			tag: 'some-comp',
+            ViewModel: observe.Object.extend({})
 		});
 		var renderer = stache("<some-comp "+
 			"{{#if preview}}next:from='nextPage'{{/if}} "+
@@ -515,18 +517,19 @@ helpers.makeTests("can-component viewModels", function(){
 	});
 
     QUnit.test("one-way - child to parent - parent that does not leak scope, but has no view", function(){
+
         Component.extend({
             tag: "outer-noleak",
-            viewModel: {
+            ViewModel: observe.Object.extend("Outer",{},{
                 name: "outer"
-            },
+            }),
             leakScope: false
         });
         Component.extend({
             tag: "my-child",
-            viewModel : {
+            ViewModel : observe.Object.extend("Inner",{},{
                 name: "inner"
-            },
+            }),
             leakScope: false
         });
 

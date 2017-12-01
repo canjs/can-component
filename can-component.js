@@ -34,7 +34,6 @@ var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
-var observe = require("can-observe");
 var domEvents = require("can-util/dom/events/events");
 
 require('can-util/dom/events/inserted/inserted');
@@ -183,7 +182,8 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
-						this.ViewModel = observe.Object.extend(vmName,{},this.prototype.ViewModel);
+						canLog.warn("can-component: "+this.prototype.tag+" is extending the ViewModel into a can-simple-map");
+						this.ViewModel = SimpleMap.extend(vmName,{},this.prototype.ViewModel);
 					}
 				} else {
 
@@ -201,11 +201,12 @@ var Component = Construct.extend(
 								//!steal-remove-end
 								this.viewModelInstance = protoViewModel;
 							} else {
-								this.ViewModel = observe.Object.extend(vmName,{},protoViewModel);
+								canLog.warn("can-component: "+this.prototype.tag+" is extending the viewModel into a can-simple-map");
+								this.ViewModel = SimpleMap.extend(vmName,{},protoViewModel);
 							}
 						}
 					} else {
-						this.ViewModel = observe.Object.extend(vmName,{},{});
+						this.ViewModel = SimpleMap.extend(vmName,{},{});
 					}
 				}
 

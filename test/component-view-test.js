@@ -12,6 +12,7 @@ var queues = require("can-queues");
 var getFragment = require("can-util/dom/fragment/fragment");
 var viewCallbacks = require("can-view-callbacks");
 var Scope = require("can-view-scope");
+var observe = require("can-observe");
 
 var innerHTML = function(el){
     return el && el.innerHTML;
@@ -183,9 +184,9 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
             view: stache('{{#shown}}<child-tag></child-tag>{{/shown}}'),
 
-            viewModel: {
+            viewModel: observe.Object.extend("ParentTag",{},{
                 shown: false
-            },
+            }),
             events: {
                 ' inserted': function () {
                     this.viewModel.shown = true;
@@ -276,7 +277,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
                     var self = this.viewModel;
                     stop();
                     setTimeout(function() {
-                        self.value = 100;
+                        self.set("value" , 100);
                         var wrapper = frag.lastChild,
                             simpleExample = wrapper.firstChild,
                             textNode = simpleExample.firstChild;

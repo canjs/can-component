@@ -19,7 +19,7 @@ helpers.makeTests("can-component helpers", function(){
 			view: stache('<p>{{valueHelper}}</p>'),
 			helpers: {
 				valueHelper: function () {
-					return this.value;
+					return this.get("value");
 				}
 			}
 		});

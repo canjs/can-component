@@ -32,16 +32,16 @@ var classSupport = (function() {
 
 helpers.makeTests("can-component viewModels with observe", function(){
 
-    QUnit.test("ViewModel as a plain object defaults to a can-observe type", function(){
+    QUnit.test("Basic can-observe type", function(){
         Component.extend({
             tag: "observe-add",
             view: stache("<button on:click='add()'>+1</button><span>{{count}}</span>"),
-            ViewModel: {
+            ViewModel: observe.Object.extend("ObserveAdd",{},{
                 count: 0,
                 add: function(){
                     this.count++;
                 }
-            }
+            })
         });
 
         var frag = stache("<observe-add/>")();
