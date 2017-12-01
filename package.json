@@ -42,7 +42,7 @@
     "can-compute": "^3.3.1",
     "can-construct": "^3.2.0",
     "can-control": "^3.2.0",
-    "can-globals": "^0.2.3",
+    "can-globals": "<2.0.0",
     "can-namespace": "1.0.0",
     "can-observation": "^3.3.1",
     "can-reflect": "^1.2.1",
