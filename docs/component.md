@@ -58,7 +58,7 @@ a [can-component/can-template] that is used to render the search results:
    ```
 
    @param {can-stache.sectionRenderer} [TEMPLATES] Between the starting and ending tag
-   can exist one or many [can-component/can-template] elements.  Use to [can-component/can-template] elements
+   can exist one or many [can-component/can-template] elements.  Use [can-component/can-template] elements
    to pass custom templates to child components.  Each `<can-template>`
    is given a `name` attribute and can be rendered by a corresponding [can-component/can-slot]
    in the component's [can-component.prototype.view].
