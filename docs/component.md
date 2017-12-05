@@ -45,7 +45,7 @@ a [can-component/can-template] that is used to render the search results:
    - [can-stache-bindings.twoWay]=[can-stache.expressions expression] — two-way data binding child to parent
    - [can-stache-bindings.event]=[can-stache/expressions/call expression] — event binding on the view model
 
-   Note that because DOM attribute names are case-insensitive, use hypens (`-`) to
+   Note that because DOM attribute names are case-insensitive, use hypens (`-`)
    in the attribute name to setup for `camelCase` properties.
 
    Example:
@@ -58,7 +58,7 @@ a [can-component/can-template] that is used to render the search results:
    ```
 
    @param {can-stache.sectionRenderer} [TEMPLATES] Between the starting and ending tag
-   can exist one or many [can-component/can-template] elements.  Use to [can-component/can-template] elements
+   can exist one or many [can-component/can-template] elements.  Use [can-component/can-template] elements
    to pass custom templates to child components.  Each `<can-template>`
    is given a `name` attribute and can be rendered by a corresponding [can-component/can-slot]
    in the component's [can-component.prototype.view].
