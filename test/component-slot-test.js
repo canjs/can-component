@@ -165,7 +165,7 @@ test("<can-slot> Context one-way binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {this}="subject" />'
+			'<can-slot name="foo" this:from="subject" />'
 		),
 		ViewModel: ViewModel
 	});
@@ -198,7 +198,7 @@ test("<can-slot> Context two-way binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {(this)}="subject" />'
+			'<can-slot name="foo" this:bind="subject" />'
 		),
 		ViewModel: ViewModel
 	});
@@ -214,7 +214,7 @@ test("<can-slot> Context two-way binding works", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject {(subject)}="this" /></can-template>' +
+			'<can-template name="foo"><my-subject subject:bind="this" /></can-template>' +
 		'</my-email>'
 	);
 
@@ -245,7 +245,7 @@ test("<can-slot> Context child-to-parent binding works", function() {
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'<can-slot name="foo" {^this}="subject" />'
+			'<can-slot name="foo" this:to="subject" />'
 		),
 		ViewModel: ViewModel
 	});
@@ -264,7 +264,7 @@ test("<can-slot> Context child-to-parent binding works", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject {^subject}="this" /></can-template>' +
+			'<can-template name="foo"><my-subject subject:to="this" /></can-template>' +
 		'</my-email>'
 	);
 
@@ -368,7 +368,7 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 	Component.extend({
 		tag : 'my-email',
 		view : stache(
-			'{{#if showSubject}}<can-slot name="subject" {this}="subject" />{{/if}}'
+			'{{#if showSubject}}<can-slot name="subject" this:from="subject" />{{/if}}'
 		),
 		ViewModel: ViewModel
 	});

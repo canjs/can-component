@@ -33,7 +33,7 @@ QUnit.test('Works with can-define', function () {
 		view: stache('Name: {{fullName}}')
 	});
 
-	var frag = stache('<can-define-component {first-name}="firstName" {last-name}="lastName" />')({
+	var frag = stache('<can-define-component firstName:from="firstName" lastName:from="lastName" />')({
 		firstName: 'Chris',
 		lastName: 'Gomez'
 	});

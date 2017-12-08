@@ -46,15 +46,15 @@
 <div id='timing'>Last ~45.58 on Justin's computer</div>
 
 <script id="complex-component-template" type='text/stache'>
-<child-component {first-name}="first" {last-name}="last">
+<child-component firstName:from="first" lastName:from="last">
 	<can-template name="a-template"><b>{{this}}</b></can-template>
 	<can-template name="b-template"><i>{{this}}</i></can-template>
 </child-component>
 </script>
 <script id="child-component-template" type='text/stache'>
 <h1>
-	<span><can-slot name="a-template" {this}='firstName'/></span>
-	<span><can-slot name="b-template" {this}='lastName'/></span>
+	<span><can-slot name="a-template" this:from='firstName'/></span>
+	<span><can-slot name="b-template" this:from='lastName'/></span>
 </h1>
 </script>
 
