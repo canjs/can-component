@@ -388,7 +388,7 @@ helpers.makeTests("can-component viewModels", function(){
 
         Component.extend({
             tag: 'product-swatch',
-            view: stache('<product-swatch-color {(variations)}="variations"></product-swatch-color>'),
+            view: stache('<product-swatch-color variations:bind="variations"></product-swatch-color>'),
             ViewModel: DefineMap.extend({
 
                 variations: {
