@@ -38,7 +38,7 @@ of of the corresponding [can-component/can-template].  This lets you pass data t
 template. The following passes `user` as `this` to the corresponding `<can-template name="user-details">`:
 
 ```html
-<can-slot name="user-details" {this}="user">
+<can-slot name="user-details" this:from="user">
 ```
 
 [can-stache-bindings.toChild], [can-stache-bindings.toParent] and [can-stache-bindings.twoWay] with `this`
@@ -111,8 +111,8 @@ var ViewModel = DefineMap.extend({
 Component.extend({
 	tag : 'my-email',
 	view : stache(
-		'<can-slot name="subject" {this}="subject"/>' +
-		'<can-slot name="body" {this}="body"/>'
+		'<can-slot name="subject" this:from="subject"/>' +
+		'<can-slot name="body" this:from="body"/>'
 	),
 	ViewModel
 });

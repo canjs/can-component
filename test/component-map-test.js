@@ -525,9 +525,9 @@ function makeTest(name, doc, mutObs) {
 			tag: "next-prev",
 			view: stache(
 				'<a href="javascript://"' +
-				'class="prev {{#paginate.canPrev}}enabled{{/paginate.canPrev}}" ($click)="paginate.prev()">Prev</a>' +
+				'class="prev {{#paginate.canPrev}}enabled{{/paginate.canPrev}}" on:click="paginate.prev()">Prev</a>' +
 				'<a href="javascript://"' +
-				'class="next {{#paginate.canNext}}enabled{{/paginate.canNext}}" ($click)="paginate.next()">Next</a>')
+				'class="next {{#paginate.canNext}}enabled{{/paginate.canNext}}" on:click="paginate.next()">Next</a>')
 		});
 
 		var paginator = new Paginate({
@@ -1350,7 +1350,7 @@ function makeTest(name, doc, mutObs) {
 			}
 		});
 
-		var frag = stache('<destroyable-component {(product)}="product"></destroyable-component>')(state);
+		var frag = stache('<destroyable-component product:bind="product"></destroyable-component>')(state);
 
 		// element must be inserted, otherwise attributes event will not be fired
 		domMutate.appendChild.call(this.fixture,frag);
@@ -1399,7 +1399,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: 'product-swatch',
-			view: stache('<product-swatch-color {(variations)}="variations"></product-swatch-color>'),
+			view: stache('<product-swatch-color variations:bind="variations"></product-swatch-color>'),
 			ViewModel: CanMap.extend({
 				tag: "product-swatch",
 				define: {
@@ -1429,8 +1429,8 @@ function makeTest(name, doc, mutObs) {
 
 	test("references scopes are available to bindings nested in components (#2029)", function(){
 
-		var renderer = stache('<export-er {^value}="*reference" />'+
-			'<wrap-er><simple-example {key}="*reference"/></wrap-er>');
+		var renderer = stache('<export-er value:to="*reference" />'+
+			'<wrap-er><simple-example key:from="*reference"/></wrap-er>');
 
 		Component.extend({
 			tag : "wrap-er"
@@ -1675,7 +1675,7 @@ function makeTest(name, doc, mutObs) {
 
 		Component.extend({
 			tag: "ref-export",
-			view: stache('<other-export {(name)}="*otherExport"/><content>{{*otherExport}}</content>')
+			view: stache('<other-export name:bind="*otherExport"/><content>{{*otherExport}}</content>')
 		});
 
 		// this should have otherExport name in the page
