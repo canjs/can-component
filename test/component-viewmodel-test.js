@@ -1,6 +1,6 @@
 var QUnit = require("steal-qunit");
 
-var helpers = require("./helpers")
+var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
@@ -11,7 +11,6 @@ var DefineList = require("can-define/list/list");
 var domEvents = require('can-util/dom/events/events');
 var SetterObservable = require("can-simple-observable/setter/setter");
 var SimpleObservable = require("can-simple-observable");
-var attr = require("can-util/dom/attr/attr");
 var canReflect = require("can-reflect");
 var domMutate = require('can-util/dom/mutate/mutate');
 var Construct = require("can-construct");

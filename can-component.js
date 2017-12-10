@@ -17,30 +17,28 @@ var stacheBindings = require("can-stache-bindings");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
+var canReflect = require("can-reflect");
+var SimpleObservable = require("can-simple-observable");
+var SimpleMap = require("can-simple-map");
+var canLog = require('can-log');
+var canDev = require('can-log/dev/dev');
+var assign = require('can-assign');
+var DOCUMENT = require('can-globals/document/document');
+require('can-view-model');
+
 
 var domData = require('can-util/dom/data/data');
 var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var domDispatch = require('can-util/dom/dispatch/dispatch');
 var string = require("can-util/js/string/string");
-var canReflect = require("can-reflect");
-
-var canEach = require('can-util/js/each/each');
-var assign = require('can-util/js/assign/assign');
-var isFunction = require('can-util/js/is-function/is-function');
-var canLog = require('can-util/js/log/log');
-var canDev = require("can-util/js/dev/dev");
-var makeArray = require("can-util/js/make-array/make-array");
-var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
-var SimpleObservable = require("can-simple-observable");
-var SimpleMap = require("can-simple-map");
 var domEvents = require("can-util/dom/events/events");
 
 require('can-util/dom/events/inserted/inserted');
 require('can-util/dom/events/removed/removed');
-require('can-view-model');
 
-var DOCUMENT = require('can-globals/document/document');
+
+
 
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
@@ -130,7 +128,7 @@ function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leak
 			nodeList.expression = "<can-slot name='"+el.getAttribute('name')+"'/>";
 
 			var frag = template(tagData.scope, tagData.options, nodeList);
-			var newNodes = makeArray( getChildNodes(frag) );
+			var newNodes = canReflect.toArray( getChildNodes(frag) );
 			nodeLists.replace(nodeList, frag);
 			nodeLists.update(nodeList, newNodes);
 
@@ -157,7 +155,7 @@ var Component = Construct.extend(
 				var self = this;
 
 				// Define a control using the `events` prototype property.
-				if(!isEmptyObject(this.prototype.events)) {
+				if(this.prototype.events !== undefined && canReflect.size(this.prototype.events) !== 0) {
 					this.Control = ComponentControl.extend(this.prototype.events);
 				}
 
@@ -227,7 +225,7 @@ var Component = Construct.extend(
 				});
 
 				if(this.prototype.autoMount) {
-					canEach( DOCUMENT().getElementsByTagName(this.prototype.tag), function(el){
+					canReflect.eachIndex( DOCUMENT().getElementsByTagName(this.prototype.tag), function(el){
 						if( ! domData.get.call(el, "viewModel") ) {
 							new self(el, {
 								scope: new Scope(),
@@ -312,11 +310,14 @@ var Component = Construct.extend(
 					tags: {}
 				};
 			// Setup helpers to callback with `this` as the component
-			canEach(this.helpers || {}, function(val, prop) {
-				if (isFunction(val)) {
-					options.helpers[prop] = val.bind(viewModel);
-				}
-			});
+			if(this.helpers !== undefined) {
+				canReflect.eachKey(this.helpers, function(val, prop) {
+					if (typeof val === "function") {
+						options.helpers[prop] = val.bind(viewModel);
+					}
+				});
+			}
+
 
 			// ## `events` control
 
