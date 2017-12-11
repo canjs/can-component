@@ -5,7 +5,7 @@
 
 @signature `connectedCallback: () => function disconnectedCallback () { ... }`
 
-Used to teardown anything that was set up during the [can-component/connectedCallback] lifecycle hook. `disconnectedCallback` is defined by returning a function from the [can-component/connectedCallback] lifecycle hook. (this allows it to be defined within the same closure scope as setup)
+Used to tear down anything that was set up during the [can-component/connectedCallback] lifecycle hook. `disconnectedCallback` is defined by returning a function from the [can-component/connectedCallback] lifecycle hook. This allows it to be defined within the same closure scope as setup.
 
 For example, the following removes all `listen` bindings on teardown:
 

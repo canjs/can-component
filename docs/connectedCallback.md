@@ -1,7 +1,7 @@
 @typedef {function} can-component/connectedCallback connectedCallback
 @parent can-component.events
 
-@description A lifecycle hook called after the component's element is inserted on the document.
+@description A lifecycle hook called after the component's element is inserted into the document.
 
 @signature `connectedCallback: function () { return disconnectedCallback; }`
 
