@@ -1,9 +1,9 @@
 @typedef {function} can-component/connectedCallback connectedCallback
 @parent can-component.events
 
-@description An event called with the component’s element after it isinserted on the document.
+@description A lifecycle hook called after the component's element is inserted on the document.
 
-@signature `connectedCallback: function (element) { return disconnectedCallback; }`
+@signature `connectedCallback: function () { return disconnectedCallback; }`
 
 Mainly used as the context to orchestrate property bindings that would
 otherwise be a stream or an inappropriate side-effect during a getter.
@@ -26,5 +26,4 @@ const Person = DefineMap.extend({
 
 `connectedCallback` is named as such to match the [web components](https://developers.google.com/web/fundamentals/web-components/customelements#reactions) spec for the same concept.
 
-  @param {HTMLElement} element The component element.
-  @return {Function} disconnectedCallback The [can-component/disconnectedCallback] function to be called during teardown.
+If `connectedCallback` returns a function, that function will be the [can-component/disconnectedCallback] that's called during teardown.
