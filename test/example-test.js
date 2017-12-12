@@ -607,7 +607,7 @@ helpers.makeTests("can-component examples", function(doc) {
 					var lis = testArea.getElementsByTagName("li");
 
 					equal(lis.length, 3, "removed li after shifting a foodType");
-					foodTypes.each(function(type, i) {
+					foodTypes.forEach(function(type, i) {
 						equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
 					});
 
