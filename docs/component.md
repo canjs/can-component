@@ -8,7 +8,8 @@
 @group can-component.static 0 static
 @group can-component.prototype 1 prototype
 @group can-component.elements 2 elements
-@group can-component.events 3 special events
+@group can-component.lifecycle 3 lifecycle hooks
+@group can-component.events 4 special events
 @package ../package.json
 
 @description Create a custom element that can be used to manage widgets
@@ -254,6 +255,50 @@ The following view, with the previous `hello-world` component:
 Renders:
 
     <hello-world><h1>Howdy</h1></hello-world>
+
+### Lifecycle Hooks
+
+Mainly used to set up special bindings, [can-component/connectedCallback] is defined on the viewModel and is called automatically when a component is inserted into the dom. When writing tests, since `connectedCallback` is on the viewModel, it can be called manually to to reduce complexity of tests that would otherwise need the full component to be initialized and inserted into the/a DOM. For that reason, `connectedCallback` is prefered to using `inserted` in [can-component::events events].
+
+The following example listens to changes on the `name` property
+and counts them in the `nameChanged` property:
+
+```js
+const Person = DefineMap.extend({
+  nameChanged: "number",
+  name: "string",
+  connectedCallback () {
+    this.listenTo("name", function () {
+      this.nameChanged++;
+    });
+    var disconnectedCallback = this.stopListening.bind(this);
+    return disconnectedCallback;
+  }
+})
+```
+
+The [can-component/connectedCallback] function may return a `disconnectedCallback` function this is called during teardown. Defined in the same closure scope as setup, its primary use is to tear down anything that was set up during the `connectedCallback` lifecycle hook.
+
+Special bindings are used to setup observable property behaviors that are unable to be represented easily within the declarative APIs of the `viewModel`. It doesn't remove all imperative code but will help keep imperitive code isolated and leave other properies more testable. Otherwise, properties like `name` in the example above, would need side-effects in setters or getters:
+
+```js
+  nameChanged: "number",
+  name: {
+    type: "string",
+    set: function (newVal, lastSetVal) {
+      this.nameChanged = (this.nameChanged || 0) + 1;
+      return newVal;
+    }
+  }
+```
+
+This might look preferable but the pattern should be avoided. A more complex example would have side-effects changing a property (like `nameChanged` is in the `name` setter) coming from several different getters, setters, and methods all updating a common property. This makes debugging and testing each property more difficult.
+
+There are additional ways to achieve the behavior, the most common are listed here in order of least preferable to most preferable:
+
+side-effects < vm event bindings < listenTo in connectedCallback < streams
+
+`connectedCallback` is named as such to match the [web components](https://developers.google.com/web/fundamentals/web-components/customelements#reactions) spec for the same concept.
 
 ### Events
 
