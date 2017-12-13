@@ -32,11 +32,11 @@ Use [can-view-model] to read a component’s view model instance.
 
 The view bindings on a tag control the properties and values used to instantiate the `ViewModel`. For example, calling `<my-tag>` as follows invokes `MyTagViewModel` as shown in the following example:
 
-```
+```html
 <my-tag/> <!-- new MyTagViewModel({}) -->
 
 <my-tag
-	{message}="'Hi There'"/> <!-- new MyTagViewModel({message: "Hi There"}) -->
+	message:from="'Hi There'"/> <!-- new MyTagViewModel({message: "Hi There"}) -->
 ```
 
 @return {Object} A new instance of the corresponding constructor function. This instance is
@@ -68,16 +68,21 @@ Component.extend({
 ```
 
 If this component HTML was inserted into the page like:
+
 ```js
 var renderer = stache("<my-paginate/>");
 var frag = renderer();
 document.body.appendChild(frag);
 ```
+
 It would result in:
 
-    <my-paginate>Page 1</my-paginate>
+```html
+<my-paginate>Page 1</my-paginate>
+```
 
 This is because the provided ViewModel object is used to create an instance of [can-define/map/map] like:
+
 ```js
 var viewModel = new MyPaginateViewModel();
 ```
@@ -88,9 +93,10 @@ Next, the values are passed into `viewModel` from the [can-stache-bindings data 
 (in this case there is none).
 
 And finally, that data is used to render the component’s view and inserted into the element using [can-view-scope] and [can-stache]:
+
 ```js
-var newViewModel = new Scope(viewModel),
-	result = stache("Page {{page}}.")(newViewModel);
+var newViewModel = new Scope(viewModel);
+var result = stache("Page {{page}}.")(newViewModel);
 element.innerHTML = result;
 ```
 
@@ -100,6 +106,7 @@ by setting the Component’s ViewModel to an object and using
 that anonymous type as the view model.
 
 The following does the same as above:
+
 ```js
 Component.extend({
 	tag: "my-paginate",
@@ -125,11 +132,14 @@ Values can be "passed" into the viewModel instance of a component, similar to pa
 
 Using [can-stache], values are passed into components like this:
 
-    <my-paginate {offset}='index' {limit}='size' />
+```html
+<my-paginate offset:from='index' limit:from='size' />
+```
 
 The above creates an offset and limit property on the component that are initialized to whatever index and size are.
 
 The following component requires an `offset` and `limit`:
+
 ```js
 Component.extend({
 	tag: "my-paginate",
@@ -143,31 +153,40 @@ Component.extend({
 	view: stache("Page {{page}}.")
 });
 ```
+
 If `<my-paginate>` is used like:
+
 ```js
-var renderer = stache("<my-paginate {offset}='index' {limit}='size' />");
+var renderer = stache("<my-paginate offset:from='index' limit:from='size' />");
 
 var pageInfo = new DefineMap({index: 0, size: 20});
 
 document.body.appendChild(renderer(pageInfo));
 ```
-... `pageInfo`’s index and size are set as the component’s offset and
+
+…`pageInfo`’s index and size are set as the component’s offset and
 limit attributes. If we were to change the value of `pageInfo`’s
 index like:
+
 ```js
 pageInfo.index = 20;
 ```
-... the component’s offset value will change and its view will update to:
 
-    <my-paginate>Page 2</my-paginate>
+…the component’s offset value will change and its view will update to:
+
+```html
+<my-paginate>Page 2</my-paginate>
+```
 
 ### Using attribute values
 
 You can also pass a literal string value of the attribute. To do this in [can-stache],
-simply pass any value not wrapped in single brackets, and the viewModel instance property will
+simply pass a quoted value not wrapped in single brackets, and the viewModel instance property will
 be initialized to this string value:
 
-    <my-tag title="hello" />
+```html
+<my-tag title:from="'hello'" />
+```
 
 The above will set the title property on the component’s viewModel instance to the string `hello`.
 
@@ -184,7 +203,6 @@ out.addEventListener("click", function(ev){
 	var parent = el.parentNode;
 	if(el.nodeName === "BUTTON") {
 		parent.setAttribute("title", "Users");
-		parent.removeChild(el);
 	}
 });
 ```
@@ -210,7 +228,7 @@ var ViewModel = DefineMap.extend({
 Component.extend({
 	tag: "my-paginate",
 	ViewModel: ViewModel,
-	view: stache("Page {{page}} <button ($click)='next()'>Next</button>")
+	view: stache("Page {{page}} <button on:click='next()'>Next</button>")
 });
 ```
 
@@ -239,10 +257,10 @@ Component.extend({
 
 These can be listened to with [can-stache-bindings.event] bindings like:
 
-```js
+```html
 <player-edit
-  	(close)="removeEdit()"
-  	{player}="editingPlayer" />
+	on:close="removeEdit()"
+	player:from="editingPlayer" />
 ```
 
 The following demo uses this ability to create a close button that

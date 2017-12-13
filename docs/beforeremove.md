@@ -33,8 +33,8 @@ events: {
 Uses [can-stache-bindings.event] bindings to listen for a component’s
 `beforeremove` event.
 
-```
-<my-panel ($beforeremove)="removePanel(%viewModel)"/>
+```html
+<my-panel on:beforeremove="removePanel(scope.viewModel)"/>
 ```
 
   @param {can-stache/expressions/call} CALL_EXRESSION A call expression that calls some method when the event happens.

@@ -6,24 +6,25 @@ Listen to events on elements and observables.
 @option {Object.<can-control.eventDescription,can-control.eventHandler>} An object of event names and methods
 that handle the event. For example:
 
-    Component.extend({
-	  ViewModel: {
+```js
+Component.extend({
+	ViewModel: {
 		limit: "number",
 		offset: "number",
-	    next: function(){
-	      this.offset = this.offset + this.limit;
-	    }
-	  },
-      events: {
-        ".next click": function(){
-          this.viewModel.next()
-        },
-		"{viewModel} limit": function(viewModel, ev, newValue){
-		  console.log("limit is now", newValue);
+		next: function(){
+			this.offset = this.offset + this.limit;
 		}
-      }
-    })
-
+	},
+	events: {
+		".next click": function(){
+			this.viewModel.next()
+		},
+		"{viewModel} limit": function(viewModel, ev, newValue){
+			console.log("limit is now", newValue);
+		}
+	}
+});
+```
 
 A component’s events object is used as the prototype of a [can-control]. The control gets created on the component’s
 element.
@@ -50,21 +51,25 @@ of using live-binding, we could listen to when offset changes and update the pag
 
 Components have the ability to bind to special inserted and removed events that are called when a component’s tag has been inserted into or removed from the page:
 
-      events: {
-        "inserted": function(){
-          // called when the component’s tag is inserted into the DOM
-        },
-        "removed": function(){
-          // called when the component’s tag is removed from the DOM
-        }
-      }
+```js
+			events: {
+				"inserted": function(){
+					// called when the component’s tag is inserted into the DOM
+				},
+				"removed": function(){
+					// called when the component’s tag is removed from the DOM
+				}
+			}
+```
 
 ## High performance view rendering
 
 While [can-stache-bindings] conveniently allows you to call a [can-component::ViewModel] method from a view like:
 
-    <input ($change)="doSomething()"/>
+```html
+<input ($change)="doSomething()"/>
+``
 
-This has the effect of binding an event handler directly to this element. Every element that has a `($click)` or similar attribute has an event handler bound to it. For a large grid or list, this could have a performance penalty.
+This has the effect of binding an event handler directly to this element. Every element that has a `on:click` or similar attribute has an event handler bound to it. For a large grid or list, this could have a performance penalty.
 
 By contrast, events bound using [can-component]’s events object use event delegation, which is useful for high performance view rendering. In a large grid or list, event delegation only binds a single event handler rather than one per row.
