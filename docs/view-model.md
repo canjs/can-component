@@ -15,7 +15,7 @@ is rendered with.
 This is typically used only for special situations where a custom scope or custom bindings
 need to be setup.
 
-```
+```js
 var Component = require("can-component");
 var Scope = require("can-view-scope");
 
@@ -28,7 +28,7 @@ Component.extend({
 	}
 });
 
-stache("<my-element {first}='firstName' last='Meyer'/>")({
+stache("<my-element first:from='firstName' last='Meyer'/>")({
   firstName: "Justin",
   middleName: "Barry"
 });
@@ -36,18 +36,22 @@ stache("<my-element {first}='firstName' last='Meyer'/>")({
 
 @param {Object} properties An object of values specified by the custom element’s attributes. For example, a view rendered like:
 
-    stache("<my-element title='name'></my-element>")({
-      name: "Justin"
-    })
+```js
+stache("<my-element title:from='name'></my-element>")({
+  name: "Justin"
+});
+```
 
 Creates an instance of following control:
 
-    Component.extend({
-    	tag: "my-element",
-    	viewModel: function(properties){
-    	  properties.title //-> "Justin";
-    	}
-    })
+```js
+Component.extend({
+	tag: "my-element",
+	viewModel: function(properties){
+	  properties.title //-> "Justin";
+	}
+});
+```
 
 And calls the viewModel function with `properties` like `{title: "Justin"}`.
 
@@ -57,28 +61,32 @@ The viewModel the custom tag was found within.  By default, any attribute’s va
 be looked up within the current viewModel, but if you want to add values without needing
 the user to provide an attribute, you can set this up here.  For example:
 
-    Component.extend({
-    	tag: "my-element",
-    	viewModel: function(properties, parentScope){
-    	  parentScope.get('middleName') //-> "Barry"
-    	}
-    });
+```js
+Component.extend({
+	tag: "my-element",
+	viewModel: function(properties, parentScope){
+	  parentScope.get('middleName') //-> "Barry"
+	}
+});
+```
 
 Notice how the `middleName` value is looked up in `my-element`’s parent scope.
 
 @param {HTMLElement} element The element the [can-component] is going to be placed on. If you want
 to add custom attribute handling, you can do that here.  For example:
 
-    Component.extend({
-    	tag: "my-element",
-    	viewModel: function(properties, parentScope, el){
-		  var vm = new DefineMap({clicks: 0});
-    	  domEvent.addEventListener.call(el, "click", function(){
-		    vm.clicks++;
-		  });
-		  return vm;
-    	}
-    });
+```js
+Component.extend({
+	tag: "my-element",
+	viewModel: function(properties, parentScope, el){
+		var vm = new DefineMap({clicks: 0});
+		domEvent.addEventListener.call(el, "click", function(){
+			vm.clicks++;
+		});
+		return vm;
+	}
+});
+```
 
 This example should be done with the [can-component::events] object instead.
 

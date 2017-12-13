@@ -6,11 +6,12 @@ component’s [can-component::ViewModel] instance.  `<content/>` elements within
 
 @option {can-stache.renderer} A [can-stache.renderer] returned by [can-stache]. For example:
 
-    Component({
-      tag: "my-tabs",
-      view: stache("<ul>{{#panels}}<li>{{title}}</li> ...")
-    });
-
+```js
+Component({
+  tag: "my-tabs",
+  view: stache("<ul>{{#panels}}<li>{{title}}</li> ...")
+});
+```
 
 @body
 
@@ -74,19 +75,23 @@ Notice:
 
 __Source data:__
 
-		stache("...")({
-			site: "CanJS"
-		})
+```js
+stache("...")({
+	site: "CanJS"
+});
+```
 
 This is how we render the source view that uses `<my-greeting>`. The view is rendered with `site` in its [can-component::ViewModel].
 
 __HTML Result:__
 
-    <header>
-      <my-greeting>
-        <h1>CanJS - can-component</h1>
-      </my-greeting>
-    </header>
+```html
+<header>
+  <my-greeting>
+    <h1>CanJS - can-component</h1>
+  </my-greeting>
+</header>
+```
 
 This is the result of the view transformations. The
 __user__ content within the original `<my-greeting>` is placed within the start of the `<h1>`
@@ -102,34 +107,44 @@ The view specified by `view` is rendered directly within the custom tag.
 
 For example the following component:
 
-    Component({
-      tag: "my-greeting",
-      view: stache("<h1>Hello There</h1>")
-    });
+```js
+Component({
+  tag: "my-greeting",
+  view: stache("<h1>Hello There</h1>")
+});
+```
 
 With the following source html:
 
-    <header>
-      <my-greeting></my-greeting>
-    </header>
+```html
+<header>
+  <my-greeting></my-greeting>
+</header>
+```
 
 Produces the following html:
 
-    <header>
-      <my-greeting><h1>Hello There</h1></my-greeting>
-    </header>
+```html
+<header>
+  <my-greeting><h1>Hello There</h1></my-greeting>
+</header>
+```
 
 However, if there was existing content within the source html, like:
 
-    <header>
-      <my-greeting>DO REMOVE ME!!!</my-greeting>
-    </header>
+```html
+<header>
+  <my-greeting>DO REMOVE ME!!!</my-greeting>
+</header>
+```
 
-that content is removed, and replaced by the component’s view:
+…that content is removed and replaced by the component’s view:
 
-    <header>
-      <my-greeting><h1>Hello There</h1></my-greeting>
-    </header>
+```html
+<header>
+  <my-greeting><h1>Hello There</h1></my-greeting>
+</header>
+```
 
 ### The `<content>` element
 
@@ -137,18 +152,24 @@ Use the `<content>` element to place the source content in the
 component’s element within the component’s
 view. For example, if we change the component to look like:
 
-    Component({
-      tag: "my-greeting",
-      view: stache("<h1><content/></h1>")
-    });
+```js
+Component({
+  tag: "my-greeting",
+  view: stache("<h1><content/></h1>")
+});
+```
 
 and rendered with source html, like:
 
-    <my-greeting>Hello World</my-greeting>
+```html
+<my-greeting>Hello World</my-greeting>
+```
 
 it produces:
 
-    <my-greeting><h1>Hello World</h1></my-greeting>
+```html
+<my-greeting><h1>Hello World</h1></my-greeting>
+```
 
 ### `<content>` element default content
 
@@ -156,15 +177,21 @@ If the user does not provide source content, the html
 between the `<content>` tags will be used. For example, if we
 change the component to look like:
 
-    Component({
-      tag: "my-greeting",
-      view: stache("<h1><content>Hello World</content></h1>")
-    });
+```js
+Component({
+  tag: "my-greeting",
+  view: stache("<h1><content>Hello World</content></h1>")
+});
+```
 
 and rendered with source html like:
 
-    <my-greeting></my-greeting>
+```html
+<my-greeting></my-greeting>
+```
 
 it produces:
 
-    <my-greeting><h1>Hello World</h1></my-greeting>
+```html
+<my-greeting><h1>Hello World</h1></my-greeting>
+```

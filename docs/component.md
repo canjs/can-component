@@ -50,7 +50,7 @@ a [can-component/can-template] that is used to render the search results:
 
    Example:
 
-   ```
+   ```html
    <my-tag getChild:from="expression"
            setParent:to="expression"
            twoWay:bind="expression"
@@ -80,7 +80,7 @@ a [can-component/can-template] that is used to render the search results:
    @param {can-stache.sectionRenderer} [LIGHT_DOM] The content between the starting and ending
    tag. For example, `Hello <b>World</b>` is the `LIGHT_DOM` in the following:
 
-   ```
+   ```html
    <my-tag>Hello <b>World</b></my-tag>
    ```
 
@@ -124,8 +124,10 @@ says “Hello There!”.  To create an instance of this component on the page,
 add `<hello-world/>` to a [can-stache] view, render
 the view, and insert the result in the page like:
 
-    var renderer = stache("<hello-world/>");
-    document.body.appendChild(renderer({ }));
+```js
+var renderer = stache("<hello-world/>");
+document.body.appendChild(renderer({ }));
+```
 
 Check this out here:
 
@@ -135,15 +137,17 @@ Check this out here:
 Typically, you do not append a single component at a time.  Instead,
 you'll render a view with many custom tags like:
 
-    <srchr-app>
-      <srchr-search models:from="models">
-        <input name="search"/>
-      </srchr-search>
-      <ui-panel>
-        <srchr-history/>
-        <srchr-results {models}="models"/>
-      </ui-panel>
-    </srchr-app>
+```html
+<srchr-app>
+  <srchr-search models:from="models">
+    <input name="search"/>
+  </srchr-search>
+  <ui-panel>
+    <srchr-history/>
+    <srchr-results models:from="models"/>
+  </ui-panel>
+</srchr-app>
+```
 
 ### Defining a Component
 
@@ -165,9 +169,11 @@ the component will be created on.
 
 The following matches `<hello-world>` elements.
 
-    Component.extend({
-      tag: "hello-world"
-    });
+```js
+Component.extend({
+  tag: "hello-world"
+});
+```
 
 ### View
 
@@ -176,27 +182,35 @@ the element’s innerHTML.
 
 The following component:
 
-    Component.extend({
-      tag: "hello-world",
-      view: stache("<h1>Hello World</h1>")
-    });
+```js
+Component.extend({
+  tag: "hello-world",
+  view: stache("<h1>Hello World</h1>")
+});
+```
 
 Changes `<hello-world/>` elements into:
 
-    <hello-world><h1>Hello World</h1></hello-world>
+```html
+<hello-world><h1>Hello World</h1></hello-world>
+```
 
 Use the [can-component/content] tag to position the custom element’s source HTML.
 
 The following component:
 
-    Component.extend({
-      tag: "hello-world",
-      view: stache("<h1><content/></h1>")
-    });
+```js
+Component.extend({
+  tag: "hello-world",
+  view: stache("<h1><content/></h1>")
+});
+```
 
 Changes `<hello-world>Hi There</hello-world>` into:
 
-    <hello-world><h1>Hi There</h1></hello-world>
+```html
+<hello-world><h1>Hi There</h1></hello-world>
+```
 
 ### ViewModel
 
@@ -208,52 +222,68 @@ of the custom element and added to the viewModel object.
 
 The following component:
 
-    Component.extend({
-      tag: "hello-world",
-      view: stache("<h1>{{message}}</h1>")
-    });
+```js
+Component.extend({
+  tag: "hello-world",
+  view: stache("<h1>{{message}}</h1>")
+});
+```
 
 Changes the following rendered view:
 
-    var renderer = stache("<hello-world message:from='greeting'/>");
-    renderer({
-      greeting: "Salutations"
-    })
+```js
+var renderer = stache("<hello-world message:from='greeting'/>");
+renderer({
+  greeting: "Salutations"
+});
+```
 
 Into:
 
-    <hello-world><h1>Salutations</h1></hello-world>
+```html
+<hello-world><h1>Salutations</h1></hello-world>
+```
 
 Default values can be provided. The following component:
 
-    Component.extend({
-      tag: "hello-world",
-      view: stache("<h1>{{message}}</h1>"),
-      viewModel: {
-        message: "Hi"
-      }
-    });
+```js
+Component.extend({
+  tag: "hello-world",
+  view: stache("<h1>{{message}}</h1>"),
+  viewModel: {
+    message: "Hi"
+  }
+});
+```
 
 Changes the following rendered view:
 
-    var renderer = stache("<hello-world/>");
-    renderer({})
+```js
+var renderer = stache("<hello-world/>");
+renderer({});
+```
 
 Into:
 
-    <hello-world><h1>Hi</h1></hello-world>
+```html
+<hello-world><h1>Hi</h1></hello-world>
+```
 
 If you want to set the string value of the attribute on the ViewModel,
 set an attribute without any binding syntax.
 
 The following view, with the previous `hello-world` component:
 
-    var renderer = stache("<hello-world message='Howdy'/>");
-    renderer({})
+```js
+var renderer = stache("<hello-world message='Howdy'/>");
+renderer({});
+```
 
 Renders:
 
-    <hello-world><h1>Howdy</h1></hello-world>
+```html
+<hello-world><h1>Howdy</h1></hello-world>
+```
 
 ### Events
 
@@ -261,16 +291,18 @@ A component’s [can-component::events events] object is used to listen to event
 listened to with [can-stache-bindings view bindings]). The following component
 adds “!” to the message every time `<hello-world>` is clicked:
 
-    Component.extend({
-      tag: "hello-world",
-      view: stache("<h1>{{message}}</h1>"),
-      events: {
-        "click" : function(){
-          var currentMessage = this.viewModel.message;
-          this.viewModel.message = currentMessage+ "!";
-        }
-      }
-    });
+```js
+Component.extend({
+  tag: "hello-world",
+  view: stache("<h1>{{message}}</h1>"),
+  events: {
+    "click" : function(){
+      var currentMessage = this.viewModel.message;
+      this.viewModel.message = currentMessage+ "!";
+    }
+  }
+});
+```
 
 Components have the ability to bind to special [can-util/dom/events/inserted/inserted],
 [can-component/beforeremove] and [can-util/dom/events/removed/removed] events
@@ -283,21 +315,23 @@ A component’s [can-component::helpers helpers] object provides [can-stache.hel
 that are available within the component’s view.  The following component
 only renders friendly messages:
 
-    Component.extend({
-      tag: "hello-world",
-      view: stache("{{#isFriendly message}}"+
-                  "<h1>{{message}}</h1>"+
-                "{{/isFriendly}}"),
-      helpers: {
-        isFriendly: function(message, options){
-          if( /hi|hello|howdy/.test(message) ) {
-            return options.fn();
-          } else {
-            return options.inverse();
-          }
-        }
+```js
+Component.extend({
+  tag: "hello-world",
+  view: stache("{{#isFriendly message}}"+
+              "<h1>{{message}}</h1>"+
+            "{{/isFriendly}}"),
+  helpers: {
+    isFriendly: function(message, options){
+      if( /hi|hello|howdy/.test(message) ) {
+        return options.fn();
+      } else {
+        return options.inverse();
       }
-    });
+    }
+  }
+});
+```
 
 Generally speaking, helpers should only be used for view related functionality, like
 formatting a date.  Data related methods should be in the view model or models.
@@ -316,25 +350,30 @@ to add a new tab.
 An instance of the tabs widget is created by creating `<my-tabs>` and `<my-panel>`
 elements like:
 
-    <my-tabs>
-      {{#each foodTypes}}
-        <my-panel title='title'>{{content}}</my-panel>
-      {{/each}}
-    </my-tabs>
+```html
+<my-tabs>
+  {{#each foodTypes}}
+    <my-panel title:from='title'>{{content}}</my-panel>
+  {{/each}}
+</my-tabs>
+```
 
 To add another panel, all we have to do is add data to `foodTypes` like:
 
-    foodTypes.push({
-      title: "Vegetables",
-      content: "Carrots, peas, kale"
-    })
+```js
+foodTypes.push({
+  title: "Vegetables",
+  content: "Carrots, peas, kale"
+});
+```
 
 The secret is that the `<my-panel>` element listens to when it is inserted
 and adds its data to the tabs' list of panels with:
 
-    var vm = this.parentViewModel = canViewModel(this.element.parentNode);
-    vm.addPanel(this.viewModel);
-
+```js
+var vm = this.parentViewModel = canViewModel(this.element.parentNode);
+vm.addPanel(this.viewModel);
+```
 
 ### TreeCombo
 
@@ -346,7 +385,7 @@ The secret to this widget is the viewModel’s `breadcrumb` property, which is a
 of items the user has navigated through, and `selectableItems`, which represents the children of the
 last item in the breadcrub.  These are defined on the viewModel like:
 
-
+```js
     breadcrumb: [],
     selectableItems: function(){
       var breadcrumb = this.attr("breadcrumb");
@@ -362,14 +401,17 @@ last item in the breadcrub.  These are defined on the viewModel like:
         return this.attr('items');
       }
     }
+```
 
 When the “+” icon is clicked next to each item, the viewModel’s `showChildren` method is called, which
 adds that item to the breadcrumb like:
 
+```js
     showChildren: function(item, ev) {
       ev.stopPropagation();
       this.attr('breadcrumb').push(item)
     },
+```
 
 ### Paginate
 
@@ -380,9 +422,11 @@ widget-like components: a grid, next / prev buttons, and a page count indicator.
 
 This demo uses a `Paginate` [can-define/map/map] to assist with maintaining a paginated state:
 
-    var Paginate = DefineMap.extend({
-    ...
-    });
+```js
+var Paginate = DefineMap.extend({
+  ...
+});
+```
 
 The `app` component, using [can-define/map/map], creates an instance of the `Paginate` model
 and a `websitesPromise` that represents a request for the Websites
@@ -421,15 +465,17 @@ var AppViewModel = DefineMap.extend({
 The `my-app` component passes paginate, paginate’s values, and websitesPromise to
 its sub-components:
 
-    <my-app>
-      <my-grid promiseData:from='websitesPromise'>
-        {{#each items}}
-          <tr>
-            <td width='40%'>{{name}}</td>
-            <td width='70%'>{{url}}</td>
-          </tr>
-        {{/each}}
-      </my-grid>
-      <next-prev paginate:from='paginate'></next-prev>
-      <page-count page:from='paginate.page' count:from='paginate.pageCount'/>
-    </my-app>
+```html
+<my-app>
+  <my-grid promiseData:from='websitesPromise'>
+    {{#each items}}
+      <tr>
+        <td width='40%'>{{name}}</td>
+        <td width='70%'>{{url}}</td>
+      </tr>
+    {{/each}}
+  </my-grid>
+  <next-prev paginate:from='paginate'></next-prev>
+  <page-count page:from='paginate.page' count:from='paginate.pageCount'/>
+</my-app>
+```

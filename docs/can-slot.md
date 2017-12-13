@@ -147,7 +147,6 @@ Default content can be specified to be used if there is no matching `<can-templa
 or the matching `<can-template>` has no inner content.
 
 ```js
-
 Component.extend({
 	tag : 'my-email',
 	view : stache(
