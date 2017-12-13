@@ -16,7 +16,8 @@ a component’s viewModel values in the user content.
 
 The default value is `false`.
 
-To change leakScope from the default
+To change leakScope from the default:
+
 ```js
 Component.extend({
 	tag: "my-component",
@@ -43,7 +44,7 @@ Let’s define what __outer scope__, __component’s view__ and __user content__
 
 If I have a `<hello-world>` component in a view like:
 
-```
+```html
 {{#data}}
 	<hello-world>{{subject}}</hello-world>
 {{/data}}
@@ -55,7 +56,7 @@ is `{{subject}}`.
 
 Finally, if `<hello-world>` is defined like:
 
-```
+```js
 Component.extend({
   tag: "hello-world",
   view: stache("{{greeting}} <content/>{{exclamation}}")
@@ -70,6 +71,7 @@ If `leakScope` is `true`, the __component’s view__ can read the data in the ou
 see `name: "John"` overwriting `name: "World"` in the component’s viewModel instance in the following example.
 
 If the following component is defined:
+
 ```js
 Component.extend({
 	tag: 'hello-world',
@@ -78,21 +80,30 @@ Component.extend({
 	view: stache("Hello {{name}}")
 });
 ```
+
 With this data in the outer scope:
+
 ```js
 { name: "John" }
 ```
+
 And used like so:
 
-    <hello-world />
+```html
+<hello-world />
+```
 
 If `leakScope` is `true` it will render:
 
-    <hello-world>Hello John</hello-world>
+```html
+<hello-world>Hello John</hello-world>
+```
 
 If `leakScope` is `false` it will render:
 
-    <hello-world>Hello World</hello-world>
+```html
+<hello-world>Hello World</hello-world>
+```
 
 ## Using viewModel in user content
 
@@ -100,6 +111,7 @@ if `leakScope` is `true`, the __user content__ is able to see the name property 
 viewModel instance in the following example. Else, name won't be seen.
 
 If the following component is defined:
+
 ```js
 Component.extend({
 	tag: 'hello-world',
@@ -108,14 +120,21 @@ Component.extend({
 	view: stache("Hello <content />")
 });
 ```
+
 And used like so:
 
-    <hello-world>{{name}}</hello-world>
+```html
+<hello-world>{{name}}</hello-world>
+```
 
 If `leakScope` is `true` it will render:
 
-    <hello-world>Hello World</hello-world>
+```html
+<hello-world>Hello World</hello-world>
+```
 
 If `leakScope` is `false` it will render:
 
-    <hello-world>Hello </hello-world>
+```html
+<hello-world>Hello </hello-world>
+```
