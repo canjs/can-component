@@ -258,7 +258,7 @@ Renders:
 
 ### Lifecycle Hooks
 
-Mainly used to set up special bindings, [can-component/connectedCallback] is defined on the viewModel and is called automatically when a component is inserted into the dom. When writing tests, since `connectedCallback` is on the viewModel, it can be called manually to to reduce complexity of tests that would otherwise need the full component to be initialized and inserted into the/a DOM. For that reason, `connectedCallback` is prefered to using `inserted` in [can-component::events events].
+Mainly used to set up special bindings, [can-component/connectedCallback] is defined on the viewModel and is called automatically when a component is inserted into the DOM. When writing tests, since `connectedCallback` is on the viewModel, it can be called manually to reduce complexity of tests that would otherwise need the full component to be initialized and inserted into the/a DOM. For that reason, `connectedCallback` is preferred to using `inserted` in [can-component::events events].
 
 The following example listens to changes on the `name` property
 and counts them in the `nameChanged` property:
@@ -279,7 +279,7 @@ const Person = DefineMap.extend({
 
 The [can-component/connectedCallback] function may return a `disconnectedCallback` function this is called during teardown. Defined in the same closure scope as setup, its primary use is to tear down anything that was set up during the `connectedCallback` lifecycle hook.
 
-Special bindings are used to setup observable property behaviors that are unable to be represented easily within the declarative APIs of the `viewModel`. It doesn't remove all imperative code but will help keep imperitive code isolated and leave other properies more testable. Otherwise, properties like `name` in the example above, would need side-effects in setters or getters:
+Special bindings are used to set up observable property behaviors that are unable to be represented easily within the declarative APIs of the `viewModel`. It doesn't remove all imperative code but will help keep imperitive code isolated and leave other properies more testable. Otherwise, properties like `name` in the example above, would need side-effects in setters or getters:
 
 ```js
   nameChanged: "number",
@@ -292,7 +292,7 @@ Special bindings are used to setup observable property behaviors that are unable
   }
 ```
 
-This might look preferable but the pattern should be avoided. A more complex example would have side-effects changing a property (like `nameChanged` is in the `name` setter) coming from several different getters, setters, and methods all updating a common property. This makes debugging and testing each property more difficult.
+This might look preferable but this pattern should be avoided. A more complex example would have side-effects changing a property (like `nameChanged` is in the `name` setter) coming from several different getters, setters, and methods all updating a common property. This makes debugging and testing each property more difficult.
 
 There are additional ways to achieve the behavior, the most common are listed here in order of least preferable to most preferable:
 
