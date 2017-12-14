@@ -16,7 +16,7 @@ helpers.makeTests("can-component helpers", function(){
 		expect(2);
 		Component({
 			tag: 'my-text',
-			view: stache('<p>{{valueHelper}}</p>'),
+			view: stache('<p>{{valueHelper()}}</p>'),
 			helpers: {
 				valueHelper: function () {
 					return this.get("value");

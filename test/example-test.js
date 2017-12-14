@@ -450,7 +450,7 @@ helpers.makeTests("can-component examples", function(doc) {
 
 		Component.extend({
 			tag: "page-count",
-			view: stache('Page <span>{{page}}</span>.')
+			view: stache('Page <span>{{page()}}</span>.')
 		});
 
 		var paginator = new Paginate({

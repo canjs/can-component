@@ -73,7 +73,7 @@ QUnit.test('33 - works when instantiated with an object for ViewModel', function
 
 	Component.extend({
 		tag: "test-element",
-		view: stache("{{someMethod}}"),
+		view: stache("{{someMethod()}}"),
 		ViewModel: {
 			someMethod: function() {
 				ok(true, "Function got called");
@@ -111,11 +111,11 @@ QUnit.test("helpers do not leak when leakscope is false (#77)", function () {
 	QUnit.equal(called, 0, "Outer helper not called");
 });
 
-QUnit.skip("helpers do leak when leakscope is true (#77)", function () {
+QUnit.test("helpers do leak when leakscope is true (#77)", function () {
 	var called = 0;
 	Component.extend({
 		tag: "inner-el",
-		view: stache("inner{{../test}}"),
+		view: stache("inner{{../test()}}"),
 		leakScope: true
 	});
 	Component.extend({
