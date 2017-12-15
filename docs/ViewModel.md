@@ -100,27 +100,6 @@ var result = stache("Page {{page}}.")(newViewModel);
 element.innerHTML = result;
 ```
 
-There is a short-hand for the prototype methods and properties used to extend the
-[can-types.DefaultMap default Map type] (typically [can-define/map/map])
-by setting the Component’s ViewModel to an object and using
-that anonymous type as the view model.
-
-The following does the same as above:
-
-```js
-Component.extend({
-	tag: "my-paginate",
-	ViewModel: {
-		offset: {value: 0},
-		limit: {value: 20},
-		get page() {
-			return Math.floor(this.offset / this.limit) + 1;
-		}
-	},
-	view: stache("Page {{page}}.")
-})
-```
-
 ## Values passed from attributes
 
 Values can be "passed" into the viewModel instance of a component, similar to passing arguments into a function. Using
