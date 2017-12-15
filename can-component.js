@@ -295,6 +295,8 @@ var Component = Construct.extend(
 					viewModel = viewModelInstance;
 					return viewModelInstance;
 				}, initialViewModelData);
+			} else {
+				viewModel = domData.get.call(el, "viewModel");
 			}
 
 			// Set `viewModel` to `this.viewModel` and set it to the element's `data` object as a `viewModel` property
@@ -392,7 +394,7 @@ var Component = Construct.extend(
 
 
 			var disconnectedCallback;
-			if(viewModel.connectedCallback) {
+			if(viewModel && viewModel.connectedCallback) {
 				if(componentTagData.mounted === true) {
 					disconnectedCallback = viewModel.connectedCallback(el);
 				} else {

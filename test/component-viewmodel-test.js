@@ -1,5 +1,6 @@
 var QUnit = require("steal-qunit");
 
+var canData = require('can-dom-data-state');
 var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
@@ -9,12 +10,14 @@ var domData = require('can-util/dom/data/data');
 var DefineMap = require('can-define/map/map');
 var DefineList = require("can-define/list/list");
 var domEvents = require('can-util/dom/events/events');
+var Scope = require("can-view-scope");
 var SetterObservable = require("can-simple-observable/setter/setter");
 var SimpleObservable = require("can-simple-observable");
 var canReflect = require("can-reflect");
 var domMutate = require('can-util/dom/mutate/mutate');
 var Construct = require("can-construct");
 var observe = require("can-observe");
+var tag = require('can-view-callbacks').tag;
 
 var innerHTML = function(el){
     return el && el.innerHTML;
@@ -539,5 +542,27 @@ helpers.makeTests("can-component viewModels", function(){
         QUnit.equal(vm.myChild.name,"inner", "got instance");
 
     });
+
+		QUnit.test("Can be called on an element using preventDataBindings (#183)", function(){
+			Component.extend({
+				tag: "prevent-data-bindings",
+				ViewModel: {},
+				view: stache("{{value}}")
+			});
+
+			var document = this.document;
+			var el = document.createElement("div");
+			var callback = tag("prevent-data-bindings");
+
+			var vm = new observe.Object({ value: "it worked" });
+			canData.set.call(el, "viewModel", vm);
+			canData.set.call(el, "preventDataBindings", true);
+			callback(el, {
+				scope: new Scope({ value: "it did not work" })
+			});
+			canData.set.call(el, "preventDataBindings", false);
+
+			QUnit.equal(el.firstChild.nodeValue, "it worked");
+		});
 
 });
