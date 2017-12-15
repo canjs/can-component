@@ -29,6 +29,7 @@ var helpers = {
 
 
     			if(doc) {
+						this.document = doc;
     				this.fixture = doc.createElement("div");
     				doc.body.appendChild(this.fixture);
     			} else {
