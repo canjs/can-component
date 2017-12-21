@@ -201,7 +201,7 @@ Clicking the __Change title__ button sets a `<panel>` element’s `title` attrib
 out.addEventListener("click", function(ev){
 	var el = ev.target;
 	var parent = el.parentNode;
-	if(el.nodeName === "BUTTON") {
+	if (el.nodeName === "BUTTON") {
 		parent.setAttribute("title", "Users");
 	}
 });
@@ -244,14 +244,13 @@ dispatches a `"close"` event when its close method is called:
 ```js
 Component.extend({
 	tag: "player-edit",
-	view: stache.from('player-edit-stache'),
+	view: stache($('#player-edit-stache').html()),
 	ViewModel: DefineMap.extend({
 		player: Player,
 		close: function(){
 			this.dispatch("close");
 		}
-	}),
-	leakScope: true
+	})
 });
 ```
 
