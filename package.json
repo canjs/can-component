@@ -2,7 +2,7 @@
   "name": "can-component",
   "version": "4.0.0-pre.21",
   "description": "Custom elements for CanJS",
-  "homepage": "http://canjs.com",
+  "homepage": "https://canjs.com/doc/can-component.html",
   "repository": {
     "type": "git",
     "url": "git://github.com/canjs/can-component.git"
