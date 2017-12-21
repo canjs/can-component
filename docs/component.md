@@ -352,7 +352,7 @@ elements like:
 
 ```html
 <my-tabs>
-  {{#each foodTypes}}
+  {{#each(foodTypes)}}
     <my-panel title:from='title'>{{content}}</my-panel>
   {{/each}}
 </my-tabs>
@@ -383,34 +383,37 @@ The following tree combo lets people walk through a hierarchy and select locatio
 
 The secret to this widget is the viewModel’s `breadcrumb` property, which is an array
 of items the user has navigated through, and `selectableItems`, which represents the children of the
-last item in the breadcrub.  These are defined on the viewModel like:
+last item in the breadcrumb.  These are defined on the viewModel like:
 
 ```js
-    breadcrumb: [],
-    selectableItems: function(){
-      var breadcrumb = this.attr("breadcrumb");
+	breadcrumb: {
+		Value: DefineList
+	},
+	selectableItems: {
+		get: function(){
+			var breadcrumb = this.breadcrumb;
 
-      // if there’s an item in the breadcrumb
-      if(breadcrumb.attr('length')){
-
-        // return the last item’s children
-        return breadcrumb.attr(""+(breadcrumb.length-1)+'.children');
-      } else{
-
-        // return the top list of items
-        return this.attr('items');
-      }
-    }
+			// if there's an item in the breadcrumb
+			if(breadcrumb.length){
+				// return the last item's children
+				var i = breadcrumb.length - 1;
+				return breadcrumb[i].children;
+			} else{
+				// return the top list of items
+				return this.items;
+			}
+		}
+	},
 ```
 
 When the “+” icon is clicked next to each item, the viewModel’s `showChildren` method is called, which
 adds that item to the breadcrumb like:
 
 ```js
-    showChildren: function(item, ev) {
-      ev.stopPropagation();
-      this.attr('breadcrumb').push(item)
-    },
+	showChildren: function(item, ev) {
+		ev.stopPropagation();
+		this.breadcrumb.push(item);
+	},
 ```
 
 ### Paginate
@@ -445,18 +448,10 @@ var AppViewModel = DefineMap.extend({
 	},
 	websitesPromise: {
 		get: function() {
-			var params = {
-					limit: this.paginate.limit,
-					offset: this.paginate.offset
-				},
-				websitesPromise = Website.getList(params),
-				self = this;
-
-			websitesPromise.then(function(websites) {
-				self.paginate.count = websites.length;
+			return Website.getList({
+				limit: this.paginate.limit,
+				offset: this.paginate.offset
 			});
-
-			return websitesPromise;
 		}
 	}
 });
@@ -468,7 +463,7 @@ its sub-components:
 ```html
 <my-app>
   <my-grid promiseData:from='websitesPromise'>
-    {{#each items}}
+    {{#each(items)}}
       <tr>
         <td width='40%'>{{name}}</td>
         <td width='70%'>{{url}}</td>
@@ -476,6 +471,6 @@ its sub-components:
     {{/each}}
   </my-grid>
   <next-prev paginate:from='paginate'></next-prev>
-  <page-count page:from='paginate.page' count:from='paginate.pageCount'/>
+  <page-count page:from='paginate.page' count:from='paginate.pageCount'></page-count>
 </my-app>
 ```
