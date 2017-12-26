@@ -391,21 +391,7 @@ var Component = Construct.extend(
 				betweenTagsTagData = lightTemplateTagData;
 				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
-
-
 			var disconnectedCallback;
-			if(viewModel && viewModel.connectedCallback) {
-				if(componentTagData.mounted === true) {
-					disconnectedCallback = viewModel.connectedCallback(el);
-				} else {
-					domEvents.addEventListener.call(el, "inserted", function connectedHandler(){
-						domEvents.removeEventListener.call(el, "inserted", connectedHandler);
-						disconnectedCallback = viewModel.connectedCallback(el);
-					});
-				}
-
-			}
-
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
 			var nodeList = nodeLists.register([], function() {
 				domDispatch.call(el, "beforeremove", [], false);
@@ -430,6 +416,19 @@ var Component = Construct.extend(
 
 			// update the nodeList with the new children so the mapping gets applied
 			nodeLists.update(nodeList, getChildNodes(el));
+
+
+			if(viewModel && viewModel.connectedCallback) {
+				if(componentTagData.mounted === true) {
+					disconnectedCallback = viewModel.connectedCallback(el);
+				} else {
+					domEvents.addEventListener.call(el, "inserted", function connectedHandler(){
+						domEvents.removeEventListener.call(el, "inserted", connectedHandler);
+						disconnectedCallback = viewModel.connectedCallback(el);
+					});
+				}
+
+			}
 		}
 	});
 

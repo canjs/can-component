@@ -48,7 +48,8 @@ helpers.makeTests("can-component autoMount", function(doc){
             autoMount: true,
             view: stache("Hello World"),
             ViewModel: {
-                connectedCallback: function(){
+                connectedCallback: function(element){
+                    QUnit.equal( element.innerHTML, "Hello World" );
                     QUnit.ok(true, "called on automounted components");
                     QUnit.start();
                 }

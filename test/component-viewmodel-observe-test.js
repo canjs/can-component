@@ -87,13 +87,15 @@ helpers.makeTests("can-component viewModels with observe", function(){
 
         });
 
-        QUnit.test("connectedCallback and disconnectedCallback", 2, function(){
+        QUnit.test("connectedCallback and disconnectedCallback", 3, function(){
             QUnit.stop();
 
             Component.extend({
                 tag: "connected-component",
+                view: stache('rendered'),
                 ViewModel: class extends observe.Object {
                     connectedCallback(element) {
+                        QUnit.equal(element.innerHTML, "rendered", "rendered view");
                         QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "connectedCallback");
                         return function(){
                             QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "disconnectedCallback");
