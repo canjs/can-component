@@ -478,16 +478,30 @@ var Paginate = DefineMap.extend({
 
 The `app` component, using [can-define/map/map], creates an instance of the `Paginate` model
 and a `websitesPromise` that represents a request for the Websites
-that should be displayed.  Notice how the paginate’s `count` value is tied to the
-value of the `websitesPromise`’s resolved `value`’s `count`.
+that should be displayed.  Notice how the `websitesCount` value is updated when
+the `websitesPromise` resolves. [can-component/connectedCallback] is used to
+listen for changes to `websitesCount`, which then updates the paginate’s `count`
+value.
 
 ```js
 var AppViewModel = DefineMap.extend({
+	connectedCallback: function() {
+		this.listenTo('websitesCount', function(event, count) {
+			this.paginate.count = count;
+		});
+		return this.stopListening.bind(this);
+	},
 	paginate: {
 		value: function() {
 			return new Paginate({
-				limit: 5,
-				count: compute(this, "websitesPromise.value.count")
+				limit: 5
+			});
+		}
+	},
+	websitesCount: {
+		get: function(lastValue, setValue) {
+			this.websitesPromise.then(function(websites) {
+				setValue(websites.count);
 			});
 		}
 	},

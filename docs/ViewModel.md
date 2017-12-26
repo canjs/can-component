@@ -190,19 +190,24 @@ be initialized to this string value:
 
 The above will set the title property on the component’s viewModel instance to the string `hello`.
 
-If the tag’s `title` attribute is changed, it updates the viewModel instance property
-automatically.  This can be seen in the following example:
+If the tag’s `title` attribute is changed, it __does not__ update the viewModel
+instance property automatically. Instead, you can use [can-view-model] to get a
+reference to the viewModel instance and modify it. This can be seen in the
+following example:
 
 @demo demos/can-component/accordion.html
 
-Clicking the __Change title__ button sets a `<panel>` element’s `title` attribute like:
+Clicking the __Change title__ button sets a `<my-panel>` element’s `title`
+attribute like:
 
 ```js
-out.addEventListener("click", function(ev){
+var canViewModel = require("can-view-model");
+
+out.addEventListener("click", function(ev) {
 	var el = ev.target;
-	var parent = el.parentNode;
+	var parent = canViewModel(el.parentNode);
 	if (el.nodeName === "BUTTON") {
-		parent.setAttribute("title", "Users");
+		parent.title = "Users";
 	}
 });
 ```
