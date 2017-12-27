@@ -5,12 +5,9 @@ var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
 var canViewModel = require('can-view-model');
-var domData = require('can-util/dom/data/data');
-var DefineMap = require('can-define/map/map');
-var domEvents = require('can-util/dom/events/events');
 var SetterObservable = require("can-simple-observable/setter/setter");
 var SimpleObservable = require("can-simple-observable");
-var domMutate = require('can-util/dom/mutate/mutate');
+var domMutateNode = require('can-dom-mutate/node');
 
 var innerHTML = function(el){
     return el && el.innerHTML;

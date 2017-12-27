@@ -4,8 +4,10 @@ var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
-var domEvents = require('can-util/dom/events/events');
-var domMutate = require('can-util/dom/mutate/mutate');
+var domEvents = require('can-dom-events');
+var domMutateNode = require('can-dom-mutate/node');
+var domMutateDomEvents = require('can-dom-mutate/dom-events');
+var insertedEvent = domMutateDomEvents.inserted;
 var canViewModel = require('can-view-model');
 var DefineMap = require("can-define/map/map");
 var queues = require("can-queues");
@@ -108,7 +110,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
         var helloWorld = frag.childNodes.item(1);
 
-        domEvents.dispatch.call(helloWorld, "click");
+        domEvents.dispatch(helloWorld, "click");
 
         equal( helloWorld.innerHTML , "Hello There!");
 
@@ -160,6 +162,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
     });
 
     QUnit.test("inserted event fires twice if component inside live binding block", function () {
+		var undo = domEvents.addEvent(insertedEvent);
 
         var inited = 0,
             inserted = 0;
@@ -196,12 +199,13 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
         var frag = stache("<parent-tag id='pt'></parent-tag>")({});
 
-        domMutate.appendChild.call(this.fixture, frag);
+        domMutateNode.appendChild.call(this.fixture, frag);
         stop();
         function checkCount(){
             if(inserted >= 1) {
                 equal(inited, 1, "inited");
-                equal(inserted, 1, "inserted");
+				equal(inserted, 1, "inserted");
+				undo();
                 start();
             } else {
                 setTimeout(checkCount,30);

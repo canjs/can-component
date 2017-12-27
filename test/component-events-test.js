@@ -7,9 +7,11 @@ var Component = require("can-component");
 var canViewModel = require('can-view-model');
 
 var SimpleObservable = require("can-simple-observable");
-var domMutate = require('can-util/dom/mutate/mutate');
-
-
+var domEvents = require('can-dom-events');
+var domMutateNode = require('can-dom-mutate/node');
+var domMutateDomEvents = require('can-dom-mutate/dom-events');
+var insertedEvent = domMutateDomEvents.inserted;
+var removedEvent = domMutateDomEvents.removed;
 
 helpers.makeTests("can-component events", function(){
 
@@ -74,7 +76,8 @@ helpers.makeTests("can-component events", function(){
     });
 
     QUnit.test("stache conditionally nested components calls inserted once (#967)", function(){
-        expect(1);
+		expect(1);
+		var undo = domEvents.addEvent(insertedEvent);
 
         Component.extend({
             tag: "can-parent-stache",
@@ -96,9 +99,12 @@ helpers.makeTests("can-component events", function(){
 
         var renderer = stache("<can-parent-stache></can-parent-stache>");
 
-        domMutate.appendChild.call(this.fixture, renderer());
+        domMutateNode.appendChild.call(this.fixture, renderer());
         stop();
-        setTimeout(start, 100);
+        setTimeout(function () {
+			undo();
+			start();
+		}, 100);
     });
 
 
@@ -136,7 +142,7 @@ helpers.makeTests("can-component events", function(){
         var frag = stache('<my-app></my-app>')();
 
         // element must be inserted, otherwise attributes event will not be fired
-        domMutate.appendChild.call(this.fixture,frag);
+        domMutateNode.appendChild.call(this.fixture,frag);
         HANDLER.call(Test,{type:"something"});
     });
 
@@ -160,9 +166,9 @@ helpers.makeTests("can-component events", function(){
         var frag = stache('<destroyable-component product:bind="product"></destroyable-component>')(state);
 
         // element must be inserted, otherwise attributes event will not be fired
-        domMutate.appendChild.call(this.fixture,frag);
+        domMutateNode.appendChild.call(this.fixture,frag);
 
-        domMutate.removeChild.call(this.fixture, this.fixture.firstChild);
+        domMutateNode.removeChild.call(this.fixture, this.fixture.firstChild);
         stop();
         helpers.afterMutation(function(){
             ok(state.attr('product') == null, 'product was removed');
@@ -187,13 +193,15 @@ helpers.makeTests("can-component events", function(){
 		});
 		var frag = stache('<rebind-viewmodel></rebind-viewmodel>')();
 		var rebind = frag.firstChild;
-		domMutate.appendChild.call(this.fixture, rebind);
+		domMutateNode.appendChild.call(this.fixture, rebind);
 
 		canViewModel(rebind).get("item").set('name', 'CDN');
 	});
 
 
-    test('DOM trees not releasing when referencing CanMap inside CanMap in view (#1593)', function() {
+    QUnit.test('DOM trees not releasing when referencing CanMap inside CanMap in view (#1593)', function() {
+		var undo = domEvents.addEvent(removedEvent)
+
         var baseTemplate = stache('{{#if show}}<my-outside></my-outside>{{/if}}'),
             show = new SimpleObservable(true),
             state = new SimpleMap({
@@ -218,7 +226,7 @@ helpers.makeTests("can-component events", function(){
             leakScope: true
         });
 
-        domMutate.appendChild.call(this.fixture, baseTemplate({
+        domMutateNode.appendChild.call(this.fixture, baseTemplate({
             show: show,
             state: state
         }));
@@ -236,6 +244,7 @@ helpers.makeTests("can-component events", function(){
             state.set('inner', null);
         }, function(){
             equal(removeCount, 2, 'internal removed twice');
+			undo();
         }]);
 
         stop();
