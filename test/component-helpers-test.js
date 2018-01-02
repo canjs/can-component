@@ -4,7 +4,6 @@ var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
-var domEvents = require('can-util/dom/events/events');
 
 var innerHTML = function(el){
     return el && el.innerHTML;

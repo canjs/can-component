@@ -1,8 +1,8 @@
 var MUTATION_OBSERVER = require('can-util/dom/mutation-observer/mutation-observer');
 var DOCUMENT = require("can-util/dom/document/document");
 var makeDocument = require('can-vdom/make-document/make-document');
-var domMutate = require('can-util/dom/mutate/mutate');
-var domEvents = require('can-util/dom/events/events');
+var domMutate = require('can-dom-mutate');
+var domMutateNode = require('can-dom-mutate/node');
 var globals = require('can-globals');
 
 var helpers = {
@@ -56,14 +56,14 @@ var helpers = {
     afterMutation: function(cb) {
     	var doc = globals.getKeyValue('document');
     	var div = doc.createElement("div");
-    	domEvents.addEventListener.call(div, "inserted", function(){
+    	var insertionDisposal = domMutate.onNodeInsertion(div, function(){
+			insertionDisposal();
     		doc.body.removeChild(div);
     		setTimeout(cb, 5);
     	});
         setTimeout(function(){
-            domMutate.appendChild.call(doc.body, div);
-        },10);
-
+            domMutateNode.appendChild.call(doc.body, div);
+        }, 10);
     }
 };
 module.exports = helpers;

@@ -26,19 +26,13 @@ var assign = require('can-assign');
 var DOCUMENT = require('can-globals/document/document');
 require('can-view-model');
 
-
 var domData = require('can-util/dom/data/data');
-var domMutate = require('can-util/dom/mutate/mutate');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
-var domDispatch = require('can-util/dom/dispatch/dispatch');
 var string = require("can-util/js/string/string");
-var domEvents = require("can-util/dom/events/events");
-
-require('can-util/dom/events/inserted/inserted');
-require('can-util/dom/events/removed/removed');
-
-
-
+var domEvents = require('can-dom-events');
+var domMutate = require('can-dom-mutate');
+var domMutateNode = require('can-dom-mutate/node');
+var canSymbol = require('can-symbol');
 
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
@@ -226,7 +220,7 @@ var Component = Construct.extend(
 
 				if(this.prototype.autoMount) {
 					canReflect.eachIndex( DOCUMENT().getElementsByTagName(this.prototype.tag), function(el){
-						if( ! domData.get.call(el, "viewModel") ) {
+						if (!el[canSymbol.for('can.viewModel')]) {
 							new self(el, {
 								scope: new Scope(),
 								options: {},
@@ -296,15 +290,14 @@ var Component = Construct.extend(
 					return viewModelInstance;
 				}, initialViewModelData);
 			} else {
-				viewModel = domData.get.call(el, "viewModel");
+				viewModel = el[canSymbol.for('can.viewModel')];
 			}
 
 			// Set `viewModel` to `this.viewModel` and set it to the element's `data` object as a `viewModel` property
 			this.viewModel = viewModel;
 
-			domData.set.call(el, "viewModel", viewModel);
+			el[canSymbol.for('can.viewModel')] = viewModel;
 			domData.set.call(el, "preventDataBindings", true);
-
 
 			// ## Helpers
 			var options = {
@@ -332,9 +325,13 @@ var Component = Construct.extend(
 					destroy: callTeardownFunctions
 				});
 			} else {
-				domEvents.addEventListener.call(el, "removed", callTeardownFunctions);
+				var removalDisposal = domMutate.onNodeRemoval(el, function () {
+					if (!el.ownerDocument.contains(el)) {
+						removalDisposal();
+						callTeardownFunctions();
+					}
+				});
 			}
-
 
 			// ## Rendering
 
@@ -397,7 +394,7 @@ var Component = Construct.extend(
 			var disconnectedCallback;
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
 			var nodeList = nodeLists.register([], function() {
-				domDispatch.call(el, "beforeremove", [], false);
+				domEvents.dispatch(el, "beforeremove", false);
 				if(teardownBindings) {
 					teardownBindings();
 				}
@@ -415,18 +412,17 @@ var Component = Construct.extend(
 			frag = betweenTagsRenderer(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
 
 			// Append the resulting document fragment to the element
-			domMutate.appendChild.call(el, frag);
+			domMutateNode.appendChild.call(el, frag);
 
 			// update the nodeList with the new children so the mapping gets applied
 			nodeLists.update(nodeList, getChildNodes(el));
-
 
 			if(viewModel && viewModel.connectedCallback) {
 				if(componentTagData.mounted === true) {
 					disconnectedCallback = viewModel.connectedCallback(el);
 				} else {
-					domEvents.addEventListener.call(el, "inserted", function connectedHandler(){
-						domEvents.removeEventListener.call(el, "inserted", connectedHandler);
+					var insertionDisposal = domMutate.onNodeInsertion(el, function () {
+						insertionDisposal();
 						disconnectedCallback = viewModel.connectedCallback(el);
 					});
 				}

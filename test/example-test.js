@@ -7,9 +7,11 @@ var Component = require("can-component");
 var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 
-var domEvents = require('can-util/dom/events/events');
+var domEvents = require('can-dom-events');
 var canViewModel = require("can-view-model");
-var domMutate = require('can-util/dom/mutate/mutate');
+var domMutateNode = require('can-dom-mutate/node');
+var domMutateDomEvents = require('can-dom-mutate/dom-events');
+var insertedEvent = domMutateDomEvents.inserted;
 var canLog = require("can-util/js/log/log");
 var queues = require("can-queues");
 
@@ -243,7 +245,7 @@ helpers.makeTests("can-component examples", function(doc) {
 			equal(itemsList.length, optionsLis().length, "first level items are displayed");
 
 			// Test toggling selected, first by clicking
-			domEvents.dispatch.call(optionsLis()[0], "click");
+			domEvents.dispatch(optionsLis()[0], "click");
 
 			equal(optionsLis()[0].className, "active", "toggling something not selected adds active");
 
@@ -254,29 +256,29 @@ helpers.makeTests("can-component examples", function(doc) {
 			equal(canViewModel(treecombo).selected[0], itemsList[0], "the midwest is in selected");
 
 			// adjust the state and everything should update
-			canViewModel(treecombo, "selected")
-				.pop();
-			equal(optionsLis()[0].className, "", "toggling something not selected adds active");
+			var selectedList = canViewModel(treecombo, "selected");
+			selectedList.pop();
+			equal(optionsLis()[0].className, "", "removing selected item in viewModel removes 'active' class");
 
 			// Test going in a location
-			domEvents.dispatch.call(optionsLis()[0].getElementsByTagName('button')[0], "click");
+			domEvents.dispatch(optionsLis()[0].getElementsByTagName('button')[0], "click");
 			equal(breadcrumbLIs().length, 2, "Only the default title is shown");
 			equal(breadcrumbLIs()[1].innerHTML, "Midwest", "The breadcrumb has an item in it");
 			ok(/Illinois/.test(optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
 
 			// Test going in a location without children
-			domEvents.dispatch.call(optionsLis()[0].getElementsByTagName('button')[0], "click");
+			domEvents.dispatch(optionsLis()[0].getElementsByTagName('button')[0], "click");
 			ok(/Chicago/.test(optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
 			ok(!optionsLis()[0].getElementsByTagName('button')
 				.length, "no show children button");
 
 			// Test poping off breadcrumb
-			domEvents.dispatch.call(breadcrumbLIs()[1], "click");
+			domEvents.dispatch(breadcrumbLIs()[1], "click");
 			equal(innerHTML(breadcrumbLIs()[1]), "Midwest", "The breadcrumb has an item in it");
 			ok(/Illinois/.test(innerHTML(optionsLis()[0])), "A child of the top breadcrumb is displayed");
 
 			// Test removing everything
-			domEvents.dispatch.call(breadcrumbLIs()[0], "click");
+			domEvents.dispatch(breadcrumbLIs()[0], "click");
 			equal(breadcrumbLIs().length, 1, "Only the default title is shown");
 			equal(innerHTML(breadcrumbLIs()[0]), "Locations", "The correct title from the attribute is shown");
 
@@ -375,7 +377,7 @@ helpers.makeTests("can-component examples", function(doc) {
 			"{{/each}}" +
 			"</grid>");
 
-		domMutate.appendChild.call(this.fixture, renderer({
+		domMutateNode.appendChild.call(this.fixture, renderer({
 			viewModel: viewModel
 		}));
 
@@ -440,10 +442,10 @@ helpers.makeTests("can-component examples", function(doc) {
 			next = nextPrev.lastChild;
 
 		ok(!/enabled/.test(prev.className), "prev is not enabled");
-		ok(/enabled/.test(next.className), "next is  enabled");
+		ok(/enabled/.test(next.className), "next is enabled");
 
-		domEvents.dispatch.call(next, "click");
-		ok(/enabled/.test(prev.className), "prev is enabled");
+		domEvents.dispatch(next, "click");
+		ok(/enabled/.test(prev.getAttribute('class')), "prev is enabled"); // TODO: use .className when CSD is patched
 	});
 
 	test("page-count", function() {
@@ -477,7 +479,9 @@ helpers.makeTests("can-component examples", function(doc) {
 
 	if (System.env !== 'canjs-test') {
 		// Brittle in IE
-		test("basic tabs", function() {
+		QUnit.test("basic tabs", function() {
+			var undo = domEvents.addEvent(insertedEvent);
+
 			var TabsViewModel = DefineMap.extend({
                 active: "any",
                 panels: {Value: DefineList},
@@ -567,7 +571,7 @@ helpers.makeTests("can-component examples", function(doc) {
 				foodTypes: foodTypes
 			});
 
-			domMutate.appendChild.call(this.fixture, frag);
+			domMutateNode.appendChild.call(this.fixture, frag);
 
 			var testArea = this.fixture;
 
@@ -618,7 +622,7 @@ helpers.makeTests("can-component examples", function(doc) {
 					equal(innerHTML(panels[0]), "pasta, cereal", "the first content is shown");
 					equal(innerHTML(panels[1]), "", "the second content is removed");
 
-					domEvents.dispatch.call(lis[1], "click");
+					domEvents.dispatch(lis[1], "click");
 					lis = testArea.getElementsByTagName("li");
 
 					equal(lis[1].className, "active", "the second element is active");
@@ -626,6 +630,7 @@ helpers.makeTests("can-component examples", function(doc) {
 
 					equal(innerHTML(panels[0]), "", "the second content is removed");
 					equal(innerHTML(panels[1]), "ice cream, candy", "the second content is shown");
+					undo();
 				}
 			]);
 		});

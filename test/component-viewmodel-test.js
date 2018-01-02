@@ -9,12 +9,13 @@ var canViewModel = require('can-view-model');
 var domData = require('can-util/dom/data/data');
 var DefineMap = require('can-define/map/map');
 var DefineList = require("can-define/list/list");
-var domEvents = require('can-util/dom/events/events');
 var Scope = require("can-view-scope");
 var SetterObservable = require("can-simple-observable/setter/setter");
 var SimpleObservable = require("can-simple-observable");
 var canReflect = require("can-reflect");
-var domMutate = require('can-util/dom/mutate/mutate');
+var canSymbol = require('can-symbol');
+var domEvents = require('can-dom-events');
+var domMutateNode = require('can-dom-mutate/node');
 var Construct = require("can-construct");
 var observe = require("can-observe");
 var tag = require('can-view-callbacks').tag;
@@ -131,7 +132,7 @@ helpers.makeTests("can-component viewModels", function(){
 
         var el = frag.firstChild;
 
-        equal(canViewModel(el), domData.get.call(el, "viewModel"), "one argument grabs the viewModel object");
+        equal(canViewModel(el), el[canSymbol.for('can.viewModel')], "one argument grabs the viewModel object");
         equal(canViewModel(el, "foo"), "bar", "two arguments fetches a value");
         canViewModel(el, "foo", "baz");
         equal(canViewModel(el, "foo"), "baz", "Three arguments sets the value");
@@ -179,13 +180,13 @@ helpers.makeTests("can-component viewModels", function(){
 		equal( buttons.length, 1, "there is one button");
 		equal( innerHTML(buttons[0]) , "hide", "the button's text is hide");
 
-		domEvents.dispatch.call(buttons[0], "click");
+		domEvents.dispatch(buttons[0], "click");
 		buttons = myApp.getElementsByTagName("button");
 
 		equal(buttons.length, 1, "there is one button");
 		equal(innerHTML(buttons[0]), "show", "the button's text is show");
 
-		domEvents.dispatch.call(buttons[0], "click");
+		domEvents.dispatch(buttons[0], "click");
 		buttons = myApp.getElementsByTagName("button");
 
 		equal(buttons.length, 1, "there is one button");
@@ -350,7 +351,7 @@ helpers.makeTests("can-component viewModels", function(){
 
 		var stayClassy = frag.firstChild;
 
-		domMutate.appendChild.call(this.fixture, frag);
+		domMutateNode.appendChild.call(this.fixture, frag);
 
 		var viewModel = canViewModel(stayClassy);
 
@@ -477,7 +478,7 @@ helpers.makeTests("can-component viewModels", function(){
 		var threads = [
 			function(){
 
-				equal(vm.next, 2, "has binidng");
+				equal(vm.next, 2, "has binding");
 				equal(vm.swap, true, "swap - has binding");
 				//equal(vm.get("checked"), "", "attr - has binding"); (commented out because we don't do this sort of binding)
                 map.attr("preview", false);
@@ -555,7 +556,7 @@ helpers.makeTests("can-component viewModels", function(){
 			var callback = tag("prevent-data-bindings");
 
 			var vm = new observe.Object({ value: "it worked" });
-			canData.set.call(el, "viewModel", vm);
+			el[canSymbol.for('can.viewModel')] = vm;
 			canData.set.call(el, "preventDataBindings", true);
 			callback(el, {
 				scope: new Scope({ value: "it did not work" })

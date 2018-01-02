@@ -8,12 +8,12 @@ var canViewModel = require('can-view-model');
 var domData = require('can-util/dom/data/data');
 var DefineMap = require('can-define/map/map');
 var DefineList = require("can-define/list/list");
-var domEvents = require('can-util/dom/events/events');
 var SetterObservable = require("can-simple-observable/setter/setter");
 var SimpleObservable = require("can-simple-observable");
 var attr = require("can-util/dom/attr/attr");
 var canReflect = require("can-reflect");
-var domMutate = require('can-util/dom/mutate/mutate');
+var domEvents = require('can-dom-events');
+var domMutateNode = require('can-dom-mutate/node');
 var observe = require("can-observe");
 
 var innerHTML = function(el){
@@ -50,7 +50,7 @@ helpers.makeTests("can-component viewModels with observe", function(){
 
         QUnit.equal(spans[0].innerHTML, "0", "first value");
 
-        domEvents.dispatch.call(buttons[0], "click");
+        domEvents.dispatch(buttons[0], "click");
 
         QUnit.equal(spans[0].innerHTML, "1", "second value");
 
@@ -81,7 +81,7 @@ helpers.makeTests("can-component viewModels with observe", function(){
 
             QUnit.equal(spans[0].innerHTML, "0", "first value");
 
-            domEvents.dispatch.call(buttons[0], "click");
+            domEvents.dispatch(buttons[0], "click");
 
             QUnit.equal(spans[0].innerHTML, "1", "second value");
 
@@ -106,11 +106,11 @@ helpers.makeTests("can-component viewModels with observe", function(){
             var template = stache("<connected-component/>");
             var frag = template();
             var first = frag.firstChild;
-            domMutate.appendChild.call(this.fixture, frag);
+            domMutateNode.appendChild.call(this.fixture, frag);
 
             helpers.afterMutation(function(){
 
-                domMutate.removeChild.call(first.parentNode, first);
+                domMutateNode.removeChild.call(first.parentNode, first);
                 helpers.afterMutation(function(){
                     QUnit.start();
                 });
