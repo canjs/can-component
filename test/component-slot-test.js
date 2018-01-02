@@ -154,6 +154,30 @@ test("<can-slot> Works with default content", function() {
 	equal(testView.firstChild.innerHTML, 'Default Content');
 });
 
+test("<can-slot> Works in a self-closing template", function() {
+	/* A component like <hello-world/> can be rendered like <hello-world></hello-world> */
+
+	var ViewModel = DefineMap.extend({});
+
+	Component.extend({
+		tag : 'my-email',
+		view : stache(
+			'<can-slot name="subject">' +
+				'Default Content' +
+			'</can-slot>'
+		),
+		ViewModel: ViewModel
+	});
+
+	var renderer = stache(
+		'<my-email/>'
+	);
+
+	var testView = renderer();
+
+	equal(testView.firstChild.innerHTML, 'Default Content');
+});
+
 test("<can-slot> Context one-way binding works", function() {
 	/*Passing in a custom context like <can-slot name='subject' {context}='value' />*/
 

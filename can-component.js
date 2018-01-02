@@ -368,7 +368,10 @@ var Component = Construct.extend(
 
 				// Add a hookup for each <can-slot>
 				options.tags['can-slot'] = makeInsertionTagCallback('can-slot', componentTagData, shadowTagData, leakScope, function(el) {
-					return componentTagData.templates[el.getAttribute("name")];
+					var templates = componentTagData.templates;
+					if (templates) {// This is undefined if the component is <self-closing/>
+						return templates[el.getAttribute("name")];
+					}
 				});
 
 				// Add a hookup for <content>
