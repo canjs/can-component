@@ -198,12 +198,15 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
         domMutate.appendChild.call(this.fixture, frag);
         stop();
+
+        var attempts = 0;
         function checkCount(){
-            if(inserted >= 1) {
+            if(inserted >= 1 || attempts > 100) {
                 equal(inited, 1, "inited");
                 equal(inserted, 1, "inserted");
                 start();
             } else {
+                attempts += 1;
                 setTimeout(checkCount,30);
             }
         }
