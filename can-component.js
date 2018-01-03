@@ -180,6 +180,9 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
+						//!steal-remove-start
+						canLog.warn("can-component: " + this.prototype.tag + " is extending the default map type; please explicitly provide a constructor function");
+						//!steal-remove-end
 						this.ViewModel = types.DefaultMap.extend(vmName, this.prototype.ViewModel);
 					}
 				} else {
