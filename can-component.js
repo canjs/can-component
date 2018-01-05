@@ -21,6 +21,7 @@ var nodeLists = require("can-view-nodelist");
 var canReflect = require("can-reflect");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
+var DefineMap = require("can-define/map/map");
 var canLog = require('can-log');
 var canDev = require('can-log/dev/dev');
 var assign = require('can-assign');
@@ -175,8 +176,7 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
-						canLog.warn("can-component: "+this.prototype.tag+" is extending the ViewModel into a can-simple-map");
-						this.ViewModel = SimpleMap.extend(vmName,{},this.prototype.ViewModel);
+						this.ViewModel = DefineMap.extend(vmName, {}, this.prototype.ViewModel);
 					}
 				} else {
 

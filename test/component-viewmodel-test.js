@@ -431,7 +431,7 @@ helpers.makeTests("can-component viewModels", function(){
 		Component.extend({
 			tag : 'chi-ld',
 			ViewModel: {
-                childProp: 'bar'
+				childProp: { value: 'bar' }
             }
 		});
 

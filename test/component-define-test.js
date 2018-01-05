@@ -159,3 +159,40 @@ if(System.env.indexOf("production") < 0) {
 		canDev.warn = oldwarn;
 	});
 }
+
+QUnit.test("ViewModel defaults to DefineMap if set to an Object", function() {
+	Component.extend({
+		tag: 'can-define-component',
+		ViewModel: {
+			firstName: {
+				type: 'string'
+			},
+			lastName: {
+				type: 'string'
+			},
+			fullName: {
+				get: function () {
+					return [this.firstName, this.lastName].join(' ');
+				}
+			}
+		},
+		view: stache('Name: {{fullName}}')
+	});
+
+	var frag = stache('<can-define-component firstName:from="firstName" lastName:from="lastName" />')({
+		firstName: 'Chris',
+		lastName: 'Gomez'
+	});
+
+	var vm = viewModel(frag.firstChild);
+
+	QUnit.ok(vm instanceof DefineMap, 'vm is a DefineMap');
+	QUnit.equal(vm.firstName, 'Chris', 'ViewModel was set from scope');
+	QUnit.equal(vm.lastName, 'Gomez', 'ViewModel was set from scope');
+	QUnit.equal(frag.firstChild.innerHTML, 'Name: Chris Gomez', 'Rendered fullName');
+
+	vm.firstName = 'Justin';
+	vm.lastName = 'Meyer';
+
+	QUnit.equal(frag.firstChild.innerHTML, 'Name: Justin Meyer', 'Rendered fullName after change');
+});
