@@ -13,6 +13,7 @@ var ComponentControl = require("./control/control");
 var namespace = require('can-namespace');
 
 var Construct = require("can-construct");
+var stache = require("can-stache");
 var stacheBindings = require("can-stache-bindings");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
@@ -211,6 +212,11 @@ var Component = Construct.extend(
 				}
 				if (this.prototype.view) {
 					this.renderer = this.prototype.view;
+				}
+
+				// default to stache if renderer is a string
+				if (typeof this.renderer === "string") {
+					this.renderer = stache(this.renderer);
 				}
 
 				// Register this component to be created when its `tag` is found.
