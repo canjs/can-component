@@ -424,4 +424,26 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 		equal(tn.nodeValue, "qux", "was bound!");
 	});
 
+	QUnit.test("view defaults to stache if set to a string", function() {
+
+		Component.extend({
+			tag: "hello-world",
+			leakScope: true,
+			view: "{{greeting}} World{{../exclamation}}",
+			viewModel: function(){
+                return new SimpleMap({greeting: "Hello"});
+            }
+		});
+
+		var renderer = stache("<hello-world />");
+		var frag = renderer({
+			exclamation: "!"
+		});
+
+		var hello = frag.firstChild;
+
+		equal( hello.innerHTML.trim() , "Hello World!");
+
+	});
+
 });

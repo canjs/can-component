@@ -100,8 +100,7 @@ var result = stache("Page {{page}}.")(newViewModel);
 element.innerHTML = result;
 ```
 
-There is a short-hand for the prototype methods and properties used to extend the
-[can-types.DefaultMap default Map type] (typically [can-define/map/map])
+There is a short-hand for the prototype methods and properties used to extend [can-define/map/map DefineMap]
 by setting the Component’s ViewModel to an object and using
 that anonymous type as the view model.
 
