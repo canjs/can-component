@@ -25,7 +25,6 @@ var DefineMap = require("can-define/map/map");
 var canLog = require('can-log');
 var canDev = require('can-log/dev/dev');
 var assign = require('can-assign');
-var DOCUMENT = require('can-globals/document/document');
 require('can-view-model');
 
 var domData = require('can-util/dom/data/data');
@@ -223,22 +222,7 @@ var Component = Construct.extend(
 				viewCallbacks.tag(this.prototype.tag, function(el, options) {
 					new self(el, options);
 				});
-
-				if(this.prototype.autoMount) {
-					canReflect.eachIndex( DOCUMENT().getElementsByTagName(this.prototype.tag), function(el){
-						if (!el[canSymbol.for('can.viewModel')]) {
-							new self(el, {
-								scope: new Scope(),
-								options: {},
-								templates: {},
-								subtemplate: null,
-								mounted: true
-							});
-						}
-					});
-				}
 			}
-
 		}
 	}, {
 		// ## Prototype
