@@ -34,6 +34,7 @@ var domEvents = require('can-dom-events');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require('can-symbol');
+var DOCUMENT = require('can-globals/document/document');
 
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
@@ -381,7 +382,9 @@ var Component = Construct.extend(
 				betweenTagsTagData = lightTemplateTagData;
 				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
-			var disconnectedCallback;
+			var disconnectedCallback,
+				componentInPage;
+
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
 			var nodeList = nodeLists.register([], function() {
 				domEvents.dispatch(el, "beforeremove", false);
@@ -408,7 +411,9 @@ var Component = Construct.extend(
 			nodeLists.update(nodeList, getChildNodes(el));
 
 			if(viewModel && viewModel.connectedCallback) {
-				if(componentTagData.mounted === true) {
+				componentInPage = DOCUMENT().body.contains(el);
+
+				if(componentInPage) {
 					disconnectedCallback = viewModel.connectedCallback(el);
 				} else {
 					var insertionDisposal = domMutate.onNodeInsertion(el, function () {
