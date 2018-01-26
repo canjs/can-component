@@ -18,7 +18,7 @@ or application logic.
 @signature `<TAG BINDINGS...>[TEMPLATES][LIGHT_DOM]</TAG>`
 
 Create an instance of a component on a particular tag in a [can-stache] view.
-In 2.3, use the [can-stache-bindings bindings] syntaxes to set up bindings.
+Use the [can-stache-bindings bindings] syntaxes to set up bindings.
 
 The following creates a `my-autocomplete` element and passes the `my-autocomplete`'s
 [can-component.prototype.ViewModel] the `Search` model as its `source` property and
