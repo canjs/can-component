@@ -44,7 +44,7 @@
     "can-control": "^3.2.0",
     "can-globals": "<2.0.0",
     "can-namespace": "1.0.0",
-    "can-observation": "^3.3.1",
+    "can-observation": "^4.0.0",
     "can-reflect": "^1.2.1",
     "can-simple-map": "^3.3.0",
     "can-stache-bindings": "^3.4.0",
