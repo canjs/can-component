@@ -27,7 +27,7 @@ var canDev = require('can-log/dev/dev');
 var assign = require('can-assign');
 require('can-view-model');
 
-var domData = require('can-util/dom/data/data');
+var domData = require('can-dom-data-state');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var string = require("can-util/js/string/string");
 var domEvents = require('can-dom-events');

@@ -6,7 +6,6 @@ var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
 var canViewModel = require('can-view-model');
-var domData = require('can-util/dom/data/data');
 var DefineMap = require('can-define/map/map');
 var DefineList = require("can-define/list/list");
 var Scope = require("can-view-scope");
