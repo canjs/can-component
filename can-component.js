@@ -13,32 +13,28 @@ var ComponentControl = require("./control/control");
 var namespace = require('can-namespace');
 
 var Construct = require("can-construct");
+var stache = require("can-stache");
 var stacheBindings = require("can-stache-bindings");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
-
-var compute = require('can-compute');
-var domData = require('can-util/dom/data/data');
-var domMutate = require('can-util/dom/mutate/mutate');
-var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
-var domDispatch = require('can-util/dom/dispatch/dispatch');
-var types = require("can-types");
-var string = require("can-util/js/string/string");
 var canReflect = require("can-reflect");
-
-var canEach = require('can-util/js/each/each');
-var assign = require('can-util/js/assign/assign');
-var isFunction = require('can-util/js/is-function/is-function');
-var canLog = require('can-util/js/log/log');
-var canDev = require("can-util/js/dev/dev");
-var makeArray = require("can-util/js/make-array/make-array");
-var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
-
-require('can-util/dom/events/inserted/inserted');
-require('can-util/dom/events/removed/removed');
+var SimpleObservable = require("can-simple-observable");
+var SimpleMap = require("can-simple-map");
+var DefineMap = require("can-define/map/map");
+var canLog = require('can-log');
+var canDev = require('can-log/dev/dev');
+var assign = require('can-assign');
 require('can-view-model');
 
+var domData = require('can-dom-data-state');
+var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
+var string = require("can-util/js/string/string");
+var domEvents = require('can-dom-events');
+var domMutate = require('can-dom-mutate');
+var domMutateNode = require('can-dom-mutate/node');
+var canSymbol = require('can-symbol');
+var DOCUMENT = require('can-globals/document/document');
 
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
@@ -56,7 +52,7 @@ function addContext(el, tagData, insertionElementTagData) {
 	// it should be used for bindings
 	var teardown = stacheBindings.behaviors.viewModel(el, insertionElementTagData, function(initialData) {
 		// Create a compute responsible for keeping the vm up-to-date
-		return vm = compute(initialData);
+		return vm = new SimpleObservable(initialData);
 	}, undefined, true);
 
 
@@ -74,7 +70,7 @@ function addContext(el, tagData, insertionElementTagData) {
 
 // Returns a hookupFuction that gets the proper tagData in a template, renders it, and adds it to nodeLists
 function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leakScope, getPrimaryTemplate) {
-	var options = shadowTagData.options._context;
+	var options = shadowTagData.options;
 
 	return function hookupFunction(el, insertionElementTagData) {
 		var template = getPrimaryTemplate(el) || insertionElementTagData.subtemplate,
@@ -128,7 +124,7 @@ function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leak
 			nodeList.expression = "<can-slot name='"+el.getAttribute('name')+"'/>";
 
 			var frag = template(tagData.scope, tagData.options, nodeList);
-			var newNodes = makeArray( getChildNodes(frag) );
+			var newNodes = canReflect.toArray( getChildNodes(frag) );
 			nodeLists.replace(nodeList, frag);
 			nodeLists.update(nodeList, newNodes);
 
@@ -155,7 +151,7 @@ var Component = Construct.extend(
 				var self = this;
 
 				// Define a control using the `events` prototype property.
-				if(!isEmptyObject(this.prototype.events)) {
+				if(this.prototype.events !== undefined && canReflect.size(this.prototype.events) !== 0) {
 					this.Control = ComponentControl.extend(this.prototype.events);
 				}
 
@@ -180,7 +176,7 @@ var Component = Construct.extend(
 					if(typeof this.prototype.ViewModel === "function") {
 						this.ViewModel = this.prototype.ViewModel;
 					} else {
-						this.ViewModel = types.DefaultMap.extend(vmName, this.prototype.ViewModel);
+						this.ViewModel = DefineMap.extend(vmName, {}, this.prototype.ViewModel);
 					}
 				} else {
 
@@ -198,11 +194,12 @@ var Component = Construct.extend(
 								//!steal-remove-end
 								this.viewModelInstance = protoViewModel;
 							} else {
-								this.ViewModel = types.DefaultMap.extend(vmName,protoViewModel);
+								canLog.warn("can-component: "+this.prototype.tag+" is extending the viewModel into a can-simple-map");
+								this.ViewModel = SimpleMap.extend(vmName,{},protoViewModel);
 							}
 						}
 					} else {
-						this.ViewModel = types.DefaultMap.extend(vmName,{});
+						this.ViewModel = SimpleMap.extend(vmName,{},{});
 					}
 				}
 
@@ -217,12 +214,16 @@ var Component = Construct.extend(
 					this.renderer = this.prototype.view;
 				}
 
+				// default to stache if renderer is a string
+				if (typeof this.renderer === "string") {
+					this.renderer = stache(this.renderer);
+				}
+
 				// Register this component to be created when its `tag` is found.
 				viewCallbacks.tag(this.prototype.tag, function(el, options) {
 					new self(el, options);
 				});
 			}
-
 		}
 	}, {
 		// ## Prototype
@@ -268,8 +269,8 @@ var Component = Construct.extend(
 							// If `scopeResult` is of a `can.Map` type, use it to wrap the `initialViewModelData`
 							ViewModel = scopeResult;
 						} else {
-							// Otherwise extend `can.Map` with the `scopeResult` and initialize it with the `initialViewModelData`
-							ViewModel = types.DefaultMap.extend(scopeResult);
+							// Otherwise extend `SimpleMap` with the `scopeResult` and initialize it with the `initialViewModelData`
+							ViewModel = SimpleMap.extend(scopeResult);
 						}
 					}
 
@@ -279,14 +280,15 @@ var Component = Construct.extend(
 					viewModel = viewModelInstance;
 					return viewModelInstance;
 				}, initialViewModelData);
+			} else {
+				viewModel = el[canSymbol.for('can.viewModel')];
 			}
 
 			// Set `viewModel` to `this.viewModel` and set it to the element's `data` object as a `viewModel` property
 			this.viewModel = viewModel;
 
-			domData.set.call(el, "viewModel", viewModel);
+			el[canSymbol.for('can.viewModel')] = viewModel;
 			domData.set.call(el, "preventDataBindings", true);
-
 
 			// ## Helpers
 			var options = {
@@ -294,11 +296,14 @@ var Component = Construct.extend(
 					tags: {}
 				};
 			// Setup helpers to callback with `this` as the component
-			canEach(this.helpers || {}, function(val, prop) {
-				if (isFunction(val)) {
-					options.helpers[prop] = val.bind(viewModel);
-				}
-			});
+			if(this.helpers !== undefined) {
+				canReflect.eachKey(this.helpers, function(val, prop) {
+					if (typeof val === "function") {
+						options.helpers[prop] = val.bind(viewModel);
+					}
+				});
+			}
+
 
 			// ## `events` control
 
@@ -310,8 +315,14 @@ var Component = Construct.extend(
 					viewModel: this.viewModel,
 					destroy: callTeardownFunctions
 				});
+			} else {
+				var removalDisposal = domMutate.onNodeRemoval(el, function () {
+					if (!el.ownerDocument.contains(el)) {
+						removalDisposal();
+						callTeardownFunctions();
+					}
+				});
 			}
-
 
 			// ## Rendering
 
@@ -331,19 +342,15 @@ var Component = Construct.extend(
 				if (leakScope.intoShadowContent) {
 					// Give access to the component's data and the VM
 					shadowTagData = {
-						scope: componentTagData.scope.add(new Scope.Refs()).add(this.viewModel, {
-							viewModel: true
-						}),
-						options: componentTagData.options.add(options)
+						scope: componentTagData.scope.add(this.viewModel),
+						options: options
 					};
 
 				} else { // lexical
 					// only give access to the VM
 					shadowTagData = {
-						scope: Scope.refsScope().add(this.viewModel, {
-							viewModel: true
-						}),
-						options: new Scope.Options(options)
+						scope: new Scope(this.viewModel),
+						options: options
 					};
 				}
 
@@ -370,17 +377,22 @@ var Component = Construct.extend(
 					scope: componentTagData.scope.add(this.viewModel, {
 						viewModel: true
 					}),
-					options: componentTagData.options.add(options)
+					options: options
 				};
 				betweenTagsTagData = lightTemplateTagData;
 				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
+			var disconnectedCallback,
+				componentInPage;
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
 			var nodeList = nodeLists.register([], function() {
-				domDispatch.call(el, "beforeremove", [], false);
+				domEvents.dispatch(el, "beforeremove", false);
 				if(teardownBindings) {
 					teardownBindings();
+				}
+				if(disconnectedCallback) {
+					disconnectedCallback(el);
 				}
 			}, componentTagData.parentNodeList || true, false);
 			nodeList.expression = "<" + this.tag + ">";
@@ -388,13 +400,29 @@ var Component = Construct.extend(
 				nodeLists.unregister(nodeList);
 			});
 
+
+
 			frag = betweenTagsRenderer(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
 
 			// Append the resulting document fragment to the element
-			domMutate.appendChild.call(el, frag);
+			domMutateNode.appendChild.call(el, frag);
 
 			// update the nodeList with the new children so the mapping gets applied
 			nodeLists.update(nodeList, getChildNodes(el));
+
+			if(viewModel && viewModel.connectedCallback) {
+				componentInPage = DOCUMENT().body.contains(el);
+
+				if(componentInPage) {
+					disconnectedCallback = viewModel.connectedCallback(el);
+				} else {
+					var insertionDisposal = domMutate.onNodeInsertion(el, function () {
+						insertionDisposal();
+						disconnectedCallback = viewModel.connectedCallback(el);
+					});
+				}
+
+			}
 		}
 	});
 

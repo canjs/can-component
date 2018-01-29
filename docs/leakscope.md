@@ -22,7 +22,7 @@ To change leakScope from the default:
 Component.extend({
 	tag: "my-component",
 	leakScope: true,
-	ViewModel: { message: "Hello World!" },
+	ViewModel: { message: { value: "Hello World!" } },
 	view: stache("{{message}}")
 })
 ```
@@ -76,7 +76,7 @@ If the following component is defined:
 Component.extend({
 	tag: 'hello-world',
 	leakScope: true, // changed to true instead of the default value
-	ViewModel: {name: "World"},
+	ViewModel: { name: { value: "World" } },
 	view: stache("Hello {{name}}")
 });
 ```
@@ -116,7 +116,7 @@ If the following component is defined:
 Component.extend({
 	tag: 'hello-world',
 	leakScope: true, // changed to true instead of the default value
-	ViewModel: {name: "World"},
+	ViewModel: { name: { value: "World" } },
 	view: stache("Hello <content />")
 });
 ```

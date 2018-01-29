@@ -4,6 +4,7 @@ var QUnit = require("steal-qunit");
 var DefineMap = require('can-define/map/map');
 
 var viewModel = require("can-view-model");
+var canSymbol = require("can-symbol");
 
 
 QUnit.module("can-components - can-slots");
@@ -209,6 +210,7 @@ test("<can-slot> Context one-way binding works", function() {
 
 	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
 });
+var queues = require("can-queues");
 
 test("<can-slot> Context two-way binding works", function() {
 	/*Passing in a custom context like <can-slot name='subject' {(context)}='value' />*/
@@ -231,10 +233,9 @@ test("<can-slot> Context two-way binding works", function() {
 		tag : 'my-subject',
 		view : stache(
 			'{{subject}}'
-		)
+		),
+		ViewModel: DefineMap.extend("SubjectVM")
 	});
-
-	var vm = "Hello World";
 
 	var renderer = stache(
 		'<my-email>' +
@@ -243,7 +244,7 @@ test("<can-slot> Context two-way binding works", function() {
 	);
 
 	var frag = renderer();
-	vm = viewModel(frag.firstChild);
+	var vm = viewModel(frag.firstChild);
 	var childVM = viewModel(frag.firstChild.firstChild);
 
 	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
@@ -419,7 +420,9 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 	// vm.__bindings.subject.handlers
 
 	setTimeout(function() {
-		QUnit.equal(vm.__bindEvents.subject.length, 0);
+
+		var handlers = vm[canSymbol.for('can.meta')].handlers;
+		QUnit.equal(handlers.get(['subject']).length, 0);
 		QUnit.start();
 	},50);
 });
