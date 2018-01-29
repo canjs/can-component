@@ -39,7 +39,7 @@
     ]
   },
   "dependencies": {
-    "can-compute": "^3.3.1",
+    "can-compute": "^4.0.0",
     "can-construct": "^3.2.0",
     "can-control": "^3.2.0",
     "can-globals": "<2.0.0",
