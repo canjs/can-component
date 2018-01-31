@@ -41,6 +41,7 @@
     "can-construct": "^3.2.0",
     "can-control": "^4.0.0",
     "can-define": "^2.0.0",
+    "can-dom-data-state": "^1.0.1",
     "can-dom-events": "^1.1.0",
     "can-dom-mutate": "^1.0.0",
     "can-globals": "^1.0.0",
@@ -62,7 +63,6 @@
     "can-view-scope": "^4.0.0"
   },
   "devDependencies": {
-    "can-dom-data-state": "^1.0.0",
     "can-observe": "^2.0.0",
     "can-vdom": "^4.0.0",
     "detect-cyclic-packages": "^1.1.0",
