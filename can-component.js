@@ -120,13 +120,14 @@ function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leak
 				if(tagData.teardown) {
 					tagData.teardown();
 				}
-			}, insertionElementTagData.parentNodeList || true, false);
+			}, insertionElementTagData.parentNodeList || true, insertionElementTagData.directlyNested);
 			nodeList.expression = "<can-slot name='"+el.getAttribute('name')+"'/>";
 
 			var frag = template(tagData.scope, tagData.options, nodeList);
 			var newNodes = canReflect.toArray( getChildNodes(frag) );
-			nodeLists.replace(nodeList, frag);
-			nodeLists.update(nodeList, newNodes);
+			var oldNodes = nodeLists.update(nodeList, newNodes);
+			nodeLists.replace(oldNodes, frag);
+
 
 			// Restore the proper tag function so it could potentially be used again (as in lists)
 			options.tags[tagName] = hookupFunction;

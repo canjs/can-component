@@ -429,6 +429,7 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 
 
 test("blocks directly nested within template", function(){
+
 	var template = stache(
 		'<home-page>'+
 			'<can-template name="stuff">'+
@@ -453,12 +454,11 @@ test("blocks directly nested within template", function(){
 	});
 
 	var frag = template();
-
 	var homePage = frag.firstChild;
-
 	viewModel.showIf = false;
+	//queues.log("flush");
 	viewModel.showSlot = false;
-	console.log(homePage.innerHTML);
-	var spans = frag.firstChild.getElementsByTagName("span");
+
+	var spans = homePage.getElementsByTagName("span");
 	QUnit.equal(spans.length, 0, "all spans removed");
 });
