@@ -426,3 +426,39 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 		QUnit.start();
 	},50);
 });
+
+
+test("blocks directly nested within template", function(){
+
+	var template = stache(
+		'<home-page>'+
+			'<can-template name="stuff">'+
+				'{{#if(showIf)}}'+
+					'<span>.showIf is true</span>'+
+				'{{else}}'+
+					'<span>.showIf is false</span>'+
+				'{{/if}}'+
+			'</can-template>'+
+		'</home-page>');
+
+	var viewModel = new DefineMap({
+		showSlot: true,
+		showIf: true
+	});
+	Component.extend({
+		tag: 'home-page',
+		view: stache("{{#if(showSlot)}}"+
+	  		'<can-slot name="stuff" this:from="this"/>'+
+			'{{/if}}'),
+		viewModel: viewModel
+	});
+
+	var frag = template();
+	var homePage = frag.firstChild;
+	viewModel.showIf = false;
+	//queues.log("flush");
+	viewModel.showSlot = false;
+
+	var spans = homePage.getElementsByTagName("span");
+	QUnit.equal(spans.length, 0, "all spans removed");
+});
