@@ -16,14 +16,14 @@ This is commonly used for cleaning up and tearing down a component.
 For example, the following might remove the component’s ViewModel
 from a parent component’s ViewModel:
 
-```js
+```javascript
 {
-	events: {
-		"{element} beforeremove": function(){
-			canViewModel(this.element.parentNode)
-			.removePanel(this.viewModel);
-		}
-	}
+  events: {
+    "{element} beforeremove": function(){
+      canViewModel(this.element.parentNode)
+      .removePanel(this.viewModel);
+    }
+  }
 }
 ```
 

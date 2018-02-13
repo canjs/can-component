@@ -15,17 +15,17 @@ is rendered with.
 This is typically used only for special situations where a custom scope or custom bindings
 need to be setup.
 
-```js
-var Component = require("can-component");
-var Scope = require("can-view-scope");
+```javascript
+import Component from "can-component";
+import Scope from "can-view-scope";
 
 Component.extend({
-	tag: "my-element",
-	viewModel: function(properties, scope, element){
-		var vm =  new DefineMap(properties);
-		// do special stuff ...
-		return vm;
-	}
+  tag: "my-element",
+  viewModel: function(properties, scope, element){
+    const vm =  new DefineMap(properties);
+    // do special stuff /* ... */
+    return vm;
+  }
 });
 
 stache("<my-element first:from='firstName' last='Meyer'/>")({
@@ -36,7 +36,7 @@ stache("<my-element first:from='firstName' last='Meyer'/>")({
 
 @param {Object} properties An object of values specified by the custom element’s attributes. For example, a view rendered like:
 
-```js
+```javascript
 stache("<my-element title:from='name'></my-element>")({
   name: "Justin"
 });
@@ -44,12 +44,12 @@ stache("<my-element title:from='name'></my-element>")({
 
 Creates an instance of following control:
 
-```js
+```javascript
 Component.extend({
-	tag: "my-element",
-	viewModel: function(properties){
-	  properties.title //-> "Justin";
-	}
+  tag: "my-element",
+  viewModel: function(properties){
+    properties.title //-> "Justin";
+  }
 });
 ```
 
@@ -61,12 +61,12 @@ The viewModel the custom tag was found within.  By default, any attribute’s va
 be looked up within the current viewModel, but if you want to add values without needing
 the user to provide an attribute, you can set this up here.  For example:
 
-```js
+```javascript
 Component.extend({
-	tag: "my-element",
-	viewModel: function(properties, parentScope){
-	  parentScope.get('middleName') //-> "Barry"
-	}
+  tag: "my-element",
+  viewModel: function(properties, parentScope){
+    parentScope.get('middleName') //-> "Barry"
+  }
 });
 ```
 
@@ -75,16 +75,16 @@ Notice how the `middleName` value is looked up in `my-element`’s parent scope.
 @param {HTMLElement} element The element the [can-component] is going to be placed on. If you want
 to add custom attribute handling, you can do that here.  For example:
 
-```js
+```javascript
 Component.extend({
-	tag: "my-element",
-	viewModel: function(properties, parentScope, el){
-		var vm = new DefineMap({clicks: 0});
-		domEvent.addEventListener.call(el, "click", function(){
-			vm.clicks++;
-		});
-		return vm;
-	}
+  tag: "my-element",
+  viewModel: function(properties, parentScope, el){
+    const vm = new DefineMap({clicks: 0});
+    domEvent.addEventListener.call(el, "click", function(){
+      vm.clicks++;
+    });
+    return vm;
+  }
 });
 ```
 

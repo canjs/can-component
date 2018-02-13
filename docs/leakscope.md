@@ -18,12 +18,12 @@ The default value is `false`.
 
 To change leakScope from the default:
 
-```js
+```javascript
 Component.extend({
-	tag: "my-component",
-	leakScope: true,
-	ViewModel: { message: { value: "Hello World!" } },
-	view: stache("{{message}}")
+  tag: "my-component",
+  leakScope: true,
+  ViewModel: { message: { value: "Hello World!" } },
+  view: stache("{{message}}")
 })
 ```
 
@@ -56,7 +56,7 @@ is `{{subject}}`.
 
 Finally, if `<hello-world>` is defined like:
 
-```js
+```javascript
 Component.extend({
   tag: "hello-world",
   view: stache("{{greeting}} <content/>{{exclamation}}")
@@ -72,18 +72,18 @@ see `name: "John"` overwriting `name: "World"` in the component’s viewModel in
 
 If the following component is defined:
 
-```js
+```javascript
 Component.extend({
-	tag: 'hello-world',
-	leakScope: true, // changed to true instead of the default value
-	ViewModel: { name: { value: "World" } },
-	view: stache("Hello {{name}}")
+  tag: 'hello-world',
+  leakScope: true, // changed to true instead of the default value
+  ViewModel: { name: { value: "World" } },
+  view: stache("Hello {{name}}")
 });
 ```
 
 With this data in the outer scope:
 
-```js
+```javascript
 { name: "John" }
 ```
 
@@ -112,12 +112,12 @@ viewModel instance in the following example. Else, name won't be seen.
 
 If the following component is defined:
 
-```js
+```javascript
 Component.extend({
-	tag: 'hello-world',
-	leakScope: true, // changed to true instead of the default value
-	ViewModel: { name: { value: "World" } },
-	view: stache("Hello <content />")
+  tag: 'hello-world',
+  leakScope: true, // changed to true instead of the default value
+  ViewModel: { name: { value: "World" } },
+  view: stache("Hello <content />")
 });
 ```
 

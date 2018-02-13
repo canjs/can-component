@@ -14,15 +14,15 @@ the component’s [can-component::view].
 For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
 be created:
 
-```js
-var MyTagViewModel = DefineMap.extend("MyTagViewModel",{
-	message: "string"
+```javascript
+const MyTagViewModel = DefineMap.extend("MyTagViewModel",{
+  message: "string"
 });
 
 Component.extend({
-	tag: "my-tag",
-	ViewModel: MyTagViewModel,
-	view: stache("<h1>{{message}}</h1>")
+  tag: "my-tag",
+  ViewModel: MyTagViewModel,
+  view: stache("<h1>{{message}}</h1>")
 })
 ```
 
@@ -51,13 +51,13 @@ of a [can-define/map/map], that will be used to render the component’s
 view. This is most easily understood with an example.  The following
 component shows the current page number based off a `limit` and `offset` value:
 
-```js
-var MyPaginateViewModel = DefineMap.extend({
+```javascript
+const MyPaginateViewModel = DefineMap.extend({
   offset: {value: 0},
   limit: {value: 20},
-	get page() {
-		return Math.floor(this.offset / this.limit) + 1;
-	}
+  get page() {
+    return Math.floor(this.offset / this.limit) + 1;
+  }
 });
 
 Component.extend({
@@ -69,9 +69,9 @@ Component.extend({
 
 If this component HTML was inserted into the page like:
 
-```js
-var renderer = stache("<my-paginate/>");
-var frag = renderer();
+```javascript
+const renderer = stache("<my-paginate/>");
+const frag = renderer();
 document.body.appendChild(frag);
 ```
 
@@ -83,8 +83,8 @@ It would result in:
 
 This is because the provided ViewModel object is used to create an instance of [can-define/map/map] like:
 
-```js
-var viewModel = new MyPaginateViewModel();
+```javascript
+const viewModel = new MyPaginateViewModel();
 ```
 
 The [can-define.types.value] property definition makes offset default to 0 and limit default to 20.
@@ -94,9 +94,9 @@ Next, the values are passed into `viewModel` from the [can-stache-bindings data 
 
 And finally, that data is used to render the component’s view and inserted into the element using [can-view-scope] and [can-stache]:
 
-```js
-var newViewModel = new Scope(viewModel);
-var result = stache("Page {{page}}.")(newViewModel);
+```javascript
+const newViewModel = new Scope(viewModel);
+const result = stache("Page {{page}}.")(newViewModel);
 element.innerHTML = result;
 ```
 
@@ -106,17 +106,17 @@ that anonymous type as the view model.
 
 The following does the same as above:
 
-```js
+```javascript
 Component.extend({
-	tag: "my-paginate",
-	ViewModel: {
-		offset: {value: 0},
-		limit: {value: 20},
-		get page() {
-			return Math.floor(this.offset / this.limit) + 1;
-		}
-	},
-	view: stache("Page {{page}}.")
+  tag: "my-paginate",
+  ViewModel: {
+    offset: {value: 0},
+    limit: {value: 20},
+    get page() {
+      return Math.floor(this.offset / this.limit) + 1;
+    }
+  },
+  view: stache("Page {{page}}.")
 })
 ```
 
@@ -139,26 +139,26 @@ The above creates an offset and limit property on the component that are initial
 
 The following component requires an `offset` and `limit`:
 
-```js
+```javascript
 Component.extend({
-	tag: "my-paginate",
-	ViewModel: {
-		offset: {value: 0},
-		limit: {value: 20},
-		get page() {
-			return Math.floor(this.offset / this.limit) + 1;
-		}
-	},
-	view: stache("Page {{page}}.")
+  tag: "my-paginate",
+  ViewModel: {
+    offset: {value: 0},
+    limit: {value: 20},
+    get page() {
+      return Math.floor(this.offset / this.limit) + 1;
+    }
+  },
+  view: stache("Page {{page}}.")
 });
 ```
 
 If `<my-paginate>` is used like:
 
-```js
-var renderer = stache("<my-paginate offset:from='index' limit:from='size' />");
+```javascript
+const renderer = stache("<my-paginate offset:from='index' limit:from='size' />");
 
-var pageInfo = new DefineMap({index: 0, size: 20});
+const pageInfo = new DefineMap({index: 0, size: 20});
 
 document.body.appendChild(renderer(pageInfo));
 ```
@@ -167,7 +167,7 @@ document.body.appendChild(renderer(pageInfo));
 limit attributes. If we were to change the value of `pageInfo`’s
 index like:
 
-```js
+```javascript
 pageInfo.index = 20;
 ```
 
@@ -199,15 +199,15 @@ following example:
 Clicking the __Change title__ button sets a `<my-panel>` element’s `title`
 attribute like:
 
-```js
-var canViewModel = require("can-view-model");
+```javascript
+import canViewModel from "can-view-model";
 
 out.addEventListener("click", function(ev) {
-	var el = ev.target;
-	var parent = canViewModel(el.parentNode);
-	if (el.nodeName === "BUTTON") {
-		parent.title = "Users";
-	}
+  const el = ev.target;
+  const parent = canViewModel(el.parentNode);
+  if (el.nodeName === "BUTTON") {
+    parent.title = "Users";
+  }
 });
 ```
 
@@ -217,22 +217,22 @@ Using html attributes like `can-EVENT-METHOD`, you can directly call a ViewModel
 from a view. For example, we can make `<my-paginate>` elements include a next
 button that calls the ViewModel’s `next` method like:
 
-```js
-var ViewModel = DefineMap.extend({
-	offset: {value: 0},
-	limit: {value: 20},
-	next: function(){
-		this.offset = this.offset + this.limit;
-	},
-	get page() {
-		return Math.floor(this.offset / this.limit) + 1;
-	}
+```javascript
+const ViewModel = DefineMap.extend({
+  offset: {value: 0},
+  limit: {value: 20},
+  next: function(){
+    this.offset = this.offset + this.limit;
+  },
+  get page() {
+    return Math.floor(this.offset / this.limit) + 1;
+  }
 });
 
 Component.extend({
-	tag: "my-paginate",
-	ViewModel: ViewModel,
-	view: stache("Page {{page}} <button on:click='next()'>Next</button>")
+  tag: "my-paginate",
+  ViewModel: ViewModel,
+  view: stache("Page {{page}} <button on:click='next()'>Next</button>")
 });
 ```
 
@@ -245,16 +245,16 @@ ViewModel methods get called back with the current context, the element that you
 DefineMaps can publish events on themselves. For instance, the following `<player-edit>` component,
 dispatches a `"close"` event when its close method is called:
 
-```js
+```javascript
 Component.extend({
-	tag: "player-edit",
-	view: stache($('#player-edit-stache').html()),
-	ViewModel: DefineMap.extend({
-		player: Player,
-		close: function(){
-			this.dispatch("close");
-		}
-	})
+  tag: "player-edit",
+  view: stache($('#player-edit-stache').html()),
+  ViewModel: DefineMap.extend({
+    player: Player,
+    close: function(){
+      this.dispatch("close");
+    }
+  })
 });
 ```
 

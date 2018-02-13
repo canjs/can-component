@@ -98,12 +98,12 @@ a [can-component/can-template] that is used to render the search results:
 To create a Component, you must first [can-component.extend extend] `Component`
 with the methods and properties of how your component behaves:
 
-```js
-var Component = require("can-component");
-var DefineMap = require("can-define/map/map");
-var stache = require("can-stache");
+```javascript
+import Component from "can-component";
+import DefineMap from "can-define/map/map";
+import stache from "can-stache";
 
-var HelloWorldVM = DefineMap.extend({
+const HelloWorldVM = DefineMap.extend({
     visible: {value: false},
     message: {value: "Hello There!"}
 });
@@ -114,7 +114,7 @@ Component.extend({
   ViewModel: HelloWorldVM,
   events: {
     click: function(){
-    	this.viewModel.visible = !this.viewModel.visible;
+      this.viewModel.visible = !this.viewModel.visible;
     }
   }
 });
@@ -125,8 +125,8 @@ says “Hello There!”.  To create an instance of this component on the page,
 add `<hello-world/>` to a [can-stache] view, render
 the view, and insert the result in the page like:
 
-```js
-var renderer = stache("<hello-world/>");
+```javascript
+const renderer = stache("<hello-world/>");
 document.body.appendChild(renderer({ }));
 ```
 
@@ -170,7 +170,7 @@ the component will be created on.
 
 The following matches `<hello-world>` elements.
 
-```js
+```javascript
 Component.extend({
   tag: "hello-world"
 });
@@ -183,7 +183,7 @@ the element’s innerHTML.
 
 The following component:
 
-```js
+```javascript
 Component.extend({
   tag: "hello-world",
   view: stache("<h1>Hello World</h1>")
@@ -200,7 +200,7 @@ Use the [can-component/content] tag to position the custom element’s source HT
 
 The following component:
 
-```js
+```javascript
 Component.extend({
   tag: "hello-world",
   view: stache("<h1><content/></h1>")
@@ -223,7 +223,7 @@ of the custom element and added to the viewModel object.
 
 The following component:
 
-```js
+```javascript
 Component.extend({
   tag: "hello-world",
   view: stache("<h1>{{message}}</h1>")
@@ -232,8 +232,8 @@ Component.extend({
 
 Changes the following rendered view:
 
-```js
-var renderer = stache("<hello-world message:from='greeting'/>");
+```javascript
+const renderer = stache("<hello-world message:from='greeting'/>");
 renderer({
   greeting: "Salutations"
 });
@@ -247,7 +247,7 @@ Into:
 
 Default values can be provided. The following component:
 
-```js
+```javascript
 Component.extend({
   tag: "hello-world",
   view: stache("<h1>{{message}}</h1>"),
@@ -259,8 +259,8 @@ Component.extend({
 
 Changes the following rendered view:
 
-```js
-var renderer = stache("<hello-world/>");
+```javascript
+const renderer = stache("<hello-world/>");
 renderer({});
 ```
 
@@ -275,8 +275,8 @@ set an attribute without any binding syntax.
 
 The following view, with the previous `hello-world` component:
 
-```js
-var renderer = stache("<hello-world message='Howdy'/>");
+```javascript
+const renderer = stache("<hello-world message='Howdy'/>");
 renderer({});
 ```
 
@@ -293,7 +293,7 @@ Mainly used to set up special bindings, [can-component/connectedCallback] is def
 The following example listens to changes on the `name` property
 and counts them in the `nameChanged` property:
 
-```js
+```javascript
 const Person = DefineMap.extend({
   nameChanged: "number",
   name: "string",
@@ -301,7 +301,7 @@ const Person = DefineMap.extend({
     this.listenTo("name", function () {
       this.nameChanged++;
     });
-    var disconnectedCallback = this.stopListening.bind(this);
+    const disconnectedCallback = this.stopListening.bind(this);
     return disconnectedCallback;
   }
 })
@@ -311,7 +311,7 @@ The [can-component/connectedCallback] function may return a `disconnectedCallbac
 
 Special bindings are used to set up observable property behaviors that are unable to be represented easily within the declarative APIs of the `viewModel`. It doesn't remove all imperative code but will help keep imperitive code isolated and leave other properies more testable. Otherwise, properties like `name` in the example above, would need side-effects in setters or getters:
 
-```js
+```javascript
 const Person = DefineMap.extend({
   nameChanged: "number",
   name: {
@@ -338,13 +338,13 @@ A component’s [can-component::events events] object is used to listen to event
 listened to with [can-stache-bindings view bindings]). The following component
 adds “!” to the message every time `<hello-world>` is clicked:
 
-```js
+```javascript
 Component.extend({
   tag: "hello-world",
   view: stache("<h1>{{message}}</h1>"),
   events: {
     "click" : function(){
-      var currentMessage = this.viewModel.message;
+      const currentMessage = this.viewModel.message;
       this.viewModel.message = currentMessage+ "!";
     }
   }
@@ -362,7 +362,7 @@ A component’s [can-component::helpers helpers] object provides [can-stache.hel
 that are available within the component’s view.  The following component
 only renders friendly messages:
 
-```js
+```javascript
 Component.extend({
   tag: "hello-world",
   view: stache("{{#isFriendly message}}"+
@@ -407,7 +407,7 @@ elements like:
 
 To add another panel, all we have to do is add data to `foodTypes` like:
 
-```js
+```javascript
 foodTypes.push({
   title: "Vegetables",
   content: "Carrots, peas, kale"
@@ -417,8 +417,8 @@ foodTypes.push({
 The secret is that the `<my-panel>` element listens to when it is inserted
 and adds its data to the tabs' list of panels with:
 
-```js
-var vm = this.parentViewModel = canViewModel(this.element.parentNode);
+```javascript
+const vm = this.parentViewModel = canViewModel(this.element.parentNode);
 vm.addPanel(this.viewModel);
 ```
 
@@ -432,38 +432,38 @@ The secret to this widget is the viewModel’s `breadcrumb` property, which is a
 of items the user has navigated through, and `selectableItems`, which represents the children of the
 last item in the breadcrumb.  These are defined on the viewModel like:
 
-```js
+```javascript
 Component.extend({
-	breadcrumb: {
-		Value: DefineList
-	},
-	selectableItems: {
-		get: function(){
-			var breadcrumb = this.breadcrumb;
+  breadcrumb: {
+    Value: DefineList
+  },
+  selectableItems: {
+    get: function(){
+      const breadcrumb = this.breadcrumb;
 
-			// if there's an item in the breadcrumb
-			if(breadcrumb.length){
-				// return the last item's children
-				var i = breadcrumb.length - 1;
-				return breadcrumb[i].children;
-			} else{
-				// return the top list of items
-				return this.items;
-			}
-		}
-	}
+      // if there's an item in the breadcrumb
+      if(breadcrumb.length){
+        // return the last item's children
+        const i = breadcrumb.length - 1;
+        return breadcrumb[i].children;
+      } else{
+        // return the top list of items
+        return this.items;
+      }
+    }
+  }
 })
 ```
 
 When the “+” icon is clicked next to each item, the viewModel’s `showChildren` method is called, which
 adds that item to the breadcrumb like:
 
-```js
+```javascript
 Component.extend({
-	showChildren: function(item, ev) {
-		ev.stopPropagation();
-		this.breadcrumb.push(item);
-	}
+  showChildren: function(item, ev) {
+    ev.stopPropagation();
+    this.breadcrumb.push(item);
+  }
 })
 ```
 
@@ -476,9 +476,9 @@ widget-like components: a grid, next / prev buttons, and a page count indicator.
 
 This demo uses a `Paginate` [can-define/map/map] to assist with maintaining a paginated state:
 
-```js
-var Paginate = DefineMap.extend({
-  ...
+```javascript
+const Paginate = DefineMap.extend({
+  // ...
 });
 ```
 
@@ -489,36 +489,36 @@ the `websitesPromise` resolves. [can-component/connectedCallback] is used to
 listen for changes to `websitesCount`, which then updates the paginate’s `count`
 value.
 
-```js
-var AppViewModel = DefineMap.extend({
-	connectedCallback: function() {
-		this.listenTo('websitesCount', function(event, count) {
-			this.paginate.count = count;
-		});
-		return this.stopListening.bind(this);
-	},
-	paginate: {
-		value: function() {
-			return new Paginate({
-				limit: 5
-			});
-		}
-	},
-	websitesCount: {
-		get: function(lastValue, setValue) {
-			this.websitesPromise.then(function(websites) {
-				setValue(websites.count);
-			});
-		}
-	},
-	websitesPromise: {
-		get: function() {
-			return Website.getList({
-				limit: this.paginate.limit,
-				offset: this.paginate.offset
-			});
-		}
-	}
+```javascript
+const AppViewModel = DefineMap.extend({
+  connectedCallback: function() {
+    this.listenTo('websitesCount', function(event, count) {
+      this.paginate.count = count;
+    });
+    return this.stopListening.bind(this);
+  },
+  paginate: {
+    value: function() {
+      return new Paginate({
+        limit: 5
+      });
+    }
+  },
+  websitesCount: {
+    get: function(lastValue, setValue) {
+      this.websitesPromise.then(function(websites) {
+        setValue(websites.count);
+      });
+    }
+  },
+  websitesPromise: {
+    get: function() {
+      return Website.getList({
+        limit: this.paginate.limit,
+        offset: this.paginate.offset
+      });
+    }
+  }
 });
 ```
 

@@ -11,7 +11,7 @@ otherwise be a stream or an inappropriate side-effect during a getter.
 For example, the following listens to changes on the `name` property
 and counts them in the `nameChanged` property:
 
-```js
+```javascript
 const Person = DefineMap.extend({
   nameChanged: "number",
   name: "string",
@@ -19,7 +19,7 @@ const Person = DefineMap.extend({
     this.listenTo("name", function () {
       this.nameChanged++;
     });
-    var disconnectedCallback = this.stopListening.bind(this);
+    const disconnectedCallback = this.stopListening.bind(this);
     return disconnectedCallback;
   }
 })
