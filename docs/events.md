@@ -52,14 +52,16 @@ of using live-binding, we could listen to when offset changes and update the pag
 Components have the ability to bind to special inserted and removed events that are called when a component’s tag has been inserted into or removed from the page:
 
 ```js
-			events: {
-				"inserted": function(){
-					// called when the component’s tag is inserted into the DOM
-				},
-				"removed": function(){
-					// called when the component’s tag is removed from the DOM
-				}
-			}
+{
+	events: {
+		"inserted": function(){
+			// called when the component’s tag is inserted into the DOM
+		},
+		"removed": function(){
+			// called when the component’s tag is removed from the DOM
+		}
+	}
+}
 ```
 
 ## High performance view rendering

@@ -17,10 +17,12 @@ For example, the following might remove the component’s ViewModel
 from a parent component’s ViewModel:
 
 ```js
-events: {
-	"{element} beforeremove": function(){
-		canViewModel(this.element.parentNode)
+{
+	events: {
+		"{element} beforeremove": function(){
+			canViewModel(this.element.parentNode)
 			.removePanel(this.viewModel);
+		}
 	}
 }
 ```

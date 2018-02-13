@@ -312,6 +312,7 @@ The [can-component/connectedCallback] function may return a `disconnectedCallbac
 Special bindings are used to set up observable property behaviors that are unable to be represented easily within the declarative APIs of the `viewModel`. It doesn't remove all imperative code but will help keep imperitive code isolated and leave other properies more testable. Otherwise, properties like `name` in the example above, would need side-effects in setters or getters:
 
 ```js
+const Person = DefineMap.extend({
   nameChanged: "number",
   name: {
     type: "string",
@@ -320,6 +321,7 @@ Special bindings are used to set up observable property behaviors that are unabl
       return newVal;
     }
   }
+})
 ```
 
 This might look preferable but this pattern should be avoided. A more complex example would have side-effects changing a property (like `nameChanged` is in the `name` setter) coming from several different getters, setters, and methods all updating a common property. This makes debugging and testing each property more difficult.
@@ -431,6 +433,7 @@ of items the user has navigated through, and `selectableItems`, which represents
 last item in the breadcrumb.  These are defined on the viewModel like:
 
 ```js
+Component.extend({
 	breadcrumb: {
 		Value: DefineList
 	},
@@ -448,17 +451,20 @@ last item in the breadcrumb.  These are defined on the viewModel like:
 				return this.items;
 			}
 		}
-	},
+	}
+})
 ```
 
 When the “+” icon is clicked next to each item, the viewModel’s `showChildren` method is called, which
 adds that item to the breadcrumb like:
 
 ```js
+Component.extend({
 	showChildren: function(item, ev) {
 		ev.stopPropagation();
 		this.breadcrumb.push(item);
-	},
+	}
+})
 ```
 
 ### Paginate
