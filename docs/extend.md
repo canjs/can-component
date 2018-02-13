@@ -9,7 +9,7 @@ Extends the [can-component] [can-construct constructor function] with prototype
 properties and methods.  Registers the component by its [can-component::tag] with
 [can-view-callbacks.tag can-view-callbacks.tag].
 
-```javascript
+```js
 import Component from "can-component";
 import stache from "can-stache";
 import DefineMap from "can-define/map/map";
@@ -17,9 +17,9 @@ import DefineMap from "can-define/map/map";
 const VM = DefineMap.extend({ /* ... */ });
 
 Component.extend({
-  tag: "tag-name",
-  ViewModel: VM,
-  view: stache(" /* ... */ ")
+	tag: "tag-name",
+	ViewModel: VM,
+	view: stache(" /* ... */ ")
 });
 ```
 

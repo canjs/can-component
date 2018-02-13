@@ -14,16 +14,16 @@ corresponds to the `name` attribute of a `<can-slot>`.
 For example, the following passes a `<my-modal>` component a `<can-template>`
 of the modal content:
 
-```javascript
+```js
 Component.extend({
-  tag : 'my-modal',
-  view : stache(
-    '<div class="wrapper"><can-slot name="modal-content" /></div>'
-  )
+	tag : 'my-modal',
+	view : stache(
+		'<div class="wrapper"><can-slot name="modal-content" /></div>'
+	)
 });
 
 const renderer = stache(
-  '<my-modal>' +
+	'<my-modal>' +
     '<can-template name="modal-content">' +
       'Hello World!' +
     '</can-template>' +
@@ -50,18 +50,18 @@ and render that component with `<can-template>` elements in the `LIGHT_DOM`.
 Any `<can-template>` that has a name attribute matching the name attribute of a `<can-slot>` will
 have it's inner contents rendered and replace the `<can-slot>`.
 
-```javascript
+```js
 Component.extend({
-  tag : 'my-email',
-  view : stache(
-    '<can-slot name="subject" />' +
+	tag : 'my-email',
+	view : stache(
+		'<can-slot name="subject" />' +
     '<p>My Email</p>' +
     '<can-slot name="body" />'
-  )
+	)
 });
 
 const renderer = stache(
-  '<my-email>' +
+	'<my-email>' +
     '<can-template name="subject">' +
       '<h1>{{subject}}</h1>' +
     '</can-template>' +
@@ -72,8 +72,8 @@ const renderer = stache(
 );
 
 renderer({
-  subject: 'Hello World',
-  body: 'The email body'
+	subject: 'Hello World',
+	body: 'The email body'
 });
 
 /*

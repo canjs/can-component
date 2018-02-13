@@ -9,16 +9,16 @@ Replaces any `<can-slot name='NAME' />` element found in a component's view with
 of the `<can-template />` element from the `LIGHT_DOM` that has a matching [TEMPLATE_NAME] attribute. Uses the scope of
 the `LIGHT_DOM` by default.
 
-```javascript
+```js
 Component.extend({
-  tag : 'my-email',
-  view : stache(
-    '<can-slot name="subject" />'
-  )
+	tag : 'my-email',
+	view : stache(
+		'<can-slot name="subject" />'
+	)
 });
 
 const renderer = stache(
-  '<my-email>' +
+	'<my-email>' +
     '<can-template name="subject">' +
       '{{subject}}' +
     '</can-template>' +
@@ -26,7 +26,7 @@ const renderer = stache(
 );
 
 renderer({
-  subject: 'Hello World'
+	subject: 'Hello World'
 });
 //-> <my-email>Hello World</my-email>
 ```
@@ -57,18 +57,18 @@ and render that component with <can-template> elements in the `LIGHT_DOM`.
 Any `<can-slot>` that has a name attribute matching the name attribute of a `<can-template>` will be
 replaced by the rendered inner contents of the <can-template>.
 
-```javascript
+```js
 Component.extend({
-  tag : 'my-email',
-  view : stache(
-    '<can-slot name="subject" />' +
+	tag : 'my-email',
+	view : stache(
+		'<can-slot name="subject" />' +
     '<p>My Email</p>' +
     '<can-slot name="body" />'
-  )
+	)
 });
 
 const renderer = stache(
-  '<my-email>' +
+	'<my-email>' +
     '<can-template name="subject">' +
       '<h1>{{subject}}</h1>' +
     '</can-template>' +
@@ -79,8 +79,8 @@ const renderer = stache(
 );
 
 renderer({
-  subject: 'Hello World',
-  body: 'The email body'
+	subject: 'Hello World',
+	body: 'The email body'
 });
 
 /*
@@ -98,27 +98,27 @@ Context ([can-stache/keys/this]) can be bound to and passed to a template. The f
 passes `<my-email>`'s `subject` and `body` to the `subject` and `body` templates.  Notice
 how `subject` and `body` are read by `{{this}}`.
 
-```javascript
+```js
 const ViewModel = DefineMap.extend({
-  subject: {
-    value:"Hello World"
-  },
-  body: {
-    value: "Later Gator"
-  }
+	subject: {
+		value:"Hello World"
+	},
+	body: {
+		value: "Later Gator"
+	}
 });
 
 Component.extend({
-  tag : 'my-email',
-  view : stache(
-    '<can-slot name="subject" this:from="subject"/>' +
+	tag : 'my-email',
+	view : stache(
+		'<can-slot name="subject" this:from="subject"/>' +
     '<can-slot name="body" this:from="body"/>'
-  ),
-  ViewModel
+	),
+	ViewModel
 });
 
 const renderer = stache(
-  '<my-email>' +
+	'<my-email>' +
     '<can-template name="subject">' +
       '<h1>{{this}}</h1>' +
     '</can-template>' +
@@ -129,8 +129,8 @@ const renderer = stache(
 );
 
 const testView = renderer({
-  subject: 'Hello World',
-  body: 'This is a greeting.'
+	subject: 'Hello World',
+	body: 'This is a greeting.'
 });
 
 /*
@@ -146,24 +146,24 @@ const testView = renderer({
 Default content can be specified to be used if there is no matching `<can-template>`
 or the matching `<can-template>` has no inner content.
 
-```javascript
+```js
 Component.extend({
-  tag : 'my-email',
-  view : stache(
-    '<can-slot name="subject">' +
+	tag : 'my-email',
+	view : stache(
+		'<can-slot name="subject">' +
       '<p>This is the default {{subject}}</p>' +
     '</can-slot>'
-  )
+	)
 });
 
 const renderer = stache(
-  '<my-email>' +
+	'<my-email>' +
     '<can-template name="subject" />' +
   '</my-email>'
 );
 
 const testView = renderer({
-  subject: 'content'
+	subject: 'content'
 });
 
 /*
