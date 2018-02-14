@@ -12,17 +12,17 @@ For example, the following listens to changes on the `name` property
 and counts them in the `nameChanged` property:
 
 ```js
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	nameChanged: "number",
 	name: "string",
-	connectedCallback () {
-		this.listenTo("name", function () {
+	connectedCallback() {
+		this.listenTo( "name", function() {
 			this.nameChanged++;
-		});
-		const disconnectedCallback = this.stopListening.bind(this);
+		} );
+		const disconnectedCallback = this.stopListening.bind( this );
 		return disconnectedCallback;
 	}
-})
+} );
 ```
 
 `connectedCallback` is named as such to match the [web components](https://developers.google.com/web/fundamentals/web-components/customelements#reactions) spec for the same concept.

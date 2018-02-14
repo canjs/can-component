@@ -19,38 +19,39 @@ need to be setup.
 import Component from "can-component";
 import Scope from "can-view-scope";
 
-Component.extend({
+Component.extend( {
 	tag: "my-element",
-	viewModel: function(properties, scope, element){
-		const vm =  new DefineMap(properties);
+	viewModel: function( properties, scope, element ) {
+		const vm =  new DefineMap( properties );
+
 		// do special stuff /* ... */
 		return vm;
 	}
-});
+} );
 
-stache("<my-element first:from='firstName' last='Meyer'/>")({
+stache( "<my-element first:from='firstName' last='Meyer'/>" )( {
 	firstName: "Justin",
 	middleName: "Barry"
-});
+} );
 ```
 
 @param {Object} properties An object of values specified by the custom element’s attributes. For example, a view rendered like:
 
 ```js
-stache("<my-element title:from='name'></my-element>")({
+stache( "<my-element title:from='name'></my-element>" )( {
 	name: "Justin"
-});
+} );
 ```
 
 Creates an instance of following control:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "my-element",
-	viewModel: function(properties){
-		properties.title //-> "Justin";
+	viewModel: function( properties ) {
+		properties.title; //-> "Justin";
 	}
-});
+} );
 ```
 
 And calls the viewModel function with `properties` like `{title: "Justin"}`.
@@ -62,12 +63,12 @@ be looked up within the current viewModel, but if you want to add values without
 the user to provide an attribute, you can set this up here.  For example:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "my-element",
-	viewModel: function(properties, parentScope){
-		parentScope.get('middleName') //-> "Barry"
+	viewModel: function( properties, parentScope ) {
+		parentScope.get( "middleName" ); //-> "Barry"
 	}
-});
+} );
 ```
 
 Notice how the `middleName` value is looked up in `my-element`’s parent scope.
@@ -76,16 +77,16 @@ Notice how the `middleName` value is looked up in `my-element`’s parent scope.
 to add custom attribute handling, you can do that here.  For example:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "my-element",
-	viewModel: function(properties, parentScope, el){
-		const vm = new DefineMap({clicks: 0});
-		domEvent.addEventListener.call(el, "click", function(){
+	viewModel: function( properties, parentScope, el ) {
+		const vm = new DefineMap( { clicks: 0 } );
+		domEvent.addEventListener.call( el, "click", function() {
 			vm.clicks++;
-		});
+		} );
 		return vm;
 	}
-});
+} );
 ```
 
 This example should be done with the [can-component::events] object instead.

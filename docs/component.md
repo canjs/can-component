@@ -103,21 +103,21 @@ import Component from "can-component";
 import DefineMap from "can-define/map/map";
 import stache from "can-stache";
 
-const HelloWorldVM = DefineMap.extend({
-	visible: {value: false},
-	message: {value: "Hello There!"}
-});
+const HelloWorldVM = DefineMap.extend( {
+	visible: { value: false },
+	message: { value: "Hello There!" }
+} );
 
-Component.extend({
+Component.extend( {
 	tag: "hello-world",
-	view: stache("{{#if visible}}{{message}}{{else}}Click me{{/if}}"),
+	view: stache( "{{#if visible}}{{message}}{{else}}Click me{{/if}}" ),
 	ViewModel: HelloWorldVM,
 	events: {
-		click: function(){
+		click: function() {
 			this.viewModel.visible = !this.viewModel.visible;
 		}
 	}
-});
+} );
 ```
 
 This element says “Click me” until a user clicks it and then
@@ -126,8 +126,8 @@ add `<hello-world/>` to a [can-stache] view, render
 the view, and insert the result in the page like:
 
 ```js
-const renderer = stache("<hello-world/>");
-document.body.appendChild(renderer({ }));
+const renderer = stache( "<hello-world/>" );
+document.body.appendChild( renderer( { } ) );
 ```
 
 Check this out here:
@@ -171,9 +171,9 @@ the component will be created on.
 The following matches `<hello-world>` elements.
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "hello-world"
-});
+} );
 ```
 
 ### View
@@ -184,10 +184,10 @@ the element’s innerHTML.
 The following component:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "hello-world",
-	view: stache("<h1>Hello World</h1>")
-});
+	view: stache( "<h1>Hello World</h1>" )
+} );
 ```
 
 Changes `<hello-world/>` elements into:
@@ -201,10 +201,10 @@ Use the [can-component/content] tag to position the custom element’s source HT
 The following component:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "hello-world",
-	view: stache("<h1><content/></h1>")
-});
+	view: stache( "<h1><content/></h1>" )
+} );
 ```
 
 Changes `<hello-world>Hi There</hello-world>` into:
@@ -224,19 +224,19 @@ of the custom element and added to the viewModel object.
 The following component:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "hello-world",
-	view: stache("<h1>{{message}}</h1>")
-});
+	view: stache( "<h1>{{message}}</h1>" )
+} );
 ```
 
 Changes the following rendered view:
 
 ```js
-const renderer = stache("<hello-world message:from='greeting'/>");
-renderer({
+const renderer = stache( "<hello-world message:from='greeting'/>" );
+renderer( {
 	greeting: "Salutations"
-});
+} );
 ```
 
 Into:
@@ -248,20 +248,20 @@ Into:
 Default values can be provided. The following component:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "hello-world",
-	view: stache("<h1>{{message}}</h1>"),
+	view: stache( "<h1>{{message}}</h1>" ),
 	viewModel: {
 		message: "Hi"
 	}
-});
+} );
 ```
 
 Changes the following rendered view:
 
 ```js
-const renderer = stache("<hello-world/>");
-renderer({});
+const renderer = stache( "<hello-world/>" );
+renderer( {} );
 ```
 
 Into:
@@ -276,8 +276,8 @@ set an attribute without any binding syntax.
 The following view, with the previous `hello-world` component:
 
 ```js
-const renderer = stache("<hello-world message='Howdy'/>");
-renderer({});
+const renderer = stache( "<hello-world message='Howdy'/>" );
+renderer( {} );
 ```
 
 Renders:
@@ -294,17 +294,17 @@ The following example listens to changes on the `name` property
 and counts them in the `nameChanged` property:
 
 ```js
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	nameChanged: "number",
 	name: "string",
-	connectedCallback () {
-		this.listenTo("name", function () {
+	connectedCallback() {
+		this.listenTo( "name", function() {
 			this.nameChanged++;
-		});
-		const disconnectedCallback = this.stopListening.bind(this);
+		} );
+		const disconnectedCallback = this.stopListening.bind( this );
 		return disconnectedCallback;
 	}
-})
+} );
 ```
 
 The [can-component/connectedCallback] function may return a `disconnectedCallback` function this is called during teardown. Defined in the same closure scope as setup, its primary use is to tear down anything that was set up during the `connectedCallback` lifecycle hook.
@@ -312,16 +312,16 @@ The [can-component/connectedCallback] function may return a `disconnectedCallbac
 Special bindings are used to set up observable property behaviors that are unable to be represented easily within the declarative APIs of the `viewModel`. It doesn't remove all imperative code but will help keep imperitive code isolated and leave other properies more testable. Otherwise, properties like `name` in the example above, would need side-effects in setters or getters:
 
 ```js
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	nameChanged: "number",
 	name: {
 		type: "string",
-		set: function (newVal, lastSetVal) {
-			this.nameChanged = (this.nameChanged || 0) + 1;
+		set: function( newVal, lastSetVal ) {
+			this.nameChanged = ( this.nameChanged || 0 ) + 1;
 			return newVal;
 		}
 	}
-})
+} );
 ```
 
 This might look preferable but this pattern should be avoided. A more complex example would have side-effects changing a property (like `nameChanged` is in the `name` setter) coming from several different getters, setters, and methods all updating a common property. This makes debugging and testing each property more difficult.
@@ -339,16 +339,16 @@ listened to with [can-stache-bindings view bindings]). The following component
 adds “!” to the message every time `<hello-world>` is clicked:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "hello-world",
-	view: stache("<h1>{{message}}</h1>"),
+	view: stache( "<h1>{{message}}</h1>" ),
 	events: {
-		"click" : function(){
+		"click": function() {
 			const currentMessage = this.viewModel.message;
-			this.viewModel.message = currentMessage+ "!";
+			this.viewModel.message = currentMessage + "!";
 		}
 	}
-});
+} );
 ```
 
 Components have the ability to bind to special [can-util/dom/events/inserted/inserted],
@@ -363,21 +363,21 @@ that are available within the component’s view.  The following component
 only renders friendly messages:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "hello-world",
-	view: stache("{{#isFriendly message}}"+
-              "<h1>{{message}}</h1>"+
-            "{{/isFriendly}}"),
+	view: stache( "{{#isFriendly message}}" +
+              "<h1>{{message}}</h1>" +
+            "{{/isFriendly}}" ),
 	helpers: {
-		isFriendly: function(message, options){
-			if( /hi|hello|howdy/.test(message) ) {
+		isFriendly: function( message, options ) {
+			if ( /hi|hello|howdy/.test( message ) ) {
 				return options.fn();
 			} else {
 				return options.inverse();
 			}
 		}
 	}
-});
+} );
 ```
 
 Generally speaking, helpers should only be used for view related functionality, like
@@ -408,18 +408,18 @@ elements like:
 To add another panel, all we have to do is add data to `foodTypes` like:
 
 ```js
-foodTypes.push({
+foodTypes.push( {
 	title: "Vegetables",
 	content: "Carrots, peas, kale"
-});
+} );
 ```
 
 The secret is that the `<my-panel>` element listens to when it is inserted
 and adds its data to the tabs' list of panels with:
 
 ```js
-const vm = this.parentViewModel = canViewModel(this.element.parentNode);
-vm.addPanel(this.viewModel);
+const vm = this.parentViewModel = canViewModel( this.element.parentNode );
+vm.addPanel( this.viewModel );
 ```
 
 ### TreeCombo
@@ -433,38 +433,40 @@ of items the user has navigated through, and `selectableItems`, which represents
 last item in the breadcrumb.  These are defined on the viewModel like:
 
 ```js
-Component.extend({
+Component.extend( {
 	breadcrumb: {
 		Value: DefineList
 	},
 	selectableItems: {
-		get: function(){
+		get: function() {
 			const breadcrumb = this.breadcrumb;
 
 			// if there's an item in the breadcrumb
-			if(breadcrumb.length){
+			if ( breadcrumb.length ) {
+
 				// return the last item's children
 				const i = breadcrumb.length - 1;
-				return breadcrumb[i].children;
-			} else{
+				return breadcrumb[ i ].children;
+			} else {
+
 				// return the top list of items
 				return this.items;
 			}
 		}
 	}
-})
+} );
 ```
 
 When the “+” icon is clicked next to each item, the viewModel’s `showChildren` method is called, which
 adds that item to the breadcrumb like:
 
 ```js
-Component.extend({
-	showChildren: function(item, ev) {
+Component.extend( {
+	showChildren: function( item, ev ) {
 		ev.stopPropagation();
-		this.breadcrumb.push(item);
+		this.breadcrumb.push( item );
 	}
-})
+} );
 ```
 
 ### Paginate
@@ -477,9 +479,10 @@ widget-like components: a grid, next / prev buttons, and a page count indicator.
 This demo uses a `Paginate` [can-define/map/map] to assist with maintaining a paginated state:
 
 ```js
-const Paginate = DefineMap.extend({
+const Paginate = DefineMap.extend( {
+
 	// ...
-});
+} );
 ```
 
 The `app` component, using [can-define/map/map], creates an instance of the `Paginate` model
@@ -490,36 +493,36 @@ listen for changes to `websitesCount`, which then updates the paginate’s `coun
 value.
 
 ```js
-const AppViewModel = DefineMap.extend({
+const AppViewModel = DefineMap.extend( {
 	connectedCallback: function() {
-		this.listenTo('websitesCount', function(event, count) {
+		this.listenTo( "websitesCount", function( event, count ) {
 			this.paginate.count = count;
-		});
-		return this.stopListening.bind(this);
+		} );
+		return this.stopListening.bind( this );
 	},
 	paginate: {
 		value: function() {
-			return new Paginate({
+			return new Paginate( {
 				limit: 5
-			});
+			} );
 		}
 	},
 	websitesCount: {
-		get: function(lastValue, setValue) {
-			this.websitesPromise.then(function(websites) {
-				setValue(websites.count);
-			});
+		get: function( lastValue, setValue ) {
+			this.websitesPromise.then( function( websites ) {
+				setValue( websites.count );
+			} );
 		}
 	},
 	websitesPromise: {
 		get: function() {
-			return Website.getList({
+			return Website.getList( {
 				limit: this.paginate.limit,
 				offset: this.paginate.offset
-			});
+			} );
 		}
 	}
-});
+} );
 ```
 
 The `my-app` component passes paginate, paginate’s values, and websitesPromise to

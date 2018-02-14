@@ -19,9 +19,9 @@ from a parent component’s ViewModel:
 ```js
 {
 	events: {
-		"{element} beforeremove": function(){
-			canViewModel(this.element.parentNode)
-				.removePanel(this.viewModel);
+		"{element} beforeremove": function() {
+			canViewModel( this.element.parentNode )
+				.removePanel( this.viewModel );
 		}
 	}
 }

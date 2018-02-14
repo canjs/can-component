@@ -7,10 +7,10 @@ component’s [can-component::ViewModel] instance.  `<content/>` elements within
 @option {can-stache.renderer} A [can-stache.renderer] returned by [can-stache]. For example:
 
 ```js
-Component({
+Component( {
 	tag: "my-tabs",
-	view: stache("<ul>{{#panels}}<li>{{title}}</li> /* ... */")
-});
+	view: stache( "<ul>{{#panels}}<li>{{title}}</li> /* ... */" )
+} );
 ```
 
 @body
@@ -38,15 +38,15 @@ The following explains how each part works:
 __Component:__
 
 ```js
-Component({
+Component( {
 	tag: "my-greeting",
-	view: stache("<h1><content/> - {{title}}</h1>"),
-	ViewModel: DefineMap.extend({
+	view: stache( "<h1><content/> - {{title}}</h1>" ),
+	ViewModel: DefineMap.extend( {
 		title: {
 			value: "can-component"
 		}
-	})
-});
+	} )
+} );
 ```
 
 This registers a component for elements like `<my-greeting>`. Its view
@@ -76,9 +76,9 @@ Notice:
 __Source data:__
 
 ```js
-stache("...")({
+stache( "..." )( {
 	site: "CanJS"
-});
+} );
 ```
 
 This is how we render the source view that uses `<my-greeting>`. The view is rendered with `site` in its [can-component::ViewModel].
@@ -108,10 +108,10 @@ The view specified by `view` is rendered directly within the custom tag.
 For example the following component:
 
 ```js
-Component({
+Component( {
 	tag: "my-greeting",
-	view: stache("<h1>Hello There</h1>")
-});
+	view: stache( "<h1>Hello There</h1>" )
+} );
 ```
 
 With the following source html:
@@ -153,10 +153,10 @@ component’s element within the component’s
 view. For example, if we change the component to look like:
 
 ```js
-Component({
+Component( {
 	tag: "my-greeting",
-	view: stache("<h1><content/></h1>")
-});
+	view: stache( "<h1><content/></h1>" )
+} );
 ```
 
 and rendered with source html, like:
@@ -178,10 +178,10 @@ between the `<content>` tags will be used. For example, if we
 change the component to look like:
 
 ```js
-Component({
+Component( {
 	tag: "my-greeting",
-	view: stache("<h1><content>Hello World</content></h1>")
-});
+	view: stache( "<h1><content>Hello World</content></h1>" )
+} );
 ```
 
 and rendered with source html like:
