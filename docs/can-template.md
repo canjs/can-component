@@ -15,22 +15,22 @@ For example, the following passes a `<my-modal>` component a `<can-template>`
 of the modal content:
 
 ```js
-Component.extend({
-	tag : 'my-modal',
-	view : stache(
-		'<div class="wrapper"><can-slot name="modal-content" /></div>'
+Component.extend( {
+	tag: "my-modal",
+	view: stache(
+		"<div class=\"wrapper\"><can-slot name=\"modal-content\" /></div>"
 	)
-});
+} );
 
-var renderer = stache(
-	'<my-modal>' +
-		'<can-template name="modal-content">' +
-			'Hello World!' +
-		'</can-template>' +
-	'</my-modal>'
+const renderer = stache(
+	"<my-modal>" +
+    "<can-template name=\"modal-content\">" +
+      "Hello World!" +
+    "</can-template>" +
+  "</my-modal>"
 );
 
-renderer() //-> <my-modal><div class="wrapper">Hello World!</div></my-modal>
+renderer(); //-> <my-modal><div class="wrapper">Hello World!</div></my-modal>
 ```
 
 By default, `<can-template>` is rendered with the surrounding scope
@@ -51,36 +51,36 @@ Any `<can-template>` that has a name attribute matching the name attribute of a 
 have it's inner contents rendered and replace the `<can-slot>`.
 
 ```js
-Component.extend({
-	tag : 'my-email',
-	view : stache(
-		'<can-slot name="subject" />' +
-		'<p>My Email</p>' +
-		'<can-slot name="body" />'
+Component.extend( {
+	tag: "my-email",
+	view: stache(
+		"<can-slot name=\"subject\" />" +
+    "<p>My Email</p>" +
+    "<can-slot name=\"body\" />"
 	)
-});
+} );
 
-var renderer = stache(
-	'<my-email>' +
-		'<can-template name="subject">' +
-			'<h1>{{subject}}</h1>' +
-		'</can-template>' +
-		'<can-template name="body">' +
-			'<span>{{body}}</span>' +
-		'</can-template>' +
-	'</my-email>'
+const renderer = stache(
+	"<my-email>" +
+    "<can-template name=\"subject\">" +
+      "<h1>{{subject}}</h1>" +
+    "</can-template>" +
+    "<can-template name=\"body\">" +
+      "<span>{{body}}</span>" +
+    "</can-template>" +
+  "</my-email>"
 );
 
-renderer({
-	subject: 'Hello World',
-	body: 'The email body'
-});
+renderer( {
+	subject: "Hello World",
+	body: "The email body"
+} );
 
 /*
 <my-email>
-	<h1>Hello World</h1>
-	<p>My Email</p>
-	<span>The email body</span>
+  <h1>Hello World</h1>
+  <p>My Email</p>
+  <span>The email body</span>
 </my-email>
 */
 ```

@@ -10,17 +10,17 @@ properties and methods.  Registers the component by its [can-component::tag] wit
 [can-view-callbacks.tag can-view-callbacks.tag].
 
 ```js
-var Component = require("can-component");
-var stache = require("can-stache");
-var DefineMap = require("can-define/map/map");
+import Component from "can-component";
+import stache from "can-stache";
+import DefineMap from "can-define/map/map";
 
-var VM = DefineMap.extend({ ... });
+const VM = DefineMap.extend( { /* ... */ } );
 
-Component.extend({
-  tag: "tag-name",
-  ViewModel: VM,
-  view: stache(" .... ")
-});
+Component.extend( {
+	tag: "tag-name",
+	ViewModel: VM,
+	view: stache( " /* ... */ " )
+} );
 ```
 
 @param {{}} prototype An object set as the prototype of the

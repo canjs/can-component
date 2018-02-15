@@ -16,10 +16,10 @@ The `<content>` tag can be used within `my-tag` to position the `LIGHT_DOM`.  Fo
 example, to position the `LIGHT_DOM` within an `<h1>`, `<my-tag>` could be defined like:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "my-tag",
-	view: stache("<h1><content/></h1>")
-});
+	view: stache( "<h1><content/></h1>" )
+} );
 ```
 
    @param {can-stache.sectionRenderer} [DEFAULT_CONTENT] The content that should be
@@ -28,8 +28,8 @@ Component.extend({
    The following, makes `my-tag` show `Hi There!` if no `LIGHT_DOM` is passed:
 
    ```js
-   Component.extend({
-   	tag: "my-tag",
-   	view: stache("<h1><content>Hi There!</content></h1>")
-   });
-   ```
+Component.extend( {
+	tag: "my-tag",
+	view: stache( "<h1><content>Hi There!</content></h1>" )
+} );
+```

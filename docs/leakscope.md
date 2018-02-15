@@ -19,12 +19,12 @@ The default value is `false`.
 To change leakScope from the default:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "my-component",
 	leakScope: true,
 	ViewModel: { message: { value: "Hello World!" } },
-	view: stache("{{message}}")
-})
+	view: stache( "{{message}}" )
+} );
 ```
 
 Leaving `leakScope` as the default `false` is useful for hiding and protecting
@@ -57,10 +57,10 @@ is `{{subject}}`.
 Finally, if `<hello-world>` is defined like:
 
 ```js
-Component.extend({
-  tag: "hello-world",
-  view: stache("{{greeting}} <content/>{{exclamation}}")
-})
+Component.extend( {
+	tag: "hello-world",
+	view: stache( "{{greeting}} <content/>{{exclamation}}" )
+} );
 ```
 
 `{{greeting}} <content/>{{exclamation}}` represents the __component’s view__.
@@ -73,12 +73,12 @@ see `name: "John"` overwriting `name: "World"` in the component’s viewModel in
 If the following component is defined:
 
 ```js
-Component.extend({
-	tag: 'hello-world',
+Component.extend( {
+	tag: "hello-world",
 	leakScope: true, // changed to true instead of the default value
 	ViewModel: { name: { value: "World" } },
-	view: stache("Hello {{name}}")
-});
+	view: stache( "Hello {{name}}" )
+} );
 ```
 
 With this data in the outer scope:
@@ -113,12 +113,12 @@ viewModel instance in the following example. Else, name won't be seen.
 If the following component is defined:
 
 ```js
-Component.extend({
-	tag: 'hello-world',
+Component.extend( {
+	tag: "hello-world",
 	leakScope: true, // changed to true instead of the default value
 	ViewModel: { name: { value: "World" } },
-	view: stache("Hello <content />")
-});
+	view: stache( "Hello <content />" )
+} );
 ```
 
 And used like so:

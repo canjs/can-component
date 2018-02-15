@@ -7,23 +7,23 @@ Listen to events on elements and observables.
 that handle the event. For example:
 
 ```js
-Component.extend({
+Component.extend( {
 	ViewModel: {
 		limit: "number",
 		offset: "number",
-		next: function(){
+		next: function() {
 			this.offset = this.offset + this.limit;
 		}
 	},
 	events: {
-		".next click": function(){
-			this.viewModel.next()
+		".next click": function() {
+			this.viewModel.next();
 		},
-		"{viewModel} limit": function(viewModel, ev, newValue){
-			console.log("limit is now", newValue);
+		"{viewModel} limit": function( viewModel, ev, newValue ) {
+			console.log( "limit is now", newValue );
 		}
 	}
-});
+} );
 ```
 
 A component’s events object is used as the prototype of a [can-control]. The control gets created on the component’s
@@ -52,14 +52,18 @@ of using live-binding, we could listen to when offset changes and update the pag
 Components have the ability to bind to special inserted and removed events that are called when a component’s tag has been inserted into or removed from the page:
 
 ```js
-			events: {
-				"inserted": function(){
-					// called when the component’s tag is inserted into the DOM
-				},
-				"removed": function(){
-					// called when the component’s tag is removed from the DOM
-				}
-			}
+{
+	events: {
+		"inserted": function() {
+
+			// called when the component’s tag is inserted into the DOM
+		},
+		"removed": function() {
+
+			// called when the component’s tag is removed from the DOM
+		}
+	}
+}
 ```
 
 ## High performance view rendering

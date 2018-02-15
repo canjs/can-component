@@ -15,15 +15,15 @@ For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` 
 be created:
 
 ```js
-var MyTagViewModel = DefineMap.extend("MyTagViewModel",{
+const MyTagViewModel = DefineMap.extend( "MyTagViewModel", {
 	message: "string"
-});
+} );
 
-Component.extend({
+Component.extend( {
 	tag: "my-tag",
 	ViewModel: MyTagViewModel,
-	view: stache("<h1>{{message}}</h1>")
-})
+	view: stache( "<h1>{{message}}</h1>" )
+} );
 ```
 
 Use [can-view-model] to read a component’s view model instance.
@@ -52,27 +52,27 @@ view. This is most easily understood with an example.  The following
 component shows the current page number based off a `limit` and `offset` value:
 
 ```js
-var MyPaginateViewModel = DefineMap.extend({
-  offset: {value: 0},
-  limit: {value: 20},
+const MyPaginateViewModel = DefineMap.extend( {
+	offset: { value: 0 },
+	limit: { value: 20 },
 	get page() {
-		return Math.floor(this.offset / this.limit) + 1;
+		return Math.floor( this.offset / this.limit ) + 1;
 	}
-});
+} );
 
-Component.extend({
-  tag: "my-paginate",
-  ViewModel: MyPaginateViewModel,
-  view: stache("Page {{page}}.")
-})
+Component.extend( {
+	tag: "my-paginate",
+	ViewModel: MyPaginateViewModel,
+	view: stache( "Page {{page}}." )
+} );
 ```
 
 If this component HTML was inserted into the page like:
 
 ```js
-var renderer = stache("<my-paginate/>");
-var frag = renderer();
-document.body.appendChild(frag);
+const renderer = stache( "<my-paginate/>" );
+const frag = renderer();
+document.body.appendChild( frag );
 ```
 
 It would result in:
@@ -84,7 +84,7 @@ It would result in:
 This is because the provided ViewModel object is used to create an instance of [can-define/map/map] like:
 
 ```js
-var viewModel = new MyPaginateViewModel();
+const viewModel = new MyPaginateViewModel();
 ```
 
 The [can-define.types.value] property definition makes offset default to 0 and limit default to 20.
@@ -95,8 +95,8 @@ Next, the values are passed into `viewModel` from the [can-stache-bindings data 
 And finally, that data is used to render the component’s view and inserted into the element using [can-view-scope] and [can-stache]:
 
 ```js
-var newViewModel = new Scope(viewModel);
-var result = stache("Page {{page}}.")(newViewModel);
+const newViewModel = new Scope( viewModel );
+const result = stache( "Page {{page}}." )( newViewModel );
 element.innerHTML = result;
 ```
 
@@ -107,17 +107,17 @@ that anonymous type as the view model.
 The following does the same as above:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "my-paginate",
 	ViewModel: {
-		offset: {value: 0},
-		limit: {value: 20},
+		offset: { value: 0 },
+		limit: { value: 20 },
 		get page() {
-			return Math.floor(this.offset / this.limit) + 1;
+			return Math.floor( this.offset / this.limit ) + 1;
 		}
 	},
-	view: stache("Page {{page}}.")
-})
+	view: stache( "Page {{page}}." )
+} );
 ```
 
 ## Values passed from attributes
@@ -140,27 +140,27 @@ The above creates an offset and limit property on the component that are initial
 The following component requires an `offset` and `limit`:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "my-paginate",
 	ViewModel: {
-		offset: {value: 0},
-		limit: {value: 20},
+		offset: { value: 0 },
+		limit: { value: 20 },
 		get page() {
-			return Math.floor(this.offset / this.limit) + 1;
+			return Math.floor( this.offset / this.limit ) + 1;
 		}
 	},
-	view: stache("Page {{page}}.")
-});
+	view: stache( "Page {{page}}." )
+} );
 ```
 
 If `<my-paginate>` is used like:
 
 ```js
-var renderer = stache("<my-paginate offset:from='index' limit:from='size' />");
+const renderer = stache( "<my-paginate offset:from='index' limit:from='size' />" );
 
-var pageInfo = new DefineMap({index: 0, size: 20});
+const pageInfo = new DefineMap( { index: 0, size: 20 } );
 
-document.body.appendChild(renderer(pageInfo));
+document.body.appendChild( renderer( pageInfo ) );
 ```
 
 …`pageInfo`’s index and size are set as the component’s offset and
@@ -200,15 +200,15 @@ Clicking the __Change title__ button sets a `<my-panel>` element’s `title`
 attribute like:
 
 ```js
-var canViewModel = require("can-view-model");
+import canViewModel from "can-view-model";
 
-out.addEventListener("click", function(ev) {
-	var el = ev.target;
-	var parent = canViewModel(el.parentNode);
-	if (el.nodeName === "BUTTON") {
+out.addEventListener( "click", function( ev ) {
+	const el = ev.target;
+	const parent = canViewModel( el.parentNode );
+	if ( el.nodeName === "BUTTON" ) {
 		parent.title = "Users";
 	}
-});
+} );
 ```
 
 ## Calling methods on ViewModel from events within the view
@@ -218,22 +218,22 @@ from a view. For example, we can make `<my-paginate>` elements include a next
 button that calls the ViewModel’s `next` method like:
 
 ```js
-var ViewModel = DefineMap.extend({
-	offset: {value: 0},
-	limit: {value: 20},
-	next: function(){
+const ViewModel = DefineMap.extend( {
+	offset: { value: 0 },
+	limit: { value: 20 },
+	next: function() {
 		this.offset = this.offset + this.limit;
 	},
 	get page() {
-		return Math.floor(this.offset / this.limit) + 1;
+		return Math.floor( this.offset / this.limit ) + 1;
 	}
-});
+} );
 
-Component.extend({
+Component.extend( {
 	tag: "my-paginate",
 	ViewModel: ViewModel,
-	view: stache("Page {{page}} <button on:click='next()'>Next</button>")
-});
+	view: stache( "Page {{page}} <button on:click='next()'>Next</button>" )
+} );
 ```
 
 ViewModel methods get called back with the current context, the element that you are listening to and the event that triggered the callback.
@@ -246,16 +246,16 @@ DefineMaps can publish events on themselves. For instance, the following `<playe
 dispatches a `"close"` event when its close method is called:
 
 ```js
-Component.extend({
+Component.extend( {
 	tag: "player-edit",
-	view: stache($('#player-edit-stache').html()),
-	ViewModel: DefineMap.extend({
+	view: stache( $( "#player-edit-stache" ).html() ),
+	ViewModel: DefineMap.extend( {
 		player: Player,
-		close: function(){
-			this.dispatch("close");
+		close: function() {
+			this.dispatch( "close" );
 		}
-	})
-});
+	} )
+} );
 ```
 
 These can be listened to with [can-stache-bindings.event] bindings like:
