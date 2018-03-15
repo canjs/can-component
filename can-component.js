@@ -27,6 +27,10 @@ var canDev = require('can-log/dev/dev');
 var assign = require('can-assign');
 require('can-view-model');
 
+// DefineList must be imported so Arrays on the ViewModel
+// will be converted to DefineLists automatically
+require("can-define/list/list");
+
 var domData = require('can-dom-data-state');
 var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
 var string = require("can-util/js/string/string");

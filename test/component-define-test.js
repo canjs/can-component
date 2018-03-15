@@ -196,3 +196,24 @@ QUnit.test("ViewModel defaults to DefineMap if set to an Object", function() {
 
 	QUnit.equal(frag.firstChild.innerHTML, 'Name: Justin Meyer', 'Rendered fullName after change');
 });
+
+QUnit.test("ViewModel properties default to DefineList if set to an Array (#225)", function() {
+	Component.extend({
+		tag: "viewmodel-lists",
+		view: "Hello, World",
+		ViewModel: {
+			items: {
+				default() {
+					return [ "one", "two" ];
+				}
+			}
+		}
+	});
+
+	var renderer = stache("<viewmodel-lists></viewmodel-lists>");
+
+	var fragOne = renderer();
+	var vm = viewModel(fragOne.firstChild);
+
+	QUnit.ok(vm.items instanceof define.DefineList, 'vm is a DefineList');
+});
