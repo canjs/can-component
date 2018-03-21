@@ -221,7 +221,8 @@ var Component = Construct.extend(
 
 				// default to stache if renderer is a string
 				if (typeof this.renderer === "string") {
-					this.renderer = stache(this.renderer);
+					var viewName = string.capitalize( string.camelize(this.prototype.tag) )+"View";
+					this.renderer = stache(viewName, this.renderer);
 				}
 
 				// Register this component to be created when its `tag` is found.

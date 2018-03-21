@@ -217,3 +217,16 @@ QUnit.test("ViewModel properties default to DefineList if set to an Array (#225)
 
 	QUnit.ok(vm.items instanceof define.DefineList, 'vm is a DefineList');
 });
+
+QUnit.test("filename should be passed to stache() for inline views", function() {
+	var MyComponent = Component.extend({
+		tag: "my-filename-component",
+		ViewModel: {},
+		view: "{{scope.filename}}"
+	});
+
+	var renderer = stache("<my-filename-component></my-filename-component>");
+	var frag = renderer();
+
+	QUnit.equal(frag.firstChild.innerHTML, "MyFilenameComponentView", "filename was provided to stache()");
+});
