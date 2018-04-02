@@ -7,6 +7,7 @@ var DefineMap = require("can-define/map/map");
 
 var viewModel = require("can-view-model");
 var canDev = require("can-util/js/dev/dev");
+var testHelpers = require("can-test-helpers");
 
 QUnit.module("can-component with can-define");
 
@@ -218,7 +219,7 @@ QUnit.test("ViewModel properties default to DefineList if set to an Array (#225)
 	QUnit.ok(vm.items instanceof define.DefineList, 'vm is a DefineList');
 });
 
-QUnit.test("filename should be passed to stache() for inline views", function() {
+testHelpers.dev.devOnlyTest("filename should be passed to stache() for inline views", function() {
 	var MyComponent = Component.extend({
 		tag: "my-filename-component",
 		ViewModel: {},
