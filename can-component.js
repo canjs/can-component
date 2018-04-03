@@ -240,6 +240,11 @@ var Component = Construct.extend(
 			// If a view is not provided, we fall back to
 			// dynamic scoping regardless of settings.
 
+			// Create an element if it doesn’t exist and make it available outside of this
+			if (!el) {
+				el = document.createElement(this.tag);
+			}
+			this.element = el;
 
 			// an array of teardown stuff that should happen when the element is removed
 			var teardownFunctions = [];
@@ -251,6 +256,14 @@ var Component = Construct.extend(
 				};
 			var setupBindings = !domData.get.call(el, "preventDataBindings");
 			var viewModel, frag;
+
+			// Create componentTagData if it wasn’t provided
+			if (!componentTagData) {
+				componentTagData = {
+					// TODO: fill this out once we implement #233 (passing viewModel),
+					// #234 (passing templates), and #235 (passing <content />)
+				};
+			}
 
 			// ## Scope
 			var teardownBindings;
