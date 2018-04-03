@@ -732,7 +732,7 @@ function makeTest(name, doc, mutObs) {
 		equal(frag.lastChild.firstChild.firstChild.nodeValue, 'value2');
 	});
 
-	test('access hypenated attributes via camelCase or hypenated', function () {
+	test('access hyphenated attributes via camelCase or hyphenated', function () {
 		Component({
 			tag: 'hyphen',
 			view: stache('<p>{{valueHelper}}</p>'),
