@@ -35,7 +35,7 @@ a [can-component/can-template] that is used to render the search results:
   @release 2.3
 
   @param {String} TAG An HTML tag name that matches the [can-component::tag tag]
-  property of the component. Tag names should include a hypen (`-`) or a colon (`:`) like:
+  property of the component. Tag names should include a hyphen (`-`) or a colon (`:`) like:
   `acme-tabs` or `acme:tabs`.
 
   @param {can-stache-bindings} [BINDINGS] Use the following binding syntaxes
@@ -46,7 +46,7 @@ a [can-component/can-template] that is used to render the search results:
    - [can-stache-bindings.twoWay]=[can-stache.expressions expression] — two-way data binding child to parent
    - [can-stache-bindings.event]=[can-stache/expressions/call expression] — event binding on the view model
 
-   Note that because DOM attribute names are case-insensitive, use hypens (`-`)
+   Note that because DOM attribute names are case-insensitive, use hyphens (`-`)
    in the attribute name to setup for `camelCase` properties.
 
    Example:
