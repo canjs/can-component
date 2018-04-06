@@ -89,9 +89,32 @@ a [can-component/can-template] that is used to render the search results:
    the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
    with [can-component.prototype.leakScope].
 
+@signature `new Component()`
+
+Create an instance of a component without rendering it in a template.
+
+The following defines a `MyGreeting` component and creates a `my-greeting`
+element by calling `new` on the component’s constructor function:
+
+```js
+const MyGreeting = Component.extend({
+  tag: "my-greeting",
+  view: "Hello {{subject}}",
+  ViewModel: {
+    subject: {
+      default: "world"
+    }
+  }
+});
+
+const myGreetingInstance = new MyGreeting();
+// myGreetingInstance.element is <my-greeting>Hello world</my-greeting>
+// myGreetingInstance.viewModel has {subject: "world"}
+```
+
+  @release 4.3
 
 @body
-
 
 ## Use
 
