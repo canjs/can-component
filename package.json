@@ -52,7 +52,7 @@
     "can-reflect": "^1.6.0",
     "can-simple-map": "^4.0.0",
     "can-simple-observable": "^2.0.0",
-    "can-stache": "^4.1.0",
+    "can-stache": "^4.4.0-pre.1",
     "can-stache-bindings": "^4.0.3",
     "can-stache-key": "^1.0.0",
     "can-symbol": "^1.4.1",
