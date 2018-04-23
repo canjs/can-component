@@ -418,8 +418,7 @@ var Component = Construct.extend(
 			teardownFunctions.push(function() {
 				nodeLists.unregister(nodeList);
 			});
-
-
+			this.nodeList = nodeList;
 
 			frag = betweenTagsRenderer(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
 
@@ -444,5 +443,12 @@ var Component = Construct.extend(
 			}
 		}
 	});
+
+// This adds support for components being rendered as values in stache templates
+var viewInsertSymbol = canSymbol.for("can.viewInsert");
+Component.prototype[viewInsertSymbol] = function(viewData) {
+	viewData.nodeList.newDeepChildren.push(this.nodeList);
+	return this.element;
+};
 
 module.exports = namespace.Component = Component;
