@@ -240,6 +240,17 @@ var Component = Construct.extend(
 			// If a view is not provided, we fall back to
 			// dynamic scoping regardless of settings.
 
+			// If componentTagData isn’t defined, check for el and use it if it’s defined;
+			// otherwise, an empty object is needed for componentTagData.
+			if (componentTagData === undefined) {
+				if (el === undefined) {
+					componentTagData = {};
+				} else {
+					componentTagData = el;
+					el = null;
+				}
+			}
+
 			// Create an element if it doesn’t exist and make it available outside of this
 			if (!el) {
 				el = document.createElement(this.tag);
@@ -256,14 +267,6 @@ var Component = Construct.extend(
 				};
 			var setupBindings = !domData.get.call(el, "preventDataBindings");
 			var viewModel, frag;
-
-			// Create componentTagData if it wasn’t provided
-			if (!componentTagData) {
-				componentTagData = {
-					// TODO: fill this out once we implement #233 (passing viewModel),
-					// #234 (passing templates), and #235 (passing <content />)
-				};
-			}
 
 			// ## Scope
 			var teardownBindings;
@@ -385,6 +388,23 @@ var Component = Construct.extend(
 				options.tags.content = makeInsertionTagCallback('content',  componentTagData, shadowTagData, leakScope, function() {
 					return componentTagData.subtemplate;
 				});
+
+				// Hook up any templates with which the component was instantiated
+				if (componentTagData.templates) {
+					options.partials = {};
+					for (var name in componentTagData.templates) {
+						var template = componentTagData.templates[name];
+
+						// Check if it’s already a renderer function or
+						// a string that needs to be parsed by stache
+						if (typeof template === "function") {
+							options.partials[name] = template;
+						} else if (typeof template === "string") {
+							var debugName = string.capitalize( string.camelize(name) ) + "Template";
+							options.partials[name] = stache(debugName, template);
+						}
+					}
+				}
 
 				betweenTagsRenderer = this.constructor.renderer;
 				betweenTagsTagData = shadowTagData;

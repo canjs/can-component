@@ -89,7 +89,7 @@ a [can-component/can-template] that is used to render the search results:
    the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
    with [can-component.prototype.leakScope].
 
-@signature `new Component()`
+@signature `new Component([options])`
 
 Create an instance of a component without rendering it in a template.
 
@@ -110,6 +110,41 @@ const MyGreeting = Component.extend({
 const myGreetingInstance = new MyGreeting();
 // myGreetingInstance.element is <my-greeting>Hello world</my-greeting>
 // myGreetingInstance.viewModel has {subject: "world"}
+```
+
+@param {Object} [options] Options for rendering the component, including `templates`.
+
+In the example below, a component that uses partials is defined and the partial is
+passed in when the component is instantiated.
+
+```js
+const TodosPage = Component.extend({
+  tag: "todos-page",
+  view: "<ul>{{#each(items)}} {{>item-partial}} {{/each}}</ul>",
+  ViewModel: {
+    items: {
+      default: ["eat", "sleep", "code"]
+    }
+  }
+});
+
+const todosPageInstance = new TodosPage({
+  template: {
+    "item-partial": "<li>{{name}}</li>"
+  }
+});
+```
+
+This would make `todosPageInstance.element` a fragment with the following structure:
+
+```html
+<todos-page>
+  <ul>
+    <li>eat</li>
+    <li>sleep</li>
+    <li>code</li>
+  </ul>
+</todos-page>
 ```
 
   @release 4.3
