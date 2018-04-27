@@ -123,13 +123,13 @@ const TodosPage = Component.extend({
   view: "<ul>{{#each(items)}} {{>item-partial}} {{/each}}</ul>",
   ViewModel: {
     items: {
-      default: ["eat", "sleep", "code"]
+      default: () => ["eat", "sleep", "code"]
     }
   }
 });
 
 const todosPageInstance = new TodosPage({
-  template: {
+  templates: {
     "item-partial": "<li>{{name}}</li>"
   }
 });
