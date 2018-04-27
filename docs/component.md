@@ -112,10 +112,31 @@ const myGreetingInstance = new MyGreeting();
 // myGreetingInstance.viewModel has {subject: "world"}
 ```
 
-@param {Object} [options] Options for rendering the component, including `templates`.
+@param {Object} [options] Options for rendering the component, including
+`content` and `templates`.
 
-In the example below, a component that uses partials is defined and the partial is
-passed in when the component is instantiated.
+In the example below, the `content` option is used to pass `LIGHT_DOM` into a
+component when it is instantiated.
+
+```js
+const HelloWorld = Component.extend({
+  tag: "hello-world",
+  view: "Hello <content>world</content>"
+});
+
+const helloWorldInstance = new HelloWorld({
+  content: "<em>mundo</em>"
+});
+```
+
+This would make `helloWorldInstance.element` a fragment with the following structure:
+
+```html
+<hello-world>Hello <em>mundo</em></hello-world>
+```
+
+In the example below, the `templates` option is used to pass a partial into a
+component when it is instantiated.
 
 ```js
 const TodosPage = Component.extend({

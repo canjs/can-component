@@ -1,5 +1,6 @@
 var Component = require("can-component");
 var QUnit = require("steal-qunit");
+var stache = require("can-stache");
 
 QUnit.module("can-component instantiation");
 
@@ -26,9 +27,45 @@ QUnit.test("Components can be instantiated with new", function() {
 	QUnit.equal(element.textContent, "Hello world", "element has correct text content after updating viewModel");
 });
 
+QUnit.test("Components can be instantiated with <content> - string", function() {
+	var ComponentConstructor = Component.extend({
+		tag: "new-instantiation-content",
+		view: "Hello <content>{{message}}</content>",
+		ViewModel: {
+			message: {default: "world"}
+		}
+	});
+
+	var componentInstance = new ComponentConstructor({
+		content: "<em>mundo</em>"
+	});
+
+	// Basics look correct
+	var element = componentInstance.element;
+	QUnit.equal(element.innerHTML, "Hello <em>mundo</em>", "content rendered");
+});
+
+QUnit.test("Components can be instantiated with <content> - renderer function", function() {
+	var ComponentConstructor = Component.extend({
+		tag: "new-instantiation-content",
+		view: "Hello <content>{{message}}</content>",
+		ViewModel: {
+			message: {default: "world"}
+		}
+	});
+
+	var componentInstance = new ComponentConstructor({
+		content: stache("<em>mundo</em>")
+	});
+
+	// Basics look correct
+	var element = componentInstance.element;
+	QUnit.equal(element.innerHTML, "Hello <em>mundo</em>", "content rendered");
+});
+
 QUnit.test("Components can be instantiated with templates", function() {
 	var ComponentConstructor = Component.extend({
-		tag: "new-instantiation",
+		tag: "new-instantiation-templates",
 		view: "Hello {{message}} {{>message-input}}",
 		ViewModel: {
 			message: {default: "world"}

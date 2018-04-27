@@ -348,6 +348,18 @@ var Component = Construct.extend(
 
 			// ## Rendering
 
+			// Hook up any <content> with which the component was instantiated
+			var componentContent = componentTagData.content;
+			if (componentContent) {
+				// Check if it’s already a renderer function or
+				// a string that needs to be parsed by stache
+				if (typeof componentContent === "function") {
+					componentTagData.subtemplate = componentContent;
+				} else if (typeof componentContent === "string") {
+					componentTagData.subtemplate = stache(componentContent);
+				}
+			}
+
 			var leakScope = {
 				toLightContent: this.leakScope === true,
 				intoShadowContent: this.leakScope === true
