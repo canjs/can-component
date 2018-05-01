@@ -271,6 +271,10 @@ var Component = Construct.extend(
 			// ## Scope
 			var teardownBindings;
 			if (setupBindings) {
+				// Check for the component being instantiated with a scope
+				if (componentTagData.scope !== undefined && componentTagData.scope instanceof Scope === false) {
+					componentTagData.scope = new Scope(componentTagData.scope);
+				}
 				var setupFn = componentTagData.setupBindings ||
 					function(el, callback, data){
 						return stacheBindings.behaviors.viewModel(el, componentTagData,

@@ -113,9 +113,9 @@ const myGreetingInstance = new MyGreeting();
 ```
 
 @param {Object} [options] Options for rendering the component, including
-`content` and `templates`.
+`content`, `scope`, and `templates`.
 
-In the example below, the `content` option is used to pass `LIGHT_DOM` into a
+The `content` option is used to pass `LIGHT_DOM` into a
 component when it is instantiated.
 
 ```js
@@ -135,7 +135,29 @@ This would make `helloWorldInstance.element` a fragment with the following struc
 <hello-world>Hello <em>mundo</em></hello-world>
 ```
 
-In the example below, the `templates` option is used to pass a partial into a
+You can also provide a `scope` with which the content should be rendered:
+
+```js
+const HelloWorld = Component.extend({
+  tag: "hello-world",
+  view: "Hello <content>world</content>"
+});
+
+const helloWorldInstance = new HelloWorld({
+  content: "<em>{{message}}</em>",
+  scope: {
+    message: "mundo"
+  }
+});
+```
+
+This would make `helloWorldInstance.element` a fragment with the following structure:
+
+```html
+<hello-world>Hello <em>mundo</em></hello-world>
+```
+
+The `templates` option is used to pass a partial into a
 component when it is instantiated.
 
 ```js
