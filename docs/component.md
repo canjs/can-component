@@ -112,10 +112,53 @@ const myGreetingInstance = new MyGreeting();
 // myGreetingInstance.viewModel has {subject: "world"}
 ```
 
-@param {Object} [options] Options for rendering the component, including `templates`.
+@param {Object} [options] Options for rendering the component, including
+`content`, `scope`, and `templates`.
 
-In the example below, a component that uses partials is defined and the partial is
-passed in when the component is instantiated.
+The `content` option is used to pass `LIGHT_DOM` into a
+component when it is instantiated.
+
+```js
+const HelloWorld = Component.extend({
+  tag: "hello-world",
+  view: "Hello <content>world</content>"
+});
+
+const helloWorldInstance = new HelloWorld({
+  content: "<em>mundo</em>"
+});
+```
+
+This would make `helloWorldInstance.element` a fragment with the following structure:
+
+```html
+<hello-world>Hello <em>mundo</em></hello-world>
+```
+
+You can also provide a `scope` with which the content should be rendered:
+
+```js
+const HelloWorld = Component.extend({
+  tag: "hello-world",
+  view: "Hello <content>world</content>"
+});
+
+const helloWorldInstance = new HelloWorld({
+  content: "<em>{{message}}</em>",
+  scope: {
+    message: "mundo"
+  }
+});
+```
+
+This would make `helloWorldInstance.element` a fragment with the following structure:
+
+```html
+<hello-world>Hello <em>mundo</em></hello-world>
+```
+
+The `templates` option is used to pass a partial into a
+component when it is instantiated.
 
 ```js
 const TodosPage = Component.extend({
@@ -123,13 +166,13 @@ const TodosPage = Component.extend({
   view: "<ul>{{#each(items)}} {{>item-partial}} {{/each}}</ul>",
   ViewModel: {
     items: {
-      default: ["eat", "sleep", "code"]
+      default: () => ["eat", "sleep", "code"]
     }
   }
 });
 
 const todosPageInstance = new TodosPage({
-  template: {
+  templates: {
     "item-partial": "<li>{{name}}</li>"
   }
 });

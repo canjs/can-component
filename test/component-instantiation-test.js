@@ -1,5 +1,7 @@
 var Component = require("can-component");
+var DefineMap = require("can-define/map/map");
 var QUnit = require("steal-qunit");
+var stache = require("can-stache");
 
 QUnit.module("can-component instantiation");
 
@@ -26,9 +28,96 @@ QUnit.test("Components can be instantiated with new", function() {
 	QUnit.equal(element.textContent, "Hello world", "element has correct text content after updating viewModel");
 });
 
+QUnit.test("Components can be instantiated with <content> - no scope", function() {
+	var ComponentConstructor = Component.extend({
+		tag: "new-instantiation-content-no-scope",
+		view: "Hello <content>{{message}}</content>",
+		ViewModel: {
+			message: {default: "world"}
+		}
+	});
+
+	var componentInstance = new ComponentConstructor({
+		content: stache("<em>mundo</em>")
+	});
+	var element = componentInstance.element;
+
+	// Basics look correct
+	QUnit.equal(element.innerHTML, "Hello <em>mundo</em>", "content is rendered");
+});
+
+QUnit.test("Components can be instantiated with <content> - with plain content and scope", function() {
+	var ComponentConstructor = Component.extend({
+		tag: "new-instantiation-plain-content-and-scope",
+		view: "Hello <content>{{message}}</content>",
+		ViewModel: {
+			message: {default: "world"}
+		}
+	});
+
+	var componentInstance = new ComponentConstructor({
+		content: "<em>{{message}}</em>",
+		scope: {
+			message: "mundo"
+		}
+	});
+	var element = componentInstance.element;
+
+	// Basics look correct
+	QUnit.equal(element.innerHTML, "Hello <em>mundo</em>", "content is rendered");
+});
+
+QUnit.test("Components can be instantiated with <content> - with scope - leakScope false", function() {
+	var ComponentConstructor = Component.extend({
+		leakScope: false,
+		tag: "new-instantiation-content-leakscope-false",
+		view: "Hello <content>{{message}}</content>",
+		ViewModel: {
+			message: {default: "world"}
+		}
+	});
+
+	var scopeVM = new DefineMap({});
+	var componentInstance = new ComponentConstructor({
+		content: "<em>{{message}}</em>",
+		scope: scopeVM
+	});
+	var element = componentInstance.element;
+
+	// Start off without the key defined in the scope; with leakScope false,
+	// no message will be rendered
+	QUnit.equal(element.innerHTML, "Hello <em></em>", "content is rendered with the provided scope");
+
+	// Set the key in the scope; now a message will be rendered
+	scopeVM.set("message", "mundo");
+	QUnit.equal(element.innerHTML, "Hello <em>mundo</em>", "content updates with the provided scope");
+});
+
+QUnit.test("Components can be instantiated with <content> - with scope - leakScope true", function() {
+	var ComponentConstructor = Component.extend({
+		leakScope: true,
+		tag: "new-instantiation-content-leakscope-true",
+		view: "Hello <content>{{message}}</content>",
+		ViewModel: {
+			message: {default: "world"}
+		}
+	});
+
+	var componentInstance = new ComponentConstructor({
+		content: "<em>{{scope.find('message')}}</em>",
+		scope: {
+			message: "mundo"
+		}
+	});
+	var element = componentInstance.element;
+
+	// leakScope works
+	QUnit.equal(element.innerHTML, "Hello <em>world</em>", "content is rendered with the component’s scope");
+});
+
 QUnit.test("Components can be instantiated with templates", function() {
 	var ComponentConstructor = Component.extend({
-		tag: "new-instantiation",
+		tag: "new-instantiation-templates",
 		view: "Hello {{message}} {{>message-input}}",
 		ViewModel: {
 			message: {default: "world"}

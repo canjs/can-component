@@ -237,6 +237,10 @@ var Component = Construct.extend(
 		// When a new component instance is created, setup bindings, render the view, etc.
 		setup: function(el, componentTagData) {
 			var component = this;
+			var options = {
+				helpers: {},
+				tags: {}
+			};
 			// If a view is not provided, we fall back to
 			// dynamic scoping regardless of settings.
 
@@ -256,6 +260,42 @@ var Component = Construct.extend(
 				el = document.createElement(this.tag);
 			}
 			this.element = el;
+
+			// Hook up any <content> with which the component was instantiated
+			var componentContent = componentTagData.content;
+			if (componentContent !== undefined) {
+				// Check if it’s already a renderer function or
+				// a string that needs to be parsed by stache
+				if (typeof componentContent === "function") {
+					componentTagData.subtemplate = componentContent;
+				} else if (typeof componentContent === "string") {
+					componentTagData.subtemplate = stache(componentContent);
+				}
+			}
+
+			// Check for the component being instantiated with a scope
+			var componentScope = componentTagData.scope;
+			if (componentScope !== undefined && componentScope instanceof Scope === false) {
+				componentTagData.scope = new Scope(componentScope);
+			}
+
+			// Hook up any templates with which the component was instantiated
+			var componentTemplates = componentTagData.templates;
+			if (componentTemplates !== undefined) {
+				options.partials = {};
+				for (var name in componentTemplates) {
+					var template = componentTemplates[name];
+
+					// Check if it’s already a renderer function or
+					// a string that needs to be parsed by stache
+					if (typeof template === "function") {
+						options.partials[name] = template;
+					} else if (typeof template === "string") {
+						var debugName = string.capitalize( string.camelize(name) ) + "Template";
+						options.partials[name] = stache(debugName, template);
+					}
+				}
+			}
 
 			// an array of teardown stuff that should happen when the element is removed
 			var teardownFunctions = [];
@@ -313,10 +353,7 @@ var Component = Construct.extend(
 			domData.set.call(el, "preventDataBindings", true);
 
 			// ## Helpers
-			var options = {
-					helpers: {},
-					tags: {}
-				};
+
 			// Setup helpers to callback with `this` as the component
 			if(this.helpers !== undefined) {
 				canReflect.eachKey(this.helpers, function(val, prop) {
@@ -388,23 +425,6 @@ var Component = Construct.extend(
 				options.tags.content = makeInsertionTagCallback('content',  componentTagData, shadowTagData, leakScope, function() {
 					return componentTagData.subtemplate;
 				});
-
-				// Hook up any templates with which the component was instantiated
-				if (componentTagData.templates) {
-					options.partials = {};
-					for (var name in componentTagData.templates) {
-						var template = componentTagData.templates[name];
-
-						// Check if it’s already a renderer function or
-						// a string that needs to be parsed by stache
-						if (typeof template === "function") {
-							options.partials[name] = template;
-						} else if (typeof template === "string") {
-							var debugName = string.capitalize( string.camelize(name) ) + "Template";
-							options.partials[name] = stache(debugName, template);
-						}
-					}
-				}
 
 				betweenTagsRenderer = this.constructor.renderer;
 				betweenTagsTagData = shadowTagData;
