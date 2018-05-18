@@ -12,6 +12,7 @@
 var ComponentControl = require("./control/control");
 var namespace = require('can-namespace');
 
+var Bind = require("can-bind");
 var Construct = require("can-construct");
 var stache = require("can-stache");
 var stacheBindings = require("can-stache-bindings");
@@ -19,6 +20,8 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 var canReflect = require("can-reflect");
+var canValue = require("can-value");
+var Observation = require("can-observation");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
 var DefineMap = require("can-define/map/map");
@@ -297,9 +300,91 @@ var Component = Construct.extend(
 				}
 			}
 
+			// Check for the component being instantiated with a viewModel
+			var initialViewModelData = {};
+			var componentInitVM = componentTagData.viewModel;
+			if (componentInitVM) {
+				delete componentTagData.viewModel;
+
+				// Update initialViewModelData with the plain values from the viewModel
+				for (var propName in componentInitVM) {
+					var value = componentInitVM[propName];
+					if (value instanceof Observation === false) {
+						initialViewModelData[propName] = value;
+					}
+				}
+
+				// This’ll be called when the bindings need to be turned on
+				componentTagData.setupBindings = function(el, makeViewModel, initialVMData) {
+					var componentVM = makeViewModel(initialVMData);
+					var onTeardowns = [];
+
+					// Loop through the props on the viewModel provided at initialization
+					for (var propName in componentInitVM) {
+						var child = componentInitVM[propName];
+
+						// Check for Observations; plain values are in initialVMData
+						if (child instanceof Observation) {
+
+							// Determine if this is a one-way or two-way binding
+							var childToParent = !!child[canSymbol.for("can.getValue")];
+							var parentToChild = !!child[canSymbol.for("can.setValue")];
+
+							// Create an observable for updating the viewModel passed to us
+							var parent;
+							if (childToParent) {
+								if (parentToChild) {
+									// Two-way binding, so we need to be able to get and set
+									// values on the component’s viewModel
+									parent = canValue.bind(componentVM, propName);
+								} else {
+									// One-way child-to-parent binding, so we only need to be able
+									// to set values on the component’s viewModel
+									parent = canValue.to(componentVM, propName);
+								}
+							} else {
+								// One-way parent-to-child binding, so we only need to be able
+								// to get values from the component’s viewModel
+								parent = canValue.from(componentVM, propName);
+							}
+
+							// Time to create the binding!
+							var canBinding = new Bind({
+								child: child,
+								childToParent: childToParent,
+								cycles: 0,
+								onInitDoNotUpdateChild: true,
+								onInitSetUndefinedParentIfChildIsDefined: true,
+								parent: parent,
+								parentToChild: parentToChild,
+								queue: "domUI",
+								sticky: childToParent && parentToChild ? "childSticksToParent" : undefined,
+
+								//!steal-remove-start
+								// For debugging: the names that will be assigned to the
+								// updateChild & updateParent functions within can-bind
+								updateChildName: "update " + canReflect.getName(child) + " of <" + el.nodeName.toLowerCase() + ">",
+								updateParentName: "update viewModel." + propName + " of <" + el.nodeName.toLowerCase() + ">"
+								//!steal-remove-end
+							});
+
+							// …and turn it on!
+							canBinding.start();
+
+							onTeardowns.push(canBinding.stop);
+						}
+					}
+					return function() {
+						// TODO: how should this be tested?
+						onTeardowns.forEach(function(onTeardown) {
+							onTeardown();
+						});
+					};
+				};
+			}
+
 			// an array of teardown stuff that should happen when the element is removed
 			var teardownFunctions = [];
-			var initialViewModelData = {};
 			var callTeardownFunctions = function() {
 					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
 						teardownFunctions[i]();

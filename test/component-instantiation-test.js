@@ -1,6 +1,8 @@
+var canValue = require("can-value");
 var Component = require("can-component");
 var DefineMap = require("can-define/map/map");
 var QUnit = require("steal-qunit");
+var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 
 QUnit.module("can-component instantiation");
@@ -141,4 +143,57 @@ QUnit.test("Components can be instantiated with templates", function() {
 	viewModel.message = "mundo";
 	QUnit.equal(element.textContent, "Hello mundo ", "element has correct text content after updating viewModel");
 	QUnit.equal(inputElement.value, "mundo", "input has correct value after updating viewModel");
+});
+
+QUnit.test("Components can be instantiated with viewModel", function() {
+
+	// These are the observables that would typically be outside the component’s scope
+	var bindMap = new SimpleMap({inner: new SimpleMap({key: "original bind value"})});
+	var fromMap = new SimpleMap({inner: new SimpleMap({key: "original from value"})});
+	var toMap = new SimpleMap({inner: new SimpleMap({key: "original to value"})});
+
+	// Our component
+	var ComponentConstructor = Component.extend({
+		tag: "new-instantiation-viewmodel",
+		view: "Hello",
+		ViewModel: {
+			fromChildProp: "string",
+			plainProp: "string",
+			toParentProp: "string",
+			twoWayProp: "string"
+		}
+	});
+
+	// Create a new instance of our component
+	var componentInstance = new ComponentConstructor({
+		// Pass the viewModel with a mix of plain and observable values
+		viewModel: {
+			plainProp: "plain value",
+			fromChildProp: canValue.from(fromMap, "inner.key"),
+			toParentProp: canValue.to(toMap, "inner.key"),
+			twoWayProp: canValue.bind(bindMap, "inner.key")
+		}
+	});
+	var element = componentInstance.element;
+	var viewModel = componentInstance.viewModel;
+
+	// Initial values are correct
+	QUnit.equal(viewModel.fromChildProp, "original from value", "fromChildProp init");
+	QUnit.equal(viewModel.plainProp, "plain value", "plainProp init");
+	QUnit.equal(viewModel.toParentProp, undefined, "toParentProp init");
+	QUnit.equal(viewModel.twoWayProp, "original bind value", "twoWayProp init");
+
+	// Updating the fromChildProp
+	fromMap.get("inner").set("key", "new from value");
+	QUnit.equal(viewModel.fromChildProp, "new from value", "viewModel updated after fromMap set");
+
+	// Updating the toParentProp
+	viewModel.toParentProp = "new to value";
+	QUnit.equal(toMap.get("inner").get("key"), "new to value", "toMap updated after viewModel set");
+
+	// Updating the twoWayProp
+	bindMap.get("inner").set("key", "new bind value");
+	QUnit.equal(viewModel.twoWayProp, "new bind value", "viewModel updated after bindMap set");
+	viewModel.twoWayProp = "newest bind value";
+	QUnit.equal(bindMap.get("inner").get("key"), "newest bind value", "bindMap updated after viewModel set");
 });
