@@ -5,8 +5,8 @@ An event called only on component’s elements before they are removed from the
 document if live binding is performing the removal. It can be listened to
 within a component’s [can-component.prototype.events] object or on a component
 element with [can-stache-bindings.event] bindings.  This is an additional
-special event only on component elements.  [can-util/dom/events/inserted/inserted]
-and [can-util/dom/events/removed/removed] events are available on all elements.
+special event only on component elements. Checkout [can-dom-mutate//events/events]
+for other mutation events.
 
 @signature `"{element} beforeremove": function(element, event)`
 

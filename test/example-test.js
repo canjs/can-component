@@ -12,7 +12,7 @@ var canViewModel = require("can-view-model");
 var domMutateNode = require('can-dom-mutate/node');
 var domMutateDomEvents = require('can-dom-mutate/dom-events');
 var insertedEvent = domMutateDomEvents.inserted;
-var canLog = require("can-util/js/log/log");
+var canLog = require("can-log");
 var queues = require("can-queues");
 
 var innerHTML = function(el) {

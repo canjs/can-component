@@ -32,8 +32,8 @@ require('can-view-model');
 require("can-define/list/list");
 
 var domData = require('can-dom-data-state');
-var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
-var string = require("can-util/js/string/string");
+var getChildNodes = require('can-child-nodes');
+var string = require("can-string");
 var domEvents = require('can-dom-events');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
