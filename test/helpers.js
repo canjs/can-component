@@ -59,11 +59,11 @@ var helpers = {
     	var insertionDisposal = domMutate.onNodeInsertion(div, function(){
 			insertionDisposal();
     		doc.body.removeChild(div);
-    		setTimeout(cb, 5);
+    		setTimeout(cb, 13);
     	});
         setTimeout(function(){
             domMutateNode.appendChild.call(doc.body, div);
-        }, 10);
+        }, 13);
     }
 };
 module.exports = helpers;
