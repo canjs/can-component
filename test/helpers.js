@@ -1,5 +1,6 @@
-var MUTATION_OBSERVER = require('can-util/dom/mutation-observer/mutation-observer');
-var DOCUMENT = require("can-util/dom/document/document");
+var MUTATION_OBSERVER = require('can-globals/mutation-observer/mutation-observer');
+var globals = require("can-globals");
+var DOCUMENT = require("can-globals/document/document");
 var makeDocument = require('can-vdom/make-document/make-document');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
@@ -20,16 +21,18 @@ var helpers = {
     },
     makeTest: function(name, doc, mutObs, test, qUnitTest) {
         var DOC = DOCUMENT();
-        var MUT_OBS = MUTATION_OBSERVER();
+        //var MUT_OBS = MUTATION_OBSERVER();
 
     	QUnit.module(name, {
     		setup: function () {
     			DOCUMENT(doc);
-    			MUTATION_OBSERVER(mutObs);
+                if(!mutObs) {
+                    globals.setKeyValue("MutationObserver", mutObs);
+                }
 
 
     			if(doc) {
-						this.document = doc;
+					this.document = doc;
     				this.fixture = doc.createElement("div");
     				doc.body.appendChild(this.fixture);
     			} else {
@@ -42,7 +45,7 @@ var helpers = {
     			setTimeout(function(){
     				start();
     				DOCUMENT(DOC);
-    				MUTATION_OBSERVER(MUT_OBS);
+    				globals.deleteKeyValue("MutationObserver");
     			}, 100);
     		}
     	});
