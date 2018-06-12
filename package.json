@@ -57,7 +57,7 @@
     "can-stache": "^4.1.0",
     "can-stache-bindings": "^4.0.3",
     "can-stache-key": "^1.0.0",
-    "can-string": "0.0.5",
+    "can-string": "<2.0.0",
     "can-symbol": "^1.4.1",
     "can-view-callbacks": "^4.0.0",
     "can-view-model": "^4.0.0",
