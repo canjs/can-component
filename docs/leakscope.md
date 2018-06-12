@@ -68,16 +68,13 @@ Component.extend( {
 ## Using outer scope in component view
 
 If `leakScope` is `true`, the __component’s view__ can read the data in the outer scope and will
-see `name: "John"` overwriting `name: "World"` in the component’s viewModel instance in the following example.
-
-If the following component is defined:
+[can-view-scope.prototype.find] `name: "John"` in the following example:
 
 ```js
 Component.extend( {
 	tag: "hello-world",
 	leakScope: true, // changed to true instead of the default value
-	ViewModel: { name: { value: "World" } },
-	view: stache( "Hello {{name}}" )
+	view: "Hello {{scope.find('name')}}"
 } );
 ```
 
@@ -102,8 +99,10 @@ If `leakScope` is `true` it will render:
 If `leakScope` is `false` it will render:
 
 ```html
-<hello-world>Hello World</hello-world>
+<hello-world>Hello </hello-world>
 ```
+
+[Play with this example on JS Bin.](https://bitovi-jsbin.jsbin.com/safigic/38/edit?js,output)
 
 ## Using viewModel in user content
 
@@ -117,8 +116,14 @@ Component.extend( {
 	tag: "hello-world",
 	leakScope: true, // changed to true instead of the default value
 	ViewModel: { name: { value: "World" } },
-	view: stache( "Hello <content />" )
+	view: "Hello <content />"
 } );
+```
+
+With this data in the outer scope:
+
+```js
+{ name: "John" }
 ```
 
 And used like so:
@@ -136,5 +141,7 @@ If `leakScope` is `true` it will render:
 If `leakScope` is `false` it will render:
 
 ```html
-<hello-world>Hello </hello-world>
+<hello-world>Hello John</hello-world>
 ```
+
+[Play with this example on JS Bin.](https://bitovi-jsbin.jsbin.com/safigic/40/edit?js,output)

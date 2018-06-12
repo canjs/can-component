@@ -6,7 +6,7 @@ var define = require("can-define");
 var DefineMap = require("can-define/map/map");
 
 var viewModel = require("can-view-model");
-var canDev = require("can-util/js/dev/dev");
+var canDev = require("can-log/dev/dev");
 var testHelpers = require("can-test-helpers");
 
 QUnit.module("can-component with can-define");

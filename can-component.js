@@ -32,8 +32,8 @@ require('can-view-model');
 require("can-define/list/list");
 
 var domData = require('can-dom-data-state');
-var getChildNodes = require('can-util/dom/child-nodes/child-nodes');
-var string = require("can-util/js/string/string");
+var getChildNodes = require('can-child-nodes');
+var string = require("can-string");
 var domEvents = require('can-dom-events');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
@@ -401,14 +401,14 @@ var Component = Construct.extend(
 				if (leakScope.intoShadowContent) {
 					// Give access to the component's data and the VM
 					shadowTagData = {
-						scope: componentTagData.scope.add(this.viewModel),
+						scope: componentTagData.scope.add(this.viewModel, { viewModel: true }),
 						options: options
 					};
 
 				} else { // lexical
 					// only give access to the VM
 					shadowTagData = {
-						scope: new Scope(this.viewModel),
+						scope: new Scope(this.viewModel, null, { viewModel: true }),
 						options: options
 					};
 				}

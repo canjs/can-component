@@ -442,7 +442,7 @@ adds “!” to the message every time `<hello-world>` is clicked:
 ```js
 Component.extend( {
 	tag: "hello-world",
-	view: stache( "<h1>{{message}}</h1>" ),
+	view: "<h1>{{message}}</h1>",
 	events: {
 		"click": function() {
 			const currentMessage = this.viewModel.message;
@@ -452,10 +452,9 @@ Component.extend( {
 } );
 ```
 
-Components have the ability to bind to special [can-util/dom/events/inserted/inserted],
-[can-component/beforeremove] and [can-util/dom/events/removed/removed] events
-that are called when a component’s tag has been inserted into,
-is about to removed, or was removed from the page.
+Use [can-component/connectedCallback] to listen to when an component's element
+is inserted or removed from the DOM.
+
 
 ### Helpers
 

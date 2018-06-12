@@ -5,7 +5,7 @@ var canReflect = require("can-reflect");
 var QUnit = require("steal-qunit");
 
 var viewModel = require("can-view-model");
-var canDev = require("can-util/js/dev/dev");
+var canDev = require("can-log/dev/dev");
 var testHelpers = require("can-test-helpers");
 
 QUnit.module("can-component can be rendered by can-stache");
