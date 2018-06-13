@@ -61,7 +61,7 @@
     "can-symbol": "^1.4.1",
     "can-view-callbacks": "^4.0.0",
     "can-view-model": "^4.0.0",
-    "can-view-nodelist": "^4.0.0",
+    "can-view-nodelist": "^4.1.0",
     "can-view-scope": "^4.0.0"
   },
   "devDependencies": {
