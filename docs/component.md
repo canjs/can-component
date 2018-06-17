@@ -101,94 +101,27 @@ const MyGreeting = Component.extend({
   tag: "my-greeting",
   view: "Hello {{subject}}",
   ViewModel: {
-    subject: {
-      default: "world"
-    }
+    subject: "string"
   }
 });
 
-const myGreetingInstance = new MyGreeting();
-// myGreetingInstance.element is <my-greeting>Hello world</my-greeting>
-// myGreetingInstance.viewModel has {subject: "world"}
-```
-
-@param {Object} [options] Options for rendering the component, including
-`content`, `scope`, and `templates`.
-
-The `content` option is used to pass `LIGHT_DOM` into a
-component when it is instantiated.
-
-```js
-const HelloWorld = Component.extend({
-  tag: "hello-world",
-  view: "Hello <content>world</content>"
-});
-
-const helloWorldInstance = new HelloWorld({
-  content: "<em>mundo</em>"
-});
-```
-
-This would make `helloWorldInstance.element` a fragment with the following structure:
-
-```html
-<hello-world>Hello <em>mundo</em></hello-world>
-```
-
-You can also provide a `scope` with which the content should be rendered:
-
-```js
-const HelloWorld = Component.extend({
-  tag: "hello-world",
-  view: "Hello <content>world</content>"
-});
-
-const helloWorldInstance = new HelloWorld({
-  content: "<em>{{message}}</em>",
-  scope: {
-    message: "mundo"
+const myGreetingInstance = new MyGreeting({
+  viewModel: {
+    subject: "friend"
   }
 });
+// myGreetingInstance.element is <my-greeting>Hello friend</my-greeting>
+// myGreetingInstance.viewModel has {subject: "friend"}
 ```
 
-This would make `helloWorldInstance.element` a fragment with the following structure:
+See the [Programmatically instantiating a component](#Programmaticallyinstantiatingacomponent)
+section for details.
 
-```html
-<hello-world>Hello <em>mundo</em></hello-world>
-```
-
-The `templates` option is used to pass a partial into a
-component when it is instantiated.
-
-```js
-const TodosPage = Component.extend({
-  tag: "todos-page",
-  view: "<ul>{{#each(items)}} {{>item-partial}} {{/each}}</ul>",
-  ViewModel: {
-    items: {
-      default: () => ["eat", "sleep", "code"]
-    }
-  }
-});
-
-const todosPageInstance = new TodosPage({
-  templates: {
-    "item-partial": "<li>{{name}}</li>"
-  }
-});
-```
-
-This would make `todosPageInstance.element` a fragment with the following structure:
-
-```html
-<todos-page>
-  <ul>
-    <li>eat</li>
-    <li>sleep</li>
-    <li>code</li>
-  </ul>
-</todos-page>
-```
+@param {Object} [options] Options for rendering the component, including:
+- `content`: similar to the [can-component/content] tag, the `LIGHT_DOM` to be rendered between the component’s starting and ending tags; can either be a string (which will be parsed by [can-stache] by default) or a renderer function (i.e. what’s returned by [can-stache]).
+- `scope`: an object that is the scope with which the content should be rendered.
+- `templates`: an object that has keys that are partial names and values that are either plain strings (parsed by [can-stache] by default) or renderer functions.
+- `viewModel`: an object with values to bind to the component’s view model.
 
   @release 4.3
 
@@ -250,6 +183,10 @@ you'll render a view with many custom tags like:
   </ui-panel>
 </srchr-app>
 ```
+
+You can also create an instance of a component without rendering it in the page.
+See the [Programmatically instantiating a component](#Programmaticallyinstantiatingacomponent)
+section for details.
 
 ### Defining a Component
 
@@ -482,6 +419,169 @@ Component.extend( {
 
 Generally speaking, helpers should only be used for view related functionality, like
 formatting a date.  Data related methods should be in the view model or models.
+
+## Programmatically instantiating a component
+
+You can also instantiate new component instances programmatically by using the
+component’s constructor function.
+
+The following defines a `MyGreeting` component and creates a `my-greeting`
+element by calling `new` on the component’s constructor function:
+
+```js
+import Component from "can-component";
+
+const MyGreeting = Component.extend({
+  tag: "my-greeting",
+  view: "Hello {{subject}}",
+  ViewModel: {
+    subject: "string"
+  }
+});
+
+const myGreetingInstance = new MyGreeting({
+  viewModel: {
+    subject: "friend"
+  }
+});
+// myGreetingInstance.element is <my-greeting>Hello friend</my-greeting>
+// myGreetingInstance.viewModel has {subject: "friend"}
+```
+
+In the example above, the `viewModel` is passed in as an option to the
+component’s constructor function. Read below for details on all the options.
+
+### content
+
+The `content` option is used to pass `LIGHT_DOM` into a component when it is
+instantiated, similar to the [can-component/content] tag.
+
+```js
+import Component from "can-component";
+
+const HelloWorld = Component.extend({
+  tag: "hello-world",
+  view: "Hello <content>world</content>"
+});
+
+const helloWorldInstance = new HelloWorld({
+  content: "<em>mundo</em>"
+});
+```
+
+This would make `helloWorldInstance.element` a fragment with the following structure:
+
+```html
+<hello-world>Hello <em>mundo</em></hello-world>
+```
+
+### scope
+
+You can also provide a `scope` with which the content should be rendered:
+
+```js
+import Component from "can-component";
+
+const HelloWorld = Component.extend({
+  tag: "hello-world",
+  view: "Hello <content>world</content>"
+});
+
+const helloWorldInstance = new HelloWorld({
+  content: "<em>{{message}}</em>",
+  scope: {
+    message: "mundo"
+  }
+});
+```
+
+This would make `helloWorldInstance.element` a fragment with the following structure:
+
+```html
+<hello-world>Hello <em>mundo</em></hello-world>
+```
+
+### templates
+
+The `templates` option is used to pass a partial into a
+component when it is instantiated.
+
+```js
+import Component from "can-component";
+
+const TodosPage = Component.extend({
+  tag: "todos-page",
+  view: "<ul>{{#each(items)}} {{>item-partial}} {{/each}}</ul>",
+  ViewModel: {
+    items: {
+      default: () => ["eat", "sleep", "code"]
+    }
+  }
+});
+
+const todosPageInstance = new TodosPage({
+  templates: {
+    "item-partial": "<li>{{name}}</li>"
+  }
+});
+```
+
+This would make `todosPageInstance.element` a fragment with the following structure:
+
+```html
+<todos-page>
+  <ul>
+    <li>eat</li>
+    <li>sleep</li>
+    <li>code</li>
+  </ul>
+</todos-page>
+```
+
+### viewModel
+
+The `viewModel` option is used to create the component’s view model and bind to
+it. For example:
+
+```js
+import canValue from "can-value";
+import Component from "can-component";
+import DefineMap from "can-define/map/map";
+
+const appVM = new DefineMap({
+  association: "friend"
+});
+
+const MyGreeting = Component.extend({
+  tag: "my-greeting",
+  view: "{{greeting}} {{subject}}",
+  ViewModel: {
+    greeting: "string",
+    subject: "string"
+  }
+});
+
+const myGreetingInstance = new MyGreeting({
+  viewModel: {
+    greeting: "Hello",
+    subject: canValue.bind(appVM, "association")
+  }
+});
+// myGreetingInstance.element is <my-greeting>Hello friend</my-greeting>
+// myGreetingInstance.viewModel has {subject: "friend"}
+```
+
+The way the component is instantiated above is similar to this example below,
+assuming it’s rendered by [can-stache] with `appVM` as the current scope:
+
+```html
+<my-greeting greeting:raw="Hello" subject:bind="association"></my-greeting>
+```
+
+You can recreate one-way and two-way bindings with [can-value], which has
+[can-value.bind], [can-value.from], and [can-value.to] methods for creating
+two-way, one-way parent-to-child, and one-way child-to-parent bindings,
+respectively.
 
 ## Examples
 

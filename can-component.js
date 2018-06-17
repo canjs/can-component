@@ -20,8 +20,8 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 var canReflect = require("can-reflect");
-var canValue = require("can-value");
-var Observation = require("can-observation");
+var observeReader = require("can-stache-key");
+var SettableObservable = require("can-simple-observable/setter/setter");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
 var DefineMap = require("can-define/map/map");
@@ -42,6 +42,12 @@ var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require('can-symbol');
 var DOCUMENT = require('can-globals/document/document');
+
+// Symbols
+var getValueSymbol = canSymbol.for("can.getValue");
+var setValueSymbol = canSymbol.for("can.setValue");
+var viewInsertSymbol = canSymbol.for("can.viewInsert");
+var viewModelSymbol = canSymbol.for('can.viewModel');
 
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
@@ -139,6 +145,85 @@ function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leak
 			// Restore the proper tag function so it could potentially be used again (as in lists)
 			options.tags[tagName] = hookupFunction;
 		}
+	};
+}
+
+// Helper function for taking a viewModel passed into a component’s constructor
+// function and returning a function that can be used to set up the bindings
+function getSetupFunctionForComponentVM(componentInitVM) {
+	// componentInitVM is the viewModel in `new ComponentConstructor({ viewModel: {...} })`
+	return function(el, makeViewModel, initialVMData) {
+		var onCompleteBindings = [];
+		var onTeardowns = [];
+		var viewModel;// This will be created after getting all the initial values
+
+		// Loop through all the props to create the new binding and get the initial
+		// values (so the viewModel can be created with the initial values)
+		canReflect.eachKey(componentInitVM, function(parent, propName) {
+			var canGetParentValue = !!parent[getValueSymbol];
+
+			// If we can get or set the value, then we’ll create a binding
+			if (canGetParentValue === true || parent[setValueSymbol]) {
+
+				// Create an observable for reading/writing the viewModel
+				var keysToRead = observeReader.reads(propName);
+				var child = new SettableObservable(
+					function() {
+						return observeReader.read(viewModel, keysToRead).value;
+					},
+					function(newValue) {
+						canReflect.setKeyValue(viewModel, propName, newValue);
+					}
+				);
+
+				// Create the binding similar to what’s in can-stache-bindings
+				var canBinding = new Bind({
+					child: child,
+					parent: parent,
+					queue: "domUI",
+
+					//!steal-remove-start
+					// For debugging: the names that will be assigned to the updateChild
+					// and updateParent functions within can-bind
+					updateChildName: "update viewModel." + propName + " of <" + el.nodeName.toLowerCase() + ">",
+					updateParentName: "update " + canReflect.getName(parent) + " of <" + el.nodeName.toLowerCase() + ">"
+					//!steal-remove-end
+				});
+
+				// Immediately bind to the parent
+				canBinding.startParent();
+
+				// If we can get the value, we want to instantiate the viewModel with it
+				if (canGetParentValue === true) {
+					initialVMData[propName] = canBinding.parentValue;
+				}
+
+				// Like can-stache-bindings, delay starting the rest of the binding
+				onCompleteBindings.push(canBinding.start);
+
+				// We’ll want to turn off the bindings when the component is destroyed
+				onTeardowns.push(canBinding.stop);
+
+			} else {
+				// Can’t get or set the value, so assume it’s not an observable
+				initialVMData[propName] = parent;
+			}
+		});
+
+		// Now that we have all the initial values, create the component’s viewModel
+		viewModel = makeViewModel(initialVMData);
+
+		// Call start() on all the bindings
+		for (var i = 0, len = onCompleteBindings.length; i < len; i++) {
+			onCompleteBindings[i]();
+		}
+
+		// Return a teardown function
+		return function() {
+			onTeardowns.forEach(function(onTeardown) {
+				onTeardown();
+			});
+		};
 	};
 }
 
@@ -300,107 +385,33 @@ var Component = Construct.extend(
 				}
 			}
 
-			// Check for the component being instantiated with a viewModel
-			var initialViewModelData = {};
-			var componentInitVM = componentTagData.viewModel;
-			if (componentInitVM) {
-				delete componentTagData.viewModel;
-
-				// Update initialViewModelData with the plain values from the viewModel
-				for (var propName in componentInitVM) {
-					var value = componentInitVM[propName];
-					if (value instanceof Observation === false) {
-						initialViewModelData[propName] = value;
-					}
-				}
-
-				// This’ll be called when the bindings need to be turned on
-				componentTagData.setupBindings = function(el, makeViewModel, initialVMData) {
-					var componentVM = makeViewModel(initialVMData);
-					var onTeardowns = [];
-
-					// Loop through the props on the viewModel provided at initialization
-					for (var propName in componentInitVM) {
-						var child = componentInitVM[propName];
-
-						// Check for Observations; plain values are in initialVMData
-						if (child instanceof Observation) {
-
-							// Determine if this is a one-way or two-way binding
-							var childToParent = !!child[canSymbol.for("can.getValue")];
-							var parentToChild = !!child[canSymbol.for("can.setValue")];
-
-							// Create an observable for updating the viewModel passed to us
-							var parent;
-							if (childToParent) {
-								if (parentToChild) {
-									// Two-way binding, so we need to be able to get and set
-									// values on the component’s viewModel
-									parent = canValue.bind(componentVM, propName);
-								} else {
-									// One-way child-to-parent binding, so we only need to be able
-									// to set values on the component’s viewModel
-									parent = canValue.to(componentVM, propName);
-								}
-							} else {
-								// One-way parent-to-child binding, so we only need to be able
-								// to get values from the component’s viewModel
-								parent = canValue.from(componentVM, propName);
-							}
-
-							// Time to create the binding!
-							var canBinding = new Bind({
-								child: child,
-								childToParent: childToParent,
-								cycles: 0,
-								onInitDoNotUpdateChild: true,
-								onInitSetUndefinedParentIfChildIsDefined: true,
-								parent: parent,
-								parentToChild: parentToChild,
-								queue: "domUI",
-								sticky: childToParent && parentToChild ? "childSticksToParent" : undefined,
-
-								//!steal-remove-start
-								// For debugging: the names that will be assigned to the
-								// updateChild & updateParent functions within can-bind
-								updateChildName: "update " + canReflect.getName(child) + " of <" + el.nodeName.toLowerCase() + ">",
-								updateParentName: "update viewModel." + propName + " of <" + el.nodeName.toLowerCase() + ">"
-								//!steal-remove-end
-							});
-
-							// …and turn it on!
-							canBinding.start();
-
-							onTeardowns.push(canBinding.stop);
-						}
-					}
-					return function() {
-						// TODO: how should this be tested?
-						onTeardowns.forEach(function(onTeardown) {
-							onTeardown();
-						});
-					};
-				};
-			}
-
 			// an array of teardown stuff that should happen when the element is removed
 			var teardownFunctions = [];
+			var initialViewModelData = {};
 			var callTeardownFunctions = function() {
 					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
 						teardownFunctions[i]();
 					}
 				};
-			var setupBindings = !domData.get.call(el, "preventDataBindings");
+			var preventDataBindings = domData.get.call(el, "preventDataBindings");
 			var viewModel, frag;
 
 			// ## Scope
 			var teardownBindings;
-			if (setupBindings) {
-				var setupFn = componentTagData.setupBindings ||
-					function(el, callback, data){
-						return stacheBindings.behaviors.viewModel(el, componentTagData,
-																											callback, data);
+			if (preventDataBindings) {
+				viewModel = el[viewModelSymbol];
+			} else {// Set up the bindings
+				var setupFn;
+				if (componentTagData.setupBindings) {
+					setupFn = componentTagData.setupBindings;
+				} else if (componentTagData.viewModel) {
+					// Component is being instantiated with a viewModel
+					setupFn = getSetupFunctionForComponentVM(componentTagData.viewModel);
+				} else {
+					setupFn = function(el, callback, data) {
+						return stacheBindings.behaviors.viewModel(el, componentTagData, callback, data);
 					};
+				}
 				teardownBindings = setupFn(el, function(initialViewModelData) {
 
 					var ViewModel = component.constructor.ViewModel,
@@ -427,14 +438,12 @@ var Component = Construct.extend(
 					viewModel = viewModelInstance;
 					return viewModelInstance;
 				}, initialViewModelData);
-			} else {
-				viewModel = el[canSymbol.for('can.viewModel')];
 			}
 
 			// Set `viewModel` to `this.viewModel` and set it to the element's `data` object as a `viewModel` property
 			this.viewModel = viewModel;
 
-			el[canSymbol.for('can.viewModel')] = viewModel;
+			el[viewModelSymbol] = viewModel;
 			domData.set.call(el, "preventDataBindings", true);
 
 			// ## Helpers
@@ -570,7 +579,6 @@ var Component = Construct.extend(
 	});
 
 // This adds support for components being rendered as values in stache templates
-var viewInsertSymbol = canSymbol.for("can.viewInsert");
 Component.prototype[viewInsertSymbol] = function(viewData) {
 	viewData.nodeList.newDeepChildren.push(this.nodeList);
 	return this.element;
