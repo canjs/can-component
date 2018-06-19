@@ -97,31 +97,49 @@ The following defines a `MyGreeting` component and creates a `my-greeting`
 element by calling `new` on the component’s constructor function:
 
 ```js
-const MyGreeting = Component.extend({
-  tag: "my-greeting",
-  view: "Hello {{subject}}",
+const HelloWorld = Component.extend({
+  tag: "hello-world",
+  view: "Hello <content>world</content> <ul>{{#each(items)}} {{>item-partial}} {{/each}}</ul>",
   ViewModel: {
-    subject: "string"
+    items: {
+      default: () => []
+    }
   }
 });
 
-const myGreetingInstance = new MyGreeting({
+// Create a new instance of our component
+const componentInstance = new HelloWorld({
+
+  // can-stache template to replace any <content> elements in the component’s view
+  content: "<em>{{message}}</em>",
+
+  // scope with which to render the <content>
+  scope: {
+    message: "friend"
+  },
+
+  // templates made available to the component’s view
+  templates: {
+    "item-partial": "<li>{{this}}</li>"
+  },
+
+  // values with which to initialize the component’s view model
   viewModel: {
-    subject: "friend"
+    items: ["eat", "sleep", "code"]
   }
 });
-// myGreetingInstance.element is <my-greeting>Hello friend</my-greeting>
-// myGreetingInstance.viewModel has {subject: "friend"}
+// myGreetingInstance.element is <my-greeting>Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li>  <li>code</li> </ul></my-greeting>
+// myGreetingInstance.viewModel has {items: ["eat", "sleep", "code"]}
 ```
 
 See the [Programmatically instantiating a component](#Programmaticallyinstantiatingacomponent)
 section for details.
 
 @param {Object} [options] Options for rendering the component, including:
-- `content`: similar to the [can-component/content] tag, the `LIGHT_DOM` to be rendered between the component’s starting and ending tags; can either be a string (which will be parsed by [can-stache] by default) or a renderer function (i.e. what’s returned by [can-stache]).
-- `scope`: an object that is the scope with which the content should be rendered.
-- `templates`: an object that has keys that are partial names and values that are either plain strings (parsed by [can-stache] by default) or renderer functions.
-- `viewModel`: an object with values to bind to the component’s view model.
+- **content** `{String|Function}`: similar to the [can-component/content] tag, the `LIGHT_DOM` to be rendered between the component’s starting and ending tags; can either be a string (which will be parsed by [can-stache] by default) or a [can-stache.renderer] function.
+- **scope** `{Object}`: an object that is the scope with which the content should be rendered.
+- **templates** `{Object<String,String|Function>}`: an object that has keys that are partial names and values that are either plain strings (parsed by [can-stache] by default) or [can-stache.renderer] functions.
+- **viewModel** `{Object}`: an object with values to bind to the component’s view model.
 
   @release 4.3
 
@@ -423,7 +441,10 @@ formatting a date.  Data related methods should be in the view model or models.
 ## Programmatically instantiating a component
 
 You can also instantiate new component instances programmatically by using the
-component’s constructor function.
+component’s constructor function. This is useful when you:
+
+- have complex logic for switching between different components (e.g. routing)
+- want to create components without adding them to the page (e.g. testing)
 
 The following defines a `MyGreeting` component and creates a `my-greeting`
 element by calling `new` on the component’s constructor function:
@@ -449,7 +470,10 @@ const myGreetingInstance = new MyGreeting({
 ```
 
 In the example above, the `viewModel` is passed in as an option to the
-component’s constructor function. Read below for details on all the options.
+component’s constructor function.
+
+In addition to `viewModel`, there are `templates`, `scope`, and `content`
+options. Read below for details on all the options.
 
 ### content
 
@@ -544,9 +568,9 @@ The `viewModel` option is used to create the component’s view model and bind t
 it. For example:
 
 ```js
-import canValue from "can-value";
 import Component from "can-component";
 import DefineMap from "can-define/map/map";
+import value from "can-value";
 
 const appVM = new DefineMap({
   association: "friend"
@@ -564,7 +588,7 @@ const MyGreeting = Component.extend({
 const myGreetingInstance = new MyGreeting({
   viewModel: {
     greeting: "Hello",
-    subject: canValue.bind(appVM, "association")
+    subject: value.bind(appVM, "association")
   }
 });
 // myGreetingInstance.element is <my-greeting>Hello friend</my-greeting>
@@ -582,6 +606,58 @@ You can recreate one-way and two-way bindings with [can-value], which has
 [can-value.bind], [can-value.from], and [can-value.to] methods for creating
 two-way, one-way parent-to-child, and one-way child-to-parent bindings,
 respectively.
+
+```js
+const appVM = new DefineMap({
+  family: new DefineMap({
+    first: "Milo",
+    last: "Flanders"
+  })
+});
+
+const NameComponent = Component.extend({
+  tag: "name-component",
+  view: "{{fullName}}",
+  ViewModel: {
+    givenName: "string",
+    familyName: "string",
+    get fullName() {
+      return this.givenName + " " + this.familyName;
+    }
+  }
+});
+
+const componentInstance = new NameComponent({
+  viewModel: {
+    givenName: value.from(appVM, "family.first"),
+    familyName: value.bind(appVM, "family.last"),
+    fullName: value.to(appVM, "family.full"),
+  }
+});
+```
+
+The way the component is instantiated above is similar to this example below,
+assuming it’s rendered by [can-stache] with `appVM` as the current scope:
+
+```html
+<my-greeting
+  givenName:from="family.first"
+  familyName:bind="family.last"
+  fullName:to="family.full"
+></my-greeting>
+```
+
+This will result in an `appVM` with the following data:
+
+```js
+{
+  family: {
+    first: "Milo",
+    full: "Milo Flanders",
+    last: "Flanders"
+  }
+}
+```
 
 ## Examples
 

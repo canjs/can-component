@@ -1,9 +1,9 @@
-var canValue = require("can-value");
 var Component = require("can-component");
 var DefineMap = require("can-define/map/map");
 var QUnit = require("steal-qunit");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
+var value = require("can-value");
 
 QUnit.module("can-component instantiation");
 
@@ -169,9 +169,9 @@ QUnit.test("Components can be instantiated with viewModel", function() {
 		// Pass the viewModel with a mix of plain and observable values
 		viewModel: {
 			plainProp: "plain value",
-			fromChildProp: canValue.from(fromMap, "inner.key"),
-			toParentProp: canValue.to(toMap, "inner.key"),
-			twoWayProp: canValue.bind(bindMap, "inner.key")
+			fromChildProp: value.from(fromMap, "inner.key"),
+			toParentProp: value.to(toMap, "inner.key"),
+			twoWayProp: value.bind(bindMap, "inner.key")
 		}
 	});
 	var element = componentInstance.element;
@@ -196,4 +196,90 @@ QUnit.test("Components can be instantiated with viewModel", function() {
 	QUnit.equal(viewModel.twoWayProp, "new bind value", "viewModel updated after bindMap set");
 	viewModel.twoWayProp = "newest bind value";
 	QUnit.equal(bindMap.get("inner").get("key"), "newest bind value", "bindMap updated after viewModel set");
+});
+
+QUnit.test("Components can be instantiated with all options", function() {
+
+	// Our component
+	var HelloWorld = Component.extend({
+		tag: "hello-world",
+		view: "Hello <content>world</content> <ul>{{#each(items)}} {{>item-partial}} {{/each}}</ul>",
+		ViewModel: {
+			items: {
+				default: function() {
+					return [];
+				}
+			}
+		}
+	});
+
+	// Create a new instance of our component
+	var componentInstance = new HelloWorld({
+		content: "<em>{{message}}</em>",
+		scope: {
+			message: "friend"
+		},
+		templates: {
+			"item-partial": "<li>{{this}}</li>"
+		},
+		viewModel: {
+			items: ["eat", "sleep", "code"]
+		}
+	});
+	var element = componentInstance.element;
+	var viewModel = componentInstance.viewModel;
+
+	// Basics look correct
+	QUnit.equal(
+		element.innerHTML,
+		"Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li>  <li>code</li> </ul>",
+		"element renders correctly"
+	);
+	QUnit.equal(viewModel.items.length, 3, "viewModel has items");
+});
+
+QUnit.test("Component binding instantiation works as documented", function() {
+
+	// These are the observables that would typically be outside the component’s scope
+	var appVM = new SimpleMap({
+		family: new SimpleMap({
+			first: "Milo",
+			last: "Flanders"
+		})
+	});
+
+	// Our component
+	var NameComponent = Component.extend({
+		tag: "name-component",
+		view: "{{fullName}}",
+		ViewModel: {
+			givenName: "string",
+			familyName: "string",
+			get fullName() {
+				return this.givenName + " " + this.familyName;
+			}
+		}
+	});
+
+	// Create a new instance of our component
+	var componentInstance = new NameComponent({
+	  viewModel: {
+	    givenName: value.from(appVM, "family.first"),
+	    familyName: value.bind(appVM, "family.last"),
+	    fullName: value.to(appVM, "family.full")
+	  }
+	});
+	var element = componentInstance.element;
+	var viewModel = componentInstance.viewModel;
+
+	// Initial component values are correct
+	QUnit.equal(viewModel.familyName, "Flanders", "component “bind” prop is correct");
+	QUnit.equal(viewModel.givenName, "Milo", "component “from” prop is correct");
+	QUnit.equal(viewModel.fullName, "Milo Flanders", "component “to” prop is correct");
+
+	// Initial map values are correct
+	var family = appVM.get("family");
+	QUnit.equal(family.get("last"), "Flanders", "map “bind” prop is correct");
+	QUnit.equal(family.get("first"), "Milo", "map “from” prop is correct");
+	QUnit.equal(family.get("full"), "Milo Flanders", "map “to” prop is correct");
 });
