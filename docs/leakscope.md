@@ -19,11 +19,13 @@ The default value is `false`.
 To change leakScope from the default:
 
 ```js
+import Component from "can-component";
+
 Component.extend( {
 	tag: "my-component",
 	leakScope: true,
-	ViewModel: { message: { value: "Hello World!" } },
-	view: stache( "{{message}}" )
+	ViewModel: { message: { default: "Hello World!" } },
+	view: "{{message}}"
 } );
 ```
 
@@ -59,7 +61,7 @@ Finally, if `<hello-world>` is defined like:
 ```js
 Component.extend( {
 	tag: "hello-world",
-	view: stache( "{{greeting}} <content/>{{exclamation}}" )
+	view: "{{greeting}} <content/>{{exclamation}}"
 } );
 ```
 
@@ -115,7 +117,7 @@ If the following component is defined:
 Component.extend( {
 	tag: "hello-world",
 	leakScope: true, // changed to true instead of the default value
-	ViewModel: { name: { value: "World" } },
+	ViewModel: { name: { default: "World" } },
 	view: "Hello <content />"
 } );
 ```

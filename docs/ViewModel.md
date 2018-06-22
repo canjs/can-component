@@ -7,14 +7,17 @@ Provides or describes a constructor function that provides values and methods
 to the component’s [can-component::view view]. The constructor function
 is initialized with values specified by the component element’s [can-stache-bindings data bindings].
 
-@option {function} A constructor function usually defined by [can-define/map/map.extend DefineMap.extend] or
+@option {function} A constructor function (usually defined by [can-define/map/map.extend DefineMap.extend] or
 [can-map Map.extend] that will be used to create a new observable instance accessible by
-the component’s [can-component::view].
+the component’s [can-component::view]) or an Object that will be passed to [can-define/map/map.extend DefineMap.extend].
 
 For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
 be created:
 
 ```js
+import Component from "can-component";
+import DefineMap from "can-define/map/map";
+
 const MyTagViewModel = DefineMap.extend( "MyTagViewModel", {
 	message: "string"
 } );
@@ -22,7 +25,21 @@ const MyTagViewModel = DefineMap.extend( "MyTagViewModel", {
 Component.extend( {
 	tag: "my-tag",
 	ViewModel: MyTagViewModel,
-	view: stache( "<h1>{{message}}</h1>" )
+	view: "<h1>{{message}}</h1>"
+} );
+```
+
+The example above can be abbreviated to:
+
+```js
+import Component from "can-component";
+
+Component.extend( {
+	tag: "my-tag",
+	ViewModel: {
+		message: "string"
+	},
+	view: "<h1>{{message}}</h1>"
 } );
 ```
 
@@ -53,8 +70,8 @@ component shows the current page number based off a `limit` and `offset` value:
 
 ```js
 const MyPaginateViewModel = DefineMap.extend( {
-	offset: { value: 0 },
-	limit: { value: 20 },
+	offset: { default: 0 },
+	limit: { default: 20 },
 	get page() {
 		return Math.floor( this.offset / this.limit ) + 1;
 	}
@@ -63,7 +80,7 @@ const MyPaginateViewModel = DefineMap.extend( {
 Component.extend( {
 	tag: "my-paginate",
 	ViewModel: MyPaginateViewModel,
-	view: stache( "Page {{page}}." )
+	view: "Page {{page}}."
 } );
 ```
 
@@ -110,13 +127,13 @@ The following does the same as above:
 Component.extend( {
 	tag: "my-paginate",
 	ViewModel: {
-		offset: { value: 0 },
-		limit: { value: 20 },
+		offset: { default: 0 },
+		limit: { default: 20 },
 		get page() {
 			return Math.floor( this.offset / this.limit ) + 1;
 		}
 	},
-	view: stache( "Page {{page}}." )
+	view: "Page {{page}}."
 } );
 ```
 
@@ -143,13 +160,13 @@ The following component requires an `offset` and `limit`:
 Component.extend( {
 	tag: "my-paginate",
 	ViewModel: {
-		offset: { value: 0 },
-		limit: { value: 20 },
+		offset: { default: 0 },
+		limit: { default: 20 },
 		get page() {
 			return Math.floor( this.offset / this.limit ) + 1;
 		}
 	},
-	view: stache( "Page {{page}}." )
+	view: "Page {{page}}."
 } );
 ```
 
@@ -218,21 +235,19 @@ from a view. For example, we can make `<my-paginate>` elements include a next
 button that calls the ViewModel’s `next` method like:
 
 ```js
-const ViewModel = DefineMap.extend( {
-	offset: { value: 0 },
-	limit: { value: 20 },
-	next: function() {
-		this.offset = this.offset + this.limit;
-	},
-	get page() {
-		return Math.floor( this.offset / this.limit ) + 1;
-	}
-} );
-
 Component.extend( {
 	tag: "my-paginate",
-	ViewModel: ViewModel,
-	view: stache( "Page {{page}} <button on:click='next()'>Next</button>" )
+	ViewModel: {
+		offset: { default: 0 },
+		limit: { default: 20 },
+		next: function() {
+			this.offset = this.offset + this.limit;
+		},
+		get page() {
+			return Math.floor( this.offset / this.limit ) + 1;
+		}
+	},
+	view: "Page {{page}} <button on:click='next()'>Next</button>"
 } );
 ```
 
@@ -248,7 +263,7 @@ dispatches a `"close"` event when its close method is called:
 ```js
 Component.extend( {
 	tag: "player-edit",
-	view: stache( $( "#player-edit-stache" ).html() ),
+	view: document.getElementById( "player-edit-stache" ).innerHTML,
 	ViewModel: DefineMap.extend( {
 		player: Player,
 		close: function() {

@@ -27,4 +27,4 @@ const Person = DefineMap.extend( {
 
 `connectedCallback` is named as such to match the [web components](https://developers.google.com/web/fundamentals/web-components/customelements#reactions) spec for the same concept.
 
-  @return {Function|undefined} The `disconnectedCallback` function to be called during teardown. Defined in the same closure scope as setup, it's used to tear down anything that was set up during the `connectedCallback` lifecycle hook.
+	@return {Function|undefined} The `disconnectedCallback` function to be called during teardown. Defined in the same closure scope as setup, it's used to tear down anything that was set up during the `connectedCallback` lifecycle hook.

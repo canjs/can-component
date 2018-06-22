@@ -4,12 +4,28 @@
 Provides a view to render directly within the component’s element. The view is rendered with the
 component’s [can-component::ViewModel] instance.  `<content/>` elements within the view are replaced by the source elements within the component’s tag.
 
-@option {can-stache.renderer} A [can-stache.renderer] returned by [can-stache]. For example:
+@option {can-stache.renderer} A [can-stache.renderer] returned by [can-stache] or a String that will be passed to [can-stache].
+
+For example:
 
 ```js
-Component( {
+import Component from "can-component";
+import stache from "can-stache";
+
+Component.extend( {
 	tag: "my-tabs",
 	view: stache( "<ul>{{#panels}}<li>{{title}}</li> /* ... */" )
+} );
+```
+
+…can be written as:
+
+```js
+import Component from "can-component";
+
+Component.extend( {
+	tag: "my-tabs",
+	view: "<ul>{{#panels}}<li>{{title}}</li> /* ... */"
 } );
 ```
 
@@ -38,14 +54,14 @@ The following explains how each part works:
 __Component:__
 
 ```js
-Component( {
+Component.extend( {
 	tag: "my-greeting",
-	view: stache( "<h1><content/> - {{title}}</h1>" ),
-	ViewModel: DefineMap.extend( {
+	view: "<h1><content/> - {{title}}</h1>",
+	ViewModel: {
 		title: {
-			value: "can-component"
+			default: "can-component"
 		}
-	} )
+	}
 } );
 ```
 
@@ -58,9 +74,9 @@ __Source view:__
 
 ```html
 <header>
-  <my-greeting>
-     {{site}}
-  </my-greeting>
+	<my-greeting>
+		 {{site}}
+	</my-greeting>
 </header>
 ```
 
@@ -87,9 +103,9 @@ __HTML Result:__
 
 ```html
 <header>
-  <my-greeting>
-    <h1>CanJS - can-component</h1>
-  </my-greeting>
+	<my-greeting>
+		<h1>CanJS - can-component</h1>
+	</my-greeting>
 </header>
 ```
 
@@ -108,9 +124,9 @@ The view specified by `view` is rendered directly within the custom tag.
 For example the following component:
 
 ```js
-Component( {
+Component.extend( {
 	tag: "my-greeting",
-	view: stache( "<h1>Hello There</h1>" )
+	view: "<h1>Hello There</h1>"
 } );
 ```
 
@@ -118,7 +134,7 @@ With the following source html:
 
 ```html
 <header>
-  <my-greeting></my-greeting>
+	<my-greeting></my-greeting>
 </header>
 ```
 
@@ -126,7 +142,7 @@ Produces the following html:
 
 ```html
 <header>
-  <my-greeting><h1>Hello There</h1></my-greeting>
+	<my-greeting><h1>Hello There</h1></my-greeting>
 </header>
 ```
 
@@ -134,7 +150,7 @@ However, if there was existing content within the source html, like:
 
 ```html
 <header>
-  <my-greeting>DO REMOVE ME!!!</my-greeting>
+	<my-greeting>DO REMOVE ME!!!</my-greeting>
 </header>
 ```
 
@@ -142,7 +158,7 @@ However, if there was existing content within the source html, like:
 
 ```html
 <header>
-  <my-greeting><h1>Hello There</h1></my-greeting>
+	<my-greeting><h1>Hello There</h1></my-greeting>
 </header>
 ```
 
@@ -153,9 +169,9 @@ component’s element within the component’s
 view. For example, if we change the component to look like:
 
 ```js
-Component( {
+Component.extend( {
 	tag: "my-greeting",
-	view: stache( "<h1><content/></h1>" )
+	view: "<h1><content/></h1>"
 } );
 ```
 
@@ -178,9 +194,9 @@ between the `<content>` tags will be used. For example, if we
 change the component to look like:
 
 ```js
-Component( {
+Component.extend( {
 	tag: "my-greeting",
-	view: stache( "<h1><content>Hello World</content></h1>" )
+	view: "<h1><content>Hello World</content></h1>"
 } );
 ```
 
