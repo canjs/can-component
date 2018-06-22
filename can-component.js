@@ -235,6 +235,7 @@ var Component = Construct.extend(
 		//
 		// When a component is extended, this sets up the component's internal constructor
 		// functions and views for later fast initialization.
+		// jshint maxdepth:6
 		setup: function() {
 			Construct.setup.apply(this, arguments);
 
@@ -249,9 +250,11 @@ var Component = Construct.extend(
 				}
 
 				//!steal-remove-start
-				// If a constructor is assigned to the viewModel, give a warning
-				if (this.prototype.viewModel && canReflect.isConstructorLike(this.prototype.viewModel)) {
-					canDev.warn("can-component: Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html");
+				if (process.env.NODE_ENV !== 'production') {
+					// If a constructor is assigned to the viewModel, give a warning
+					if (this.prototype.viewModel && canReflect.isConstructorLike(this.prototype.viewModel)) {
+						canDev.warn("can-component: Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html");
+					}
 				}
 				//!steal-remove-end
 
@@ -283,7 +286,9 @@ var Component = Construct.extend(
 						} else {
 							if(canReflect.isObservableLike(protoViewModel) && canReflect.isMapLike(protoViewModel)) {
 								//!steal-remove-start
-								canLog.warn("can-component: "+this.prototype.tag+" is sharing a single map across all component instances");
+								if (process.env.NODE_ENV !== 'production') {
+									canLog.warn("can-component: "+this.prototype.tag+" is sharing a single map across all component instances");
+								}
 								//!steal-remove-end
 								this.viewModelInstance = protoViewModel;
 							} else {
@@ -299,7 +304,9 @@ var Component = Construct.extend(
 				// Convert the template into a renderer function.
 				if (this.prototype.template) {
 					//!steal-remove-start
-					canLog.warn('can-component.prototype.template: is deprecated and will be removed in a future release. Use can-component.prototype.view');
+					if (process.env.NODE_ENV !== 'production') {
+						canLog.warn('can-component.prototype.template: is deprecated and will be removed in a future release. Use can-component.prototype.view');
+					}
 					//!steal-remove-end
 					this.renderer = this.prototype.template;
 				}
