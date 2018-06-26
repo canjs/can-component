@@ -199,7 +199,7 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 				}
 
 				// Like can-stache-bindings, delay starting the rest of the binding
-				onCompleteBindings.push(canBinding.start);
+				onCompleteBindings.push(canBinding.start.bind(canBinding));
 
 				// We’ll want to turn off the bindings when the component is destroyed
 				onTeardowns.push(canBinding.stop);
