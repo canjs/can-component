@@ -374,20 +374,20 @@ var Component = Construct.extend(
 				componentTagData.scope = new Scope(componentScope);
 			}
 
-			// Hook up any templates with which the component was instantiated
-			var componentTemplates = componentTagData.templates;
-			if (componentTemplates !== undefined) {
+			// Hook up any partials with which the component was instantiated
+			var componentPartials = componentTagData.partials;
+			if (componentPartials !== undefined) {
 				options.partials = {};
-				for (var name in componentTemplates) {
-					var template = componentTemplates[name];
+				for (var name in componentPartials) {
+					var partial = componentPartials[name];
 
 					// Check if it’s already a renderer function or
 					// a string that needs to be parsed by stache
-					if (typeof template === "function") {
-						options.partials[name] = template;
-					} else if (typeof template === "string") {
+					if (typeof partial === "function") {
+						options.partials[name] = partial;
+					} else if (typeof partial === "string") {
 						var debugName = string.capitalize( string.camelize(name) ) + "Template";
-						options.partials[name] = stache(debugName, template);
+						options.partials[name] = stache(debugName, partial);
 					}
 				}
 			}
