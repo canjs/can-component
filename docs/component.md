@@ -20,74 +20,62 @@ or application logic.
 Create an instance of a component on a particular tag in a [can-stache] view.
 Use the [can-stache-bindings bindings] syntaxes to set up bindings.
 
-The following creates a `my-autocomplete` element and passes the `my-autocomplete`'s
+The following creates a `my-autocomplete` element and passes the `my-autocomplete`’s
 [can-component.prototype.ViewModel] the `Search` model as its `source` property and
 a [can-component/can-template] that is used to render the search results:
 
 ```html
 <my-autocomplete source:from="Search">
-  <can-template name="search-results">
-    <li>{{name}}</li>
-  </can-template>
+	<can-template name="search-results">
+		<li>{{name}}</li>
+	</can-template>
 </my-autocomplete>
 ```
 
-  @release 2.3
+	@release 2.3
 
-  @param {String} TAG An HTML tag name that matches the [can-component::tag tag]
-  property of the component. Tag names should include a hyphen (`-`) or a colon (`:`) like:
-  `acme-tabs` or `acme:tabs`.
+	@param {String} TAG An HTML tag name that matches the [can-component::tag tag]
+	property of the component. Tag names should include a hyphen (`-`) or a colon (`:`) like:
+	`acme-tabs` or `acme:tabs`.
 
-  @param {can-stache-bindings} [BINDINGS] Use the following binding syntaxes
-  to connect the component’s [can-component::ViewModel] to the view's [can-view-scope scope]:
+	@param {can-stache-bindings} [BINDINGS] Use the following binding syntaxes
+	to connect the component’s [can-component::ViewModel] to the view’s [can-view-scope scope]:
 
-   - [can-stache-bindings.toChild]=[can-stache.expressions expression] — one-way data binding to child
-   - [can-stache-bindings.toParent]=[can-stache.expressions expression] — one-way data binding to parent
-   - [can-stache-bindings.twoWay]=[can-stache.expressions expression] — two-way data binding child to parent
-   - [can-stache-bindings.event]=[can-stache/expressions/call expression] — event binding on the view model
+	 - [can-stache-bindings.toChild]=[can-stache.expressions expression] — one-way data binding to child
+	 - [can-stache-bindings.toParent]=[can-stache.expressions expression] — one-way data binding to parent
+	 - [can-stache-bindings.twoWay]=[can-stache.expressions expression] — two-way data binding child to parent
+	 - [can-stache-bindings.event]=[can-stache/expressions/call expression] — event binding on the view model
 
-   Note that because DOM attribute names are case-insensitive, use hyphens (`-`)
-   in the attribute name to setup for `camelCase` properties.
+	 @param {can-stache.sectionRenderer} [TEMPLATES] Between the starting and ending tag
+	 can exist one or many [can-component/can-template] elements.  Use [can-component/can-template] elements
+	 to pass custom templates to child components.  Each `<can-template>`
+	 is given a `name` attribute and can be rendered by a corresponding [can-component/can-slot]
+	 in the component’s [can-component.prototype.view].
 
-   Example:
+	 For example, the following passes how each search result should look and an error message if
+	 the source is unable to request data:
 
-   ```html
-   <my-tag getChild:from="expression"
-           setParent:to="expression"
-           twoWay:bind="expression"
-           on:event="callExpression()"></my-tag>
-   ```
+	 ```html
+	 <my-autocomplete source:from="Search">
+		 <can-template name="search-results">
+			 <li>{{name}}</li>
+		 </can-template>
+		 <can-template name="search-error">
+			 <div class="error">{{message}}</div>
+		 </can-template>
+	 </my-autocomplete>
+	 ```
 
-   @param {can-stache.sectionRenderer} [TEMPLATES] Between the starting and ending tag
-   can exist one or many [can-component/can-template] elements.  Use [can-component/can-template] elements
-   to pass custom templates to child components.  Each `<can-template>`
-   is given a `name` attribute and can be rendered by a corresponding [can-component/can-slot]
-   in the component's [can-component.prototype.view].
+	 @param {can-stache.sectionRenderer} [LIGHT_DOM] The content between the starting and ending
+	 tag. For example, `Hello <b>World</b>` is the `LIGHT_DOM` in the following:
 
-   For example, the following passes how each search result should look and an error message if
-   the source is unable to request data:
+	 ```html
+	 <my-tag>Hello <b>World</b></my-tag>
+	 ```
 
-   ```html
-   <my-autocomplete source:from="Search">
-     <can-template name="search-results">
-       <li>{{name}}</li>
-     </can-template>
-     <can-template name="search-error">
-       <div class='error'>{{message}}</div>
-     </can-template>
-   </my-autocomplete>
-   ```
-
-   @param {can-stache.sectionRenderer} [LIGHT_DOM] The content between the starting and ending
-   tag. For example, `Hello <b>World</b>` is the `LIGHT_DOM` in the following:
-
-   ```html
-   <my-tag>Hello <b>World</b></my-tag>
-   ```
-
-   The `LIGHT_DOM` can be positioned with a component’s [can-component.prototype.view] with
-   the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
-   with [can-component.prototype.leakScope].
+	 The `LIGHT_DOM` can be positioned with a component’s [can-component.prototype.view] with
+	 the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
+	 with [can-component.prototype.leakScope].
 
 
 @body
@@ -100,18 +88,14 @@ with the methods and properties of how your component behaves:
 
 ```js
 import Component from "can-component";
-import DefineMap from "can-define/map/map";
-import stache from "can-stache";
-
-const HelloWorldVM = DefineMap.extend( {
-	visible: { value: false },
-	message: { value: "Hello There!" }
-} );
 
 Component.extend( {
 	tag: "hello-world",
-	view: stache( "{{#if visible}}{{message}}{{else}}Click me{{/if}}" ),
-	ViewModel: HelloWorldVM,
+	view: "{{#if visible}}{{message}}{{else}}Click me{{/if}}",
+	ViewModel: {
+		visible: { default: false },
+		message: { default: "Hello There!" }
+	},
 	events: {
 		click: function() {
 			this.viewModel.visible = !this.viewModel.visible;
@@ -126,6 +110,8 @@ add `<hello-world/>` to a [can-stache] view, render
 the view, and insert the result in the page like:
 
 ```js
+import stache from "can-stache";
+
 const renderer = stache( "<hello-world/>" );
 document.body.appendChild( renderer( { } ) );
 ```
@@ -136,17 +122,17 @@ Check this out here:
 
 
 Typically, you do not append a single component at a time.  Instead,
-you'll render a view with many custom tags like:
+you’ll render a view with many custom tags like:
 
 ```html
 <srchr-app>
-  <srchr-search models:from="models">
-    <input name="search"/>
-  </srchr-search>
-  <ui-panel>
-    <srchr-history/>
-    <srchr-results models:from="models"/>
-  </ui-panel>
+	<srchr-search models:from="models">
+		<input name="search"/>
+	</srchr-search>
+	<ui-panel>
+		<srchr-history/>
+		<srchr-results models:from="models"/>
+	</ui-panel>
 </srchr-app>
 ```
 
@@ -186,7 +172,7 @@ The following component:
 ```js
 Component.extend( {
 	tag: "hello-world",
-	view: stache( "<h1>Hello World</h1>" )
+	view: "<h1>Hello World</h1>"
 } );
 ```
 
@@ -203,7 +189,7 @@ The following component:
 ```js
 Component.extend( {
 	tag: "hello-world",
-	view: stache( "<h1><content/></h1>" )
+	view: "<h1><content/></h1>"
 } );
 ```
 
@@ -226,7 +212,7 @@ The following component:
 ```js
 Component.extend( {
 	tag: "hello-world",
-	view: stache( "<h1>{{message}}</h1>" )
+	view: "<h1>{{message}}</h1>"
 } );
 ```
 
@@ -250,7 +236,7 @@ Default values can be provided. The following component:
 ```js
 Component.extend( {
 	tag: "hello-world",
-	view: stache( "<h1>{{message}}</h1>" ),
+	view: "<h1>{{message}}</h1>",
 	viewModel: {
 		message: "Hi"
 	}
@@ -309,7 +295,11 @@ const Person = DefineMap.extend( {
 
 The [can-component/connectedCallback] function may return a `disconnectedCallback` function this is called during teardown. Defined in the same closure scope as setup, its primary use is to tear down anything that was set up during the `connectedCallback` lifecycle hook.
 
-Special bindings are used to set up observable property behaviors that are unable to be represented easily within the declarative APIs of the `viewModel`. It doesn't remove all imperative code but will help keep imperitive code isolated and leave other properies more testable. Otherwise, properties like `name` in the example above, would need side-effects in setters or getters:
+Special bindings are used to set up observable property behaviors that are
+unable to be represented easily within the declarative APIs of the `viewModel`.
+It doesn’t remove all imperative code but will help keep imperative code
+isolated and leave other properties more testable. Otherwise, properties like
+`name` in the example above, would need side-effects in setters or getters:
 
 ```js
 const Person = DefineMap.extend( {
@@ -351,7 +341,7 @@ Component.extend( {
 } );
 ```
 
-Use [can-component/connectedCallback] to listen to when an component's element
+Use [can-component/connectedCallback] to listen to when an component’s element
 is inserted or removed from the DOM.
 
 
@@ -364,9 +354,11 @@ only renders friendly messages:
 ```js
 Component.extend( {
 	tag: "hello-world",
-	view: stache( "{{#isFriendly message}}" +
-              "<h1>{{message}}</h1>" +
-            "{{/isFriendly}}" ),
+	view: `
+		{{#isFriendly message}}
+			<h1>{{message}}</h1>
+		{{/isFriendly}}
+	`
 	helpers: {
 		isFriendly: function( message, options ) {
 			if ( /hi|hello|howdy/.test( message ) ) {
@@ -398,9 +390,9 @@ elements like:
 
 ```html
 <my-tabs>
-  {{#each(foodTypes)}}
-    <my-panel title:from='title'>{{content}}</my-panel>
-  {{/each}}
+	{{#each(foodTypes)}}
+		<my-panel title:from="title">{{content}}</my-panel>
+	{{/each}}
 </my-tabs>
 ```
 
@@ -414,7 +406,7 @@ foodTypes.push( {
 ```
 
 The secret is that the `<my-panel>` element listens to when it is inserted
-and adds its data to the tabs' list of panels with:
+and adds its data to the tabs’ list of panels with:
 
 ```js
 const vm = this.parentViewModel = canViewModel( this.element.parentNode );
@@ -432,7 +424,7 @@ of items the user has navigated through, and `selectableItems`, which represents
 last item in the breadcrumb.  These are defined on the viewModel like:
 
 ```js
-Component.extend( {
+DefineMap.extend( {
 	breadcrumb: {
 		Value: DefineList
 	},
@@ -440,10 +432,10 @@ Component.extend( {
 		get: function() {
 			const breadcrumb = this.breadcrumb;
 
-			// if there's an item in the breadcrumb
+			// if there’s an item in the breadcrumb
 			if ( breadcrumb.length ) {
 
-				// return the last item's children
+				// return the last item’s children
 				const i = breadcrumb.length - 1;
 				return breadcrumb[ i ].children;
 			} else {
@@ -460,7 +452,7 @@ When the “+” icon is clicked next to each item, the viewModel’s `showChild
 adds that item to the breadcrumb like:
 
 ```js
-Component.extend( {
+DefineMap.extend( {
 	showChildren: function( item, ev ) {
 		ev.stopPropagation();
 		this.breadcrumb.push( item );
@@ -500,7 +492,7 @@ const AppViewModel = DefineMap.extend( {
 		return this.stopListening.bind( this );
 	},
 	paginate: {
-		value: function() {
+		default: function() {
 			return new Paginate( {
 				limit: 5
 			} );
@@ -529,15 +521,15 @@ its sub-components:
 
 ```html
 <my-app>
-  <my-grid promiseData:from='websitesPromise'>
-    {{#each(items)}}
-      <tr>
-        <td width='40%'>{{name}}</td>
-        <td width='70%'>{{url}}</td>
-      </tr>
-    {{/each}}
-  </my-grid>
-  <next-prev paginate:from='paginate'></next-prev>
-  <page-count page:from='paginate.page' count:from='paginate.pageCount'></page-count>
+	<my-grid promiseData:from="websitesPromise">
+		{{#each(items)}}
+			<tr>
+				<td width="40%">{{name}}</td>
+				<td width="70%">{{url}}</td>
+			</tr>
+		{{/each}}
+	</my-grid>
+	<next-prev paginate:from="paginate"></next-prev>
+	<page-count page:from="paginate.page" count:from="paginate.pageCount"></page-count>
 </my-app>
 ```

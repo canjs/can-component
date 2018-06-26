@@ -11,15 +11,11 @@ properties and methods.  Registers the component by its [can-component::tag] wit
 
 ```js
 import Component from "can-component";
-import stache from "can-stache";
-import DefineMap from "can-define/map/map";
-
-const VM = DefineMap.extend( { /* ... */ } );
 
 Component.extend( {
 	tag: "tag-name",
-	ViewModel: VM,
-	view: stache( " /* ... */ " )
+	ViewModel: { /* ... */ },
+	view: " /* ... */ "
 } );
 ```
 

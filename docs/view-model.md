@@ -17,7 +17,9 @@ need to be setup.
 
 ```js
 import Component from "can-component";
+import DefineMap from "can-define/map/map";
 import Scope from "can-view-scope";
+import stache from "can-stache";
 
 Component.extend( {
 	tag: "my-element",
@@ -93,5 +95,5 @@ This example should be done with the [can-component::events] object instead.
 
 @return {Map|Object} Returns one of the following.
 
-   - An observable map or list type.
-   - The prototype of an observable map or list type that will be used to render the component’s view.
+	 - An observable map or list type.
+	 - The prototype of an observable map or list type that will be used to render the component’s view.
