@@ -10,20 +10,23 @@ of the `<can-template />` element from the `LIGHT_DOM` that has a matching [TEMP
 the `LIGHT_DOM` by default.
 
 ```js
+import Component from "can-component";
+import stache from "can-stache";
+
 Component.extend( {
 	tag: "my-email",
-	view: stache(
-		"<can-slot name=\"subject\" />"
-	)
+	view: `
+		<can-slot name="subject" />
+	`
 } );
 
-const renderer = stache(
-	"<my-email>" +
-    "<can-template name=\"subject\">" +
-      "{{subject}}" +
-    "</can-template>" +
-  "</my-email>"
-);
+const renderer = stache(`
+	<my-email>
+		<can-template name="subject">
+			{{subject}}
+		</can-template>
+	</my-email>
+`);
 
 renderer( {
 	subject: "Hello World"
@@ -59,25 +62,28 @@ Any `<can-slot>` that has a name attribute matching the name attribute of a `<ca
 replaced by the rendered inner contents of the <can-template>.
 
 ```js
+import Component from "can-component";
+import stache from "can-stache";
+
 Component.extend( {
 	tag: "my-email",
-	view: stache(
-		"<can-slot name=\"subject\" />" +
-    "<p>My Email</p>" +
-    "<can-slot name=\"body\" />"
-	)
+	view: `
+		<can-slot name="subject" />
+		<p>My Email</p>
+		<can-slot name="body" />
+	`
 } );
 
-const renderer = stache(
-	"<my-email>" +
-    "<can-template name=\"subject\">" +
-      "<h1>{{subject}}</h1>" +
-    "</can-template>" +
-    "<can-template name=\"body\">" +
-      "<span>{{body}}</span>" +
-    "</can-template>" +
-  "</my-email>"
-);
+const renderer = stache(`
+	<my-email>
+		<can-template name="subject">
+			<h1>{{subject}}</h1>
+		</can-template>
+		<can-template name="body">
+			<span>{{body}}</span>
+		</can-template>
+	</my-email>
+`);
 
 renderer( {
 	subject: "Hello World",
@@ -86,9 +92,9 @@ renderer( {
 
 /*
 <my-email>
-  <h1>Hello World</h1>
-  <p>My Email</p>
-  <span>The email body</span>
+	<h1>Hello World</h1>
+	<p>My Email</p>
+	<span>The email body</span>
 </my-email>
 */
 ```
@@ -100,34 +106,35 @@ passes `<my-email>`'s `subject` and `body` to the `subject` and `body` templates
 how `subject` and `body` are read by `{{this}}`.
 
 ```js
-const ViewModel = DefineMap.extend( {
-	subject: {
-		value: "Hello World"
-	},
-	body: {
-		value: "Later Gator"
-	}
-} );
+import Component from "can-component";
+import stache from "can-stache";
 
 Component.extend( {
 	tag: "my-email",
-	view: stache(
-		"<can-slot name=\"subject\" this:from=\"subject\"/>" +
-    "<can-slot name=\"body\" this:from=\"body\"/>"
-	),
-	ViewModel
+	view: `
+		<can-slot name="subject" this:from="subject" />
+		<can-slot name="body" this:from="body" />
+	`,
+	ViewModel: {
+		subject: {
+			default: "Hello World"
+		},
+		body: {
+			default: "Later Gator"
+		}
+	}
 } );
 
-const renderer = stache(
-	"<my-email>" +
-    "<can-template name=\"subject\">" +
-      "<h1>{{this}}</h1>" +
-    "</can-template>" +
-    "<can-template name=\"body\">" +
-      "<p>{{this}}</p>" +
-    "</can-template>" +
-  "</my-email>"
-);
+const renderer = stache(`
+	<my-email>
+		<can-template name="subject">
+			<h1>{{this}}</h1>
+		</can-template>
+		<can-template name="body">
+			<span>{{this}}</span>
+		</can-template>
+	</my-email>
+`);
 
 const testView = renderer( {
 	subject: "Hello World",
@@ -136,8 +143,8 @@ const testView = renderer( {
 
 /*
 <my-email>
-  <h1>Hello World</h1>
-  <p>This is a greeting.</p>
+	<h1>Hello World</h1>
+	<p>This is a greeting.</p>
 </my-email>
 */
 ```
@@ -148,20 +155,23 @@ Default content can be specified to be used if there is no matching `<can-templa
 or the matching `<can-template>` has no inner content.
 
 ```js
+import Component from "can-component";
+import stache from "can-stache";
+
 Component.extend( {
 	tag: "my-email",
-	view: stache(
-		"<can-slot name=\"subject\">" +
-      "<p>This is the default {{subject}}</p>" +
-    "</can-slot>"
-	)
+	view: `
+		<can-slot name="subject">
+			<p>This is the default {{subject}}</p>
+		</can-slot>
+	`
 } );
 
-const renderer = stache(
-	"<my-email>" +
-    "<can-template name=\"subject\" />" +
-  "</my-email>"
-);
+const renderer = stache(`
+	<my-email>
+		<can-template name="subject" />
+	</my-email>
+`);
 
 const testView = renderer( {
 	subject: "content"
@@ -169,7 +179,7 @@ const testView = renderer( {
 
 /*
 <my-email>
-  <p>This is the default content</p>
+	<p>This is the default content</p>
 </my-email>
 */
 ```
