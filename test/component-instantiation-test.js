@@ -117,9 +117,9 @@ QUnit.test("Components can be instantiated with <content> - with scope - leakSco
 	QUnit.equal(element.innerHTML, "Hello <em>world</em>", "content is rendered with the component’s scope");
 });
 
-QUnit.test("Components can be instantiated with templates", function() {
+QUnit.test("Components can be instantiated with partials", function() {
 	var ComponentConstructor = Component.extend({
-		tag: "new-instantiation-templates",
+		tag: "new-instantiation-partials",
 		view: "Hello {{message}} {{>message-input}}",
 		ViewModel: {
 			message: {default: "world"}
@@ -127,7 +127,7 @@ QUnit.test("Components can be instantiated with templates", function() {
 	});
 
 	var componentInstance = new ComponentConstructor({
-		templates: {
+		partials: {
 			"message-input": "<input value:bind='message' />"
 		}
 	});
@@ -203,7 +203,7 @@ QUnit.test("Components can be instantiated with all options", function() {
 	// Our component
 	var HelloWorld = Component.extend({
 		tag: "hello-world",
-		view: "Hello <content>world</content> <ul>{{#each(items)}} {{>item-partial}} {{/each}}</ul>",
+		view: "Hello <content>world</content> <ul>{{#each(items)}} {{>itemPartial}} {{/each}}</ul>",
 		ViewModel: {
 			items: {
 				default: function() {
@@ -219,8 +219,8 @@ QUnit.test("Components can be instantiated with all options", function() {
 		scope: {
 			message: "friend"
 		},
-		templates: {
-			"item-partial": "<li>{{this}}</li>"
+		partials: {
+			itemPartial: "<li>{{this}}</li>"
 		},
 		viewModel: {
 			items: ["eat", "sleep", "code"]
@@ -236,6 +236,14 @@ QUnit.test("Components can be instantiated with all options", function() {
 		"element renders correctly"
 	);
 	QUnit.equal(viewModel.items.length, 3, "viewModel has items");
+
+	// Changing the view model updates the element
+	viewModel.items.push("repeat");
+	QUnit.equal(
+		element.innerHTML,
+		"Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li>  <li>code</li>  <li>repeat</li> </ul>",
+		"element updates correctly"
+	);
 });
 
 QUnit.test("Component binding instantiation works as documented", function() {
