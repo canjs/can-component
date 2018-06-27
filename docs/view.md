@@ -1,11 +1,22 @@
-@property {can-stache.renderer} [can-component.prototype.view] view
+@property {String|can-stache.renderer} [can-component.prototype.view] view
 @parent can-component.prototype
 
 Provides a view to render directly within the component’s element. The view is rendered with the
 component’s [can-component::ViewModel] instance.  `<content/>` elements within the view are replaced by the source elements within the component’s tag.
 
-@option {can-stache.renderer} A [can-stache.renderer] returned by [can-stache] or a String that will be passed to [can-stache].
+@type {String} A string that will be passed to [can-stache] to create a
+[can-stache.renderer]. For example:
 
+```js
+import Component from "can-component";
+
+Component.extend( {
+	tag: "my-tabs",
+	view: "<ul>{{#panels}}<li>{{title}}</li> /* ... */"
+} );
+```
+
+@type {can-stache.renderer} A [can-stache.renderer] returned by [can-stache].
 For example:
 
 ```js
@@ -15,17 +26,6 @@ import stache from "can-stache";
 Component.extend( {
 	tag: "my-tabs",
 	view: stache( "<ul>{{#panels}}<li>{{title}}</li> /* ... */" )
-} );
-```
-
-…can be written as:
-
-```js
-import Component from "can-component";
-
-Component.extend( {
-	tag: "my-tabs",
-	view: "<ul>{{#panels}}<li>{{title}}</li> /* ... */"
 } );
 ```
 
