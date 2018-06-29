@@ -40,6 +40,8 @@ var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require('can-symbol');
 var DOCUMENT = require('can-globals/document/document');
 
+stache.addBindings(stacheBindings);
+
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
 // a binding like {this}="value" is present.
