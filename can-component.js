@@ -377,15 +377,13 @@ var Component = Construct.extend(
 			// Hook up any templates with which the component was instantiated
 			var componentTemplates = componentTagData.templates;
 			if (componentTemplates !== undefined) {
-				for (var name in componentTemplates) {
-					var template = componentTemplates[name];
-
+				canReflect.eachKey(componentTemplates, function(template, name) {
 					// Check if it’s a string that needs to be parsed by stache
 					if (typeof template === "string") {
 						var debugName = name + " template";
 						componentTemplates[name] = stache(debugName, template);
 					}
-				}
+				});
 			}
 
 			// an array of teardown stuff that should happen when the element is removed
