@@ -50,6 +50,8 @@ var setValueSymbol = canSymbol.for("can.setValue");
 var viewInsertSymbol = canSymbol.for("can.viewInsert");
 var viewModelSymbol = canSymbol.for('can.viewModel');
 
+stache.addBindings(stacheBindings);
+
 // For insertion elements like <can-slot> and <context>, this will add
 // a compute viewModel to the top of the context if
 // a binding like {this}="value" is present.
