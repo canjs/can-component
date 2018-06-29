@@ -44,6 +44,7 @@ var canSymbol = require('can-symbol');
 var DOCUMENT = require('can-globals/document/document');
 
 // Symbols
+var createdByCanComponentSymbol = canSymbol("can.createdByCanComponent");
 var getValueSymbol = canSymbol.for("can.getValue");
 var setValueSymbol = canSymbol.for("can.setValue");
 var viewInsertSymbol = canSymbol.for("can.viewInsert");
@@ -321,8 +322,12 @@ var Component = Construct.extend(
 				}
 
 				// Register this component to be created when its `tag` is found.
-				viewCallbacks.tag(this.prototype.tag, function(el, options) {
-					new self(el, options);
+				viewCallbacks.tag(this.prototype.tag, function(el, tagData) {
+					// Check if a symbol already exists on the element; if it does, then
+					// a new instance of the component has already been created
+					if (el[createdByCanComponentSymbol] === undefined) {
+						new self(el, tagData);
+					}
 				});
 			}
 		}
@@ -346,13 +351,14 @@ var Component = Construct.extend(
 					componentTagData = {};
 				} else {
 					componentTagData = el;
-					el = null;
+					el = undefined;
 				}
 			}
 
 			// Create an element if it doesn’t exist and make it available outside of this
-			if (!el) {
-				el = document.createElement(this.tag);
+			if (el === undefined) {
+				el = DOCUMENT().createElement(this.tag);
+				el[createdByCanComponentSymbol] = true;
 			}
 			this.element = el;
 

@@ -11,6 +11,9 @@ QUnit.module("can-component integration with can-bind");
 QUnit.test("Using can-bind in connectedCallback works as documented", function(assert) {
 	var done = assert.async();
 
+	// This will be used to count the number of times connectedCallback is called
+	var connectedCallbackCallCount = 0;
+
 	// This component is similar to what’s shown as an example in can-bind’s docs
 	var BindComponent = Component.extend({
 		tag: "bind-component",
@@ -27,6 +30,7 @@ QUnit.test("Using can-bind in connectedCallback works as documented", function(a
 				}
 			},
 			connectedCallback: function() {
+				connectedCallbackCallCount += 1;
 				var binding = new Bind({
 					parent: value.from(this, "eventualProp"),
 					child: value.to(this, "object.prop")
@@ -57,6 +61,9 @@ QUnit.test("Using can-bind in connectedCallback works as documented", function(a
 		// When the eventualProp (parent) changes, the object.prop (child) should be updated
 		viewModel.eventualProp = 22;
 		assert.equal(viewModel.object.get("prop"), 22, "new value for one prop updates the other");
+
+		// Check to make sure connectedCallback was only called once
+		assert.equal(connectedCallbackCallCount, 1, "connectedCallback only called once");
 
 		// Clean up
 		fixture.removeChild(element);
