@@ -90,13 +90,15 @@ element by calling `new` on the component’s constructor function:
 
 ```js
 const HelloWorld = Component.extend({
-  tag: "hello-world",
-  view: "Hello <content>world</content> <ul>{{#each(items)}} {{>itemPartial}} {{/each}}</ul>",
-  ViewModel: {
-    items: {
-      default: () => []
-    }
-  }
+	tag: "hello-world",
+	view: `
+		<can-slot name="greetingTemplate" />
+		<content>world</content>
+		<ul>{{#each(items)}} {{this}} {{/each}}</ul>
+	`,
+	ViewModel: {
+		items: {}
+	}
 });
 
 // Create a new instance of our component
@@ -104,45 +106,46 @@ const componentInstance = new HelloWorld({
 
 	// values with which to initialize the component’s view model
 	viewModel: {
-		items: ["eat", "sleep", "code"]
+		items: ["eat"]
 	},
 
 	// can-stache template to replace any <content> elements in the component’s view
 	content: "<em>{{message}}</em>",
 
-	// scope with which to render the <content>
-	scope: {
-		message: "friend"
+	// <can-template> strings rendered by can-stache with the scope
+	templates: {
+		greetingTemplate: "{{greeting}}"
 	},
 
-	// partials made available to the component’s view
-	partials: {
-		itemPartial: "<li>{{this}}</li>"
+	// scope with which to render the <content> and templates
+	scope: {
+		greeting: "Hello",
+		message: "friend"
 	}
 });
 
-myGreetingInstance.element; // is <my-greeting>Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li>  <li>code</li> </ul></my-greeting>
+myGreetingInstance.element; // is like <my-greeting>Hello <em>friend</em> <ul> <li>eat</li> </ul></my-greeting>
 
-myGreetingInstance.viewModel; // is HelloWorld.ViewModel{items: ["eat", "sleep", "code"]}
+myGreetingInstance.viewModel; // is HelloWorld.ViewModel{items: ["eat"]}
 ```
 
 Changing the component’s view model will cause its element and any bindings to
 be updated:
 
 ```js
-myGreetingInstance.viewModel.items.push("repeat");
+myGreetingInstance.viewModel.items.push("sleep");
 
-myGreetingInstance.element; // is <my-greeting>Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li>  <li>code</li>  <li>repeat</li> </ul></my-greeting>
+myGreetingInstance.element; // is like <my-greeting>Hello <em>friend</em> <ul> <li>eat</li> <li>sleep</li> </ul></my-greeting>
 ```
 
 See the [Programmatically instantiating a component](#Programmaticallyinstantiatingacomponent)
 section for details.
 
 @param {Object} [options] Options for rendering the component, including:
-- **content** `{String|Function}`: similar to the [can-component/content] tag, the `LIGHT_DOM` to be rendered between the component’s starting and ending tags; can either be a string (which will be parsed by [can-stache] by default) or a [can-stache.renderer] function.
-- **partials** `{Object<String,String|Function>}`: an object that has keys that are partial names and values that are either plain strings (parsed by [can-stache] by default) or [can-stache.renderer] functions.
-- **scope** `{Object}`: an object that is the scope with which the content should be rendered.
-- **viewModel** `{Object}`: an object with values to bind to the component’s view model.
+- **content** `{String|Function}`: Similar to the [can-component/content] tag, the `LIGHT_DOM` to be rendered between the component’s starting and ending tags; can either be a string (which will be parsed by [can-stache] by default) or a [can-stache.renderer] function.
+- **scope** `{Object}`: An object that is the scope with which the content should be rendered.
+- **templates** `{Object<String,String|Function>}`: An object that has keys that are [can-component/can-template] names and values that are either plain strings (parsed by [can-stache] by default) or [can-stache.renderer] functions.
+- **viewModel** `{Object}`: An object with values to bind to the component’s view model.
 
   @release 4.3
 
@@ -481,7 +484,7 @@ myGreetingInstance.viewModel; // is MyGreeting.ViewModel{subject: "friend"}
 In the example above, the `viewModel` is passed in as an option to the
 component’s constructor function.
 
-In addition to `viewModel`, there are `scope`, `partials`, and `content`
+In addition to `viewModel`, there are `templates`, `scope`, and `content`
 options. Read below for details on all the options.
 
 ### viewModel
@@ -644,28 +647,26 @@ This would make `helloWorldInstance.element` a fragment with the following struc
 <hello-world>Hello <em>mundo</em></hello-world>
 ```
 
-### partials
+### templates
 
-The `partials` option is used to pass a partial into a
+The `templates` option is used to pass a [can-component/can-template] into a
 component when it is instantiated.
 
 ```js
 import Component from "can-component";
 
 const TodosPage = Component.extend({
-  tag: "todos-page",
-  view: "<ul>{{#each(items)}} {{>itemPartial}} {{/each}}</ul>",
-  ViewModel: {
-    items: {
-      default: () => ["eat", "sleep", "code"]
-    }
-  }
+	tag: "todos-page",
+	view: "<ul><can-slot name='itemList' /></ul>"
 });
 
 const todosPageInstance = new TodosPage({
-  partials: {
-    itemPartial: "<li>{{name}}</li>"
-  }
+	scope: {
+		items: ["eat"]
+	},
+	templates: {
+		itemList: "{{#each(items)}} <li>{{this}}</li> {{/each}}"
+	}
 });
 ```
 
@@ -675,8 +676,6 @@ This would make `todosPageInstance.element` a fragment with the following struct
 <todos-page>
   <ul>
     <li>eat</li>
-    <li>sleep</li>
-    <li>code</li>
   </ul>
 </todos-page>
 ```

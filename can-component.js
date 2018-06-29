@@ -374,22 +374,16 @@ var Component = Construct.extend(
 				componentTagData.scope = new Scope(componentScope);
 			}
 
-			// Hook up any partials with which the component was instantiated
-			var componentPartials = componentTagData.partials;
-			if (componentPartials !== undefined) {
-				options.partials = {};
-				for (var name in componentPartials) {
-					var partial = componentPartials[name];
-
-					// Check if it’s already a renderer function or
-					// a string that needs to be parsed by stache
-					if (typeof partial === "function") {
-						options.partials[name] = partial;
-					} else if (typeof partial === "string") {
-						var debugName = string.capitalize( string.camelize(name) ) + "Template";
-						options.partials[name] = stache(debugName, partial);
+			// Hook up any templates with which the component was instantiated
+			var componentTemplates = componentTagData.templates;
+			if (componentTemplates !== undefined) {
+				canReflect.eachKey(componentTemplates, function(template, name) {
+					// Check if it’s a string that needs to be parsed by stache
+					if (typeof template === "string") {
+						var debugName = name + " template";
+						componentTemplates[name] = stache(debugName, template);
 					}
-				}
+				});
 			}
 
 			// an array of teardown stuff that should happen when the element is removed

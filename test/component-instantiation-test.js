@@ -117,18 +117,19 @@ QUnit.test("Components can be instantiated with <content> - with scope - leakSco
 	QUnit.equal(element.innerHTML, "Hello <em>world</em>", "content is rendered with the component’s scope");
 });
 
-QUnit.test("Components can be instantiated with partials", function() {
+QUnit.test("Components can be instantiated with templates", function() {
 	var ComponentConstructor = Component.extend({
-		tag: "new-instantiation-partials",
-		view: "Hello {{message}} {{>message-input}}",
-		ViewModel: {
-			message: {default: "world"}
-		}
+		tag: "new-instantiation-templates",
+		view: "<can-slot name='messageInput' />"
 	});
 
+	var scopeVM = new DefineMap({
+		message: "world"
+	});
 	var componentInstance = new ComponentConstructor({
-		partials: {
-			"message-input": "<input value:bind='message' />"
+		scope: scopeVM,
+		templates: {
+			messageInput: "<input value:bind='message' />"
 		}
 	});
 
@@ -138,11 +139,9 @@ QUnit.test("Components can be instantiated with partials", function() {
 	QUnit.ok(inputElement, "template rendered");
 	QUnit.equal(inputElement.value, "world", "input has correct value");
 
-	// Updating the viewModel should update the template
-	var viewModel = componentInstance.viewModel;
-	viewModel.message = "mundo";
-	QUnit.equal(element.textContent, "Hello mundo ", "element has correct text content after updating viewModel");
-	QUnit.equal(inputElement.value, "mundo", "input has correct value after updating viewModel");
+	// Updating the scopeVM should update the template
+	scopeVM.message = "mundo";
+	QUnit.equal(inputElement.value, "mundo", "input has correct value after updating scopeVM");
 });
 
 QUnit.test("Components can be instantiated with viewModel", function() {
@@ -203,13 +202,9 @@ QUnit.test("Components can be instantiated with all options", function() {
 	// Our component
 	var HelloWorld = Component.extend({
 		tag: "hello-world",
-		view: "Hello <content>world</content> <ul>{{#each(items)}} {{>itemPartial}} {{/each}}</ul>",
+		view: "Hello <content>world</content> <ul>{{#each(items)}} <can-slot name='itemTemplate' this:from='this' /> {{/each}}</ul>",
 		ViewModel: {
-			items: {
-				default: function() {
-					return [];
-				}
-			}
+			items: {}
 		}
 	});
 
@@ -219,11 +214,11 @@ QUnit.test("Components can be instantiated with all options", function() {
 		scope: {
 			message: "friend"
 		},
-		partials: {
-			itemPartial: "<li>{{this}}</li>"
+		templates: {
+			itemTemplate: "<li>{{this}}</li>"
 		},
 		viewModel: {
-			items: ["eat", "sleep", "code"]
+			items: ["eat"]
 		}
 	});
 	var element = componentInstance.element;
@@ -232,16 +227,16 @@ QUnit.test("Components can be instantiated with all options", function() {
 	// Basics look correct
 	QUnit.equal(
 		element.innerHTML,
-		"Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li>  <li>code</li> </ul>",
+		"Hello <em>friend</em> <ul> <li>eat</li> </ul>",
 		"element renders correctly"
 	);
-	QUnit.equal(viewModel.items.length, 3, "viewModel has items");
+	QUnit.equal(viewModel.items.length, 1, "viewModel has items");
 
 	// Changing the view model updates the element
-	viewModel.items.push("repeat");
+	viewModel.items.push("sleep");
 	QUnit.equal(
 		element.innerHTML,
-		"Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li>  <li>code</li>  <li>repeat</li> </ul>",
+		"Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li> </ul>",
 		"element updates correctly"
 	);
 });
