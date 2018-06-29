@@ -1,4 +1,4 @@
-@property {function} can-component.prototype.ViewModel ViewModel
+@property {Object|function} can-component.prototype.ViewModel ViewModel
 @parent can-component.prototype
 
 @description
@@ -7,9 +7,27 @@ Provides or describes a constructor function that provides values and methods
 to the component’s [can-component::view view]. The constructor function
 is initialized with values specified by the component element’s [can-stache-bindings data bindings].
 
-@option {function} A constructor function (usually defined by [can-define/map/map.extend DefineMap.extend] or
-[can-map Map.extend] that will be used to create a new observable instance accessible by
-the component’s [can-component::view]) or an Object that will be passed to [can-define/map/map.extend DefineMap.extend].
+@type {Object} An object that will be passed to [can-define/map/map.extend DefineMap.extend] and
+used to create a new observable instance accessible by the component’s [can-component::view].
+
+For example, every time `<my-tag>` is found, a new [can-define/map/map DefineMap] instance
+will be created:
+
+```js
+import Component from "can-component";
+
+Component.extend( {
+	tag: "my-tag",
+	ViewModel: {
+		message: "string"
+	},
+	view: "<h1>{{message}}</h1>"
+} );
+```
+
+@type {function} A constructor function (usually defined by [can-define/map/map.extend DefineMap.extend] or
+[can-map Map.extend]) that will be used to create a new observable instance accessible by
+the component’s [can-component::view].
 
 For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
 be created:
@@ -25,20 +43,6 @@ const MyTagViewModel = DefineMap.extend( "MyTagViewModel", {
 Component.extend( {
 	tag: "my-tag",
 	ViewModel: MyTagViewModel,
-	view: "<h1>{{message}}</h1>"
-} );
-```
-
-The example above can be abbreviated to:
-
-```js
-import Component from "can-component";
-
-Component.extend( {
-	tag: "my-tag",
-	ViewModel: {
-		message: "string"
-	},
 	view: "<h1>{{message}}</h1>"
 } );
 ```
