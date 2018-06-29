@@ -1,3 +1,4 @@
+"use strict";
 /* jshint -W079 */
 // # can/component/component.js
 //

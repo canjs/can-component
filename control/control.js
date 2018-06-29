@@ -1,3 +1,4 @@
+"use strict";
 var Control = require("can-control");
 var canReflect = require("can-reflect");
 
