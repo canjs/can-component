@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "can-assign": "^1.1.1",
+    "can-bind": "<2.0.0",
     "can-child-nodes": "^1.0.0",
     "can-construct": "^3.2.0",
     "can-control": "^4.0.0",
@@ -54,7 +55,7 @@
     "can-reflect": "^1.6.0",
     "can-simple-map": "^4.1.0",
     "can-simple-observable": "^2.0.0",
-    "can-stache": "^4.1.0",
+    "can-stache": "^4.9.0",
     "can-stache-bindings": "^4.2.6",
     "can-stache-key": "^1.0.0",
     "can-string": "<2.0.0",
@@ -67,6 +68,7 @@
   "devDependencies": {
     "can-observe": "^2.0.0",
     "can-test-helpers": "^1.1.2",
+    "can-value": "<2.0.0",
     "can-vdom": "^4.0.0",
     "detect-cyclic-packages": "^1.1.0",
     "done-serve": "^2.0.0",
