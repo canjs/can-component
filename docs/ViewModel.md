@@ -10,7 +10,7 @@ is initialized with values specified by the component element’s [can-stache-bi
 @type {Object} An object that will be passed to [can-define/map/map.extend DefineMap.extend] and
 used to create a new observable instance accessible by the component’s [can-component::view].
 
-For example, every time `<my-tag>` is found, a new [can-define/map/map] instance
+For example, every time `<my-tag>` is found, a new [can-define/map/map DefineMap] instance
 will be created:
 
 ```js
