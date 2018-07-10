@@ -206,7 +206,7 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 				onCompleteBindings.push(canBinding.start.bind(canBinding));
 
 				// We’ll want to turn off the bindings when the component is destroyed
-				onTeardowns.push(canBinding.stop);
+				onTeardowns.push(canBinding.stop.bind(canBinding));
 
 			} else {
 				// Can’t get or set the value, so assume it’s not an observable
@@ -590,7 +590,7 @@ var Component = Construct.extend(
 
 // This adds support for components being rendered as values in stache templates
 Component.prototype[viewInsertSymbol] = function(viewData) {
-	viewData.nodeList.newDeepChildren.push(this.nodeList);
+	viewData.nodeList.deepChildren.push(this.nodeList);
 	return this.element;
 };
 

@@ -4,6 +4,8 @@ var QUnit = require("steal-qunit");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var value = require("can-value");
+var SimpleObservable = require("can-simple-observable");
+var stache = require("can-stache");
 
 QUnit.module("can-component instantiation");
 
@@ -285,4 +287,34 @@ QUnit.test("Component binding instantiation works as documented", function() {
 	QUnit.equal(family.get("last"), "Flanders", "map “bind” prop is correct");
 	QUnit.equal(family.get("first"), "Milo", "map “from” prop is correct");
 	QUnit.equal(family.get("full"), "Milo Flanders", "map “to” prop is correct");
+});
+
+QUnit.test("Component can be removed from the page", function(){
+	var ToBeRemoved = Component.extend({
+		tag: "to-be-removed",
+		view: "{{prop}}",
+		ViewModel: {
+			prop: "string"
+		}
+	});
+
+	var prop = new SimpleObservable(3);
+
+	var toBeRemoved = new ToBeRemoved({
+		viewModel: {
+			prop: prop
+		}
+	});
+
+	var show = new SimpleObservable(true);
+
+	var template = stache("<div>{{# if(show) }} {{{toBeRemoved}}} {{/ if}}</div>");
+
+	template({
+		show: show,
+		toBeRemoved: toBeRemoved
+	});
+
+	show.set(false);
+	QUnit.ok(true, "got here without an error");
 });
