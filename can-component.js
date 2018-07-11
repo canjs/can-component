@@ -206,7 +206,7 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 				onCompleteBindings.push(canBinding.start.bind(canBinding));
 
 				// We’ll want to turn off the bindings when the component is destroyed
-				onTeardowns.push(canBinding.stop);
+				onTeardowns.push(canBinding.stop.bind(canBinding));
 
 			} else {
 				// Can’t get or set the value, so assume it’s not an observable
