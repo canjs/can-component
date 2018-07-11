@@ -590,7 +590,7 @@ var Component = Construct.extend(
 
 // This adds support for components being rendered as values in stache templates
 Component.prototype[viewInsertSymbol] = function(viewData) {
-	viewData.nodeList.deepChildren.push(this.nodeList);
+	viewData.nodeList.newDeepChildren.push(this.nodeList);
 	return this.element;
 };
 

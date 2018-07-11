@@ -289,12 +289,18 @@ QUnit.test("Component binding instantiation works as documented", function() {
 	QUnit.equal(family.get("full"), "Milo Flanders", "map “to” prop is correct");
 });
 
-QUnit.test("Component can be removed from the page", function(){
+QUnit.test("Component can be removed from the page", 2, function(){
+	
 	var ToBeRemoved = Component.extend({
 		tag: "to-be-removed",
 		view: "{{prop}}",
 		ViewModel: {
 			prop: "string"
+		},
+		events: {
+			"{element} beforeremove": function(){
+				QUnit.ok(true, "torn down");
+			}
 		}
 	});
 
@@ -317,4 +323,6 @@ QUnit.test("Component can be removed from the page", function(){
 
 	show.set(false);
 	QUnit.ok(true, "got here without an error");
+
+
 });
