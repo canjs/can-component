@@ -1,5 +1,6 @@
 var Component = require("can-component");
 var SimpleMap = require("can-simple-map");
+var SimpleObservable = require("can-simple-observable");
 var stache = require("can-stache");
 var canReflect = require("can-reflect");
 var QUnit = require("steal-qunit");
@@ -74,4 +75,40 @@ QUnit.test("wrapped in a conditional", function (assert) {
 	// Hide the component
 	templateVM.set("showComponent", false);
 	assert.equal(fragment.textContent, "", "fragment ends without content");
+});
+
+QUnit.test("Component can be removed from the page", 2, function(){
+
+	var ToBeRemoved = Component.extend({
+		tag: "to-be-removed",
+		view: "{{prop}}",
+		ViewModel: {
+			prop: "string"
+		},
+		events: {
+			"{element} beforeremove": function(){
+				QUnit.ok(true, "torn down");
+			}
+		}
+	});
+
+	var prop = new SimpleObservable(3);
+
+	var toBeRemoved = new ToBeRemoved({
+		viewModel: {
+			prop: prop
+		}
+	});
+
+	var show = new SimpleObservable(true);
+
+	var template = stache("<div>{{# if(show) }} {{{toBeRemoved}}} {{/ if}}</div>");
+
+	template({
+		show: show,
+		toBeRemoved: toBeRemoved
+	});
+
+	show.set(false);
+	QUnit.ok(true, "got here without an error");
 });
