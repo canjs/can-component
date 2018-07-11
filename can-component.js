@@ -339,6 +339,7 @@ var Component = Construct.extend(
 		// ### setup
 		// When a new component instance is created, setup bindings, render the view, etc.
 		setup: function(el, componentTagData) {
+			this._initialArgs = [el,componentTagData];
 			var component = this;
 			var options = {
 				helpers: {},
@@ -550,6 +551,7 @@ var Component = Construct.extend(
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
 			var nodeList = nodeLists.register([], function() {
+				component._torndown = true;
 				domEvents.dispatch(el, "beforeremove", false);
 				if(teardownBindings) {
 					teardownBindings();
@@ -585,11 +587,15 @@ var Component = Construct.extend(
 				}
 
 			}
+			component._torndown = false;
 		}
 	});
 
 // This adds support for components being rendered as values in stache templates
 Component.prototype[viewInsertSymbol] = function(viewData) {
+	if(this._torndown) {
+		this.setup.apply(this,this._initialArgs);
+	}
 	viewData.nodeList.newDeepChildren.push(this.nodeList);
 	return this.element;
 };

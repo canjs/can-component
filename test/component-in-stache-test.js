@@ -77,7 +77,7 @@ QUnit.test("wrapped in a conditional", function (assert) {
 	assert.equal(fragment.textContent, "", "fragment ends without content");
 });
 
-QUnit.test("Component can be removed from the page", 2, function(){
+QUnit.test("Component can be removed from the page", 3, function(){
 
 	var ToBeRemoved = Component.extend({
 		tag: "to-be-removed",
@@ -104,11 +104,16 @@ QUnit.test("Component can be removed from the page", 2, function(){
 
 	var template = stache("<div>{{# if(show) }} {{{toBeRemoved}}} {{/ if}}</div>");
 
-	template({
+	var frag = template({
 		show: show,
 		toBeRemoved: toBeRemoved
 	});
 
 	show.set(false);
 	QUnit.ok(true, "got here without an error");
+
+	show.set(true);
+
+	prop.set(4);
+	QUnit.equal(frag.firstChild.getElementsByTagName("to-be-removed")[0].innerHTML, "4");
 });
