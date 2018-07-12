@@ -732,7 +732,7 @@ last item in the breadcrumb.  These are defined on the viewModel like:
 ```js
 DefineMap.extend( {
 	breadcrumb: {
-		Value: DefineList
+		Default: DefineList
 	},
 	selectableItems: {
 		get: function() {

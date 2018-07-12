@@ -23,13 +23,13 @@ helpers.makeTests("can-component examples", function(doc) {
 
 	var Paginate = DefineMap.extend({
 		count: {
-			value: Infinity
+			default: Infinity
 		},
 		offset: {
-			value: 0
+			default: 0
 		},
 		limit: {
-			value: 100
+			default: 100
 		},
 		// Prevent negative counts
 		setCount: function(newCount, success, error) {
@@ -75,13 +75,13 @@ helpers.makeTests("can-component examples", function(doc) {
 
 		var TreeComboViewModel = DefineMap.extend({
 			items: {
-				Value: DefineList
+				Default: DefineList
 			},
 			breadcrumb: {
-				Value: DefineList
+				Default: DefineList
 			},
 			selected: {
-				Value: DefineList
+				Default: DefineList
 			},
 			selectableItems: function() {
 				var breadcrumb = this.get("breadcrumb");
@@ -297,10 +297,10 @@ helpers.makeTests("can-component examples", function(doc) {
 
 		var GridViewModel = DefineMap.extend({
 			items: {
-				Value: DefineList
+				Default: DefineList
 			},
 			waiting: {
-				value: true
+				default: true
 			}
 		});
 
@@ -339,7 +339,7 @@ helpers.makeTests("can-component examples", function(doc) {
 		// deferredData property that reads from it and returns a new deferred.
 		var SimulatedScope = DefineMap.extend({
 			set: {
-				value: 0
+				default: 0
 			},
 			deferredData: function() {
 				var deferred = {};
@@ -484,7 +484,7 @@ helpers.makeTests("can-component examples", function(doc) {
 
 			var TabsViewModel = DefineMap.extend({
                 active: "any",
-                panels: {Value: DefineList},
+                panels: {Default: DefineList},
 				addPanel: function(panel) {
 					if (this.panels.length === 0) {
 						this.makeActive(panel);
@@ -538,7 +538,7 @@ helpers.makeTests("can-component examples", function(doc) {
 				view: stache("{{#if active}}<content></content>{{/if}}"),
 				tag: "panel",
 				ViewModel: DefineMap.extend({
-					active: {value: false}
+					active: {default: false}
 				}),
 				events: {
 					" inserted": function() {

@@ -17,10 +17,10 @@ test("<can-slot> Works", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			value:"Hello World"
+			default:"Hello World"
 		},
 		body: {
-			value: "Later Gator"
+			default: "Later Gator"
 		}
 	});
 
@@ -56,10 +56,10 @@ test("<can-slot> leakScope false acts as expected", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			value:"Hello World"
+			default:"Hello World"
 		},
 		body: {
-			value: "Later Gator"
+			default: "Later Gator"
 		}
 	});
 
@@ -97,10 +97,10 @@ test("<can-slot> Re-use templates", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			value:"Hello World"
+			default:"Hello World"
 		},
 		body: {
-			value: "Later Gator"
+			default: "Later Gator"
 		}
 	});
 
@@ -183,7 +183,7 @@ test("<can-slot> Context one-way binding works", function() {
 
 	var ViewModel = DefineMap.extend("MyEmailVM",{
 		subject: {
-			value: "Hello World"
+			default: "Hello World"
 		}
 	});
 
@@ -217,7 +217,7 @@ test("<can-slot> Context two-way binding works", function() {
 
 	var ViewModel = DefineMap.extend('MyEmailVM', {}, {
 		subject: {
-			value: "Hello World"
+			default: "Hello World"
 		}
 	});
 
@@ -263,7 +263,7 @@ test("<can-slot> Context child-to-parent binding works", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			value: "Hello World"
+			default: "Hello World"
 		}
 	});
 
@@ -282,7 +282,7 @@ test("<can-slot> Context child-to-parent binding works", function() {
 		),
 		ViewModel: DefineMap.extend({
 			subject: {
-				value: 'Yo'
+				default: 'Yo'
 			}
 		})
 	});
@@ -311,10 +311,10 @@ test("<can-slot> Works alongside <content>", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			value:"Hello World"
+			default:"Hello World"
 		},
 		body: {
-			value: "Later Gator"
+			default: "Later Gator"
 		}
 	});
 
@@ -348,10 +348,10 @@ test("<can-slot> Works alongside <content> with default content", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			value:"Hello World"
+			default:"Hello World"
 		},
 		body: {
-			value: "Later Gator"
+			default: "Later Gator"
 		}
 	});
 
@@ -383,10 +383,10 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 
 	var ViewModel = DefineMap.extend("MyEmailVM",{
 		subject: {
-			value: "Hello World"
+			default: "Hello World"
 		},
 		showSubject: {
-			value: true
+			default: true
 		}
 	});
 
