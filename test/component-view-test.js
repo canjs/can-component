@@ -446,4 +446,26 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
 	});
 
+    QUnit.test("content tag available (#279)", function() {
+        var template = stache("<ct-outer>CT-OUTER-LIGHT-DOM</ct-outer>");
+
+        Component.extend({
+            tag: "ct-outer",
+            view: "CT-OUTER-SHADOW-START <ct-inner/> <span><content/></span> CT-OUTER-SHADOW-END"
+        });
+
+        Component.extend({
+            tag: "ct-inner",
+            leakScope: true,
+            view: stache("")
+        });
+
+        var frag = template();
+
+		var span = frag.firstChild.getElementsByTagName("span")[0];
+        QUnit.equal(span.innerHTML, "CT-OUTER-LIGHT-DOM");
+
+
+	});
+
 });
