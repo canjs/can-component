@@ -5,49 +5,65 @@
 
 Provides or describes a constructor function that provides values and methods
 to the component’s [can-component::view view]. The constructor function
-is initialized with values specified by the component element’s [can-stache-bindings data bindings].
+is initialized with values specified by the component element’s
+[can-stache-bindings data bindings].
 
 @type {Object} An object that will be passed to [can-define/map/map.extend DefineMap.extend] and
 used to create a new observable instance accessible by the component’s [can-component::view].
 
-For example, every time `<my-tag>` is found, a new [can-define/map/map DefineMap] instance
-will be created:
+  For example, every time `<my-tag>` is found, a new [can-define/map/map DefineMap] instance
+  will be created:
 
-```js
-import Component from "can-component";
+  ```html
+  <my-tag></my-tag>
 
-Component.extend( {
+  <script type="module">
+  import {Component} from "can";
+
+  Component.extend({
 	tag: "my-tag",
 	ViewModel: {
-		message: "string"
+      message: {default: "Hello there!"}
 	},
-	view: "<h1>{{message}}</h1>"
-} );
-```
+	view: `<h1>{{message}}</h1>`
+  });
 
-@type {function} A constructor function (usually defined by [can-define/map/map.extend DefineMap.extend] or
-[can-map Map.extend]) that will be used to create a new observable instance accessible by
-the component’s [can-component::view].
+  var viewModelInstance = document.querySelector("my-tag").viewModel;
+  console.log(viewModelInstance) //-> MyTagVM{message: "Hello there!"}
+  </script>
+  ```
+  @codepen
 
-For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
-be created:
+@type {function} A constructor function (usually defined by [can-define/map/map.extend DefineMap.extend],
+or [can-observe.Object observe.Object]) that will be used to create a new observable instance accessible by the component’s [can-component::view].
 
-```js
-import Component from "can-component";
-import DefineMap from "can-define/map/map";
+  For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
+  be created:
 
-const MyTagViewModel = DefineMap.extend( "MyTagViewModel", {
-	message: "string"
-} );
+  ```html
+  <my-tag></my-tag>
 
-Component.extend( {
+  <script type="module">
+  import {Component, DefineMap} from "can";
+
+  const MyTagViewModel = DefineMap.extend( "MyTagViewModel", {
+  	message: {default: "Hello there!"}
+  } );
+
+  Component.extend({
 	tag: "my-tag",
 	ViewModel: MyTagViewModel,
-	view: "<h1>{{message}}</h1>"
-} );
-```
+	view: `<h1>{{message}}</h1>`
+  });
 
-Use [can-view-model] to read a component’s view model instance.
+  var viewModelInstance = document.querySelector("my-tag").viewModel;
+  console.log(viewModelInstance) //-> MyTagViewModel{message: "Hello there!"}
+  </script>
+  ```
+  @codepen
+
+
+  Use `element.viewModel` to read a component’s view-model instance.
 
 @param {Object} properties The initial properties that are passed by the [can-stache-bindings data bindings].
 
@@ -65,6 +81,11 @@ added to the top of the [can-view-scope] the component’s [can-component::view]
 
 @body
 
+## Background
+
+Before reading this documentation, it's useful to have read the [guides/technology-overview]
+and [guides/html] guides.
+
 ## Use
 
 [can-component]’s ViewModel property is used to create an __object__, typically an instance
@@ -72,7 +93,12 @@ of a [can-define/map/map], that will be used to render the component’s
 view. This is most easily understood with an example.  The following
 component shows the current page number based off a `limit` and `offset` value:
 
-```js
+```html
+<my-paginate></my-paginate>
+
+<script type="module">
+import {DefineMap, Component} from "can";
+
 const MyPaginateViewModel = DefineMap.extend( {
 	offset: { default: 0 },
 	limit: { default: 20 },
@@ -86,17 +112,11 @@ Component.extend( {
 	ViewModel: MyPaginateViewModel,
 	view: "Page {{page}}."
 } );
+</script>
 ```
+@codepen
 
-If this component HTML was inserted into the page like:
-
-```js
-const renderer = stache( "<my-paginate/>" );
-const frag = renderer();
-document.body.appendChild( frag );
-```
-
-It would result in:
+This will result in:
 
 ```html
 <my-paginate>Page 1</my-paginate>
@@ -127,7 +147,12 @@ that anonymous type as the view model.
 
 The following does the same as above:
 
-```js
+```html
+<my-paginate></my-paginate>
+
+<script type="module">
+import {Component} from "can";
+
 Component.extend( {
 	tag: "my-paginate",
 	ViewModel: {
@@ -139,7 +164,9 @@ Component.extend( {
 	},
 	view: "Page {{page}}."
 } );
+</script>
 ```
+@codepen
 
 ## Values passed from attributes
 
@@ -175,6 +202,7 @@ Component.extend( {
 ```
 
 If `<my-paginate>` is used like:
+
 
 ```js
 const renderer = stache( "<my-paginate offset:from='index' limit:from='size' />" );
