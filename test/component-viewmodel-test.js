@@ -543,26 +543,77 @@ helpers.makeTests("can-component viewModels", function(){
 
     });
 
-		QUnit.test("Can be called on an element using preventDataBindings (#183)", function(){
-			Component.extend({
-				tag: "prevent-data-bindings",
-				ViewModel: {},
-				view: stache("{{value}}")
-			});
-
-			var document = this.document;
-			var el = document.createElement("div");
-			var callback = tag("prevent-data-bindings");
-
-			var vm = new observe.Object({ value: "it worked" });
-			el[canSymbol.for('can.viewModel')] = vm;
-			canData.set.call(el, "preventDataBindings", true);
-			callback(el, {
-				scope: new Scope({ value: "it did not work" })
-			});
-			canData.set.call(el, "preventDataBindings", false);
-
-			QUnit.equal(el.firstChild.nodeValue, "it worked");
+	QUnit.test("Can be called on an element using preventDataBindings (#183)", function(){
+		Component.extend({
+			tag: "prevent-data-bindings",
+			ViewModel: {},
+			view: stache("{{value}}")
 		});
+
+		var document = this.document;
+		var el = document.createElement("div");
+		var callback = tag("prevent-data-bindings");
+
+		var vm = new observe.Object({ value: "it worked" });
+		el[canSymbol.for('can.viewModel')] = vm;
+		canData.set.call(el, "preventDataBindings", true);
+		callback(el, {
+			scope: new Scope({ value: "it did not work" })
+		});
+		canData.set.call(el, "preventDataBindings", false);
+
+		QUnit.equal(el.firstChild.nodeValue, "it worked");
+	});
+
+    QUnit.test("viewModel available as viewModel property (#282)", function() {
+		Component.extend({
+			tag: "can-map-viewmodel",
+			view: stache("{{name}}"),
+			viewModel: {
+                name: "Matthew"
+			}
+		});
+
+		var renderer = stache("<can-map-viewmodel></can-map-viewmodel>");
+
+		var fragOne = renderer();
+		var vmOne = fragOne.firstChild.viewModel;
+
+		var fragTwo = renderer();
+
+		vmOne.set("name", "Wilbur");
+
+		equal(fragOne.firstChild.firstChild.nodeValue, "Wilbur", "The first map changed values");
+		equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
+	});
+
+    QUnit.test("connectedCallback without a disconnect calls stopListening", 1, function(){
+        QUnit.stop();
+
+        var map = new SimpleMap();
+
+        Component.extend({
+            tag: "connected-component-listen",
+            view: stache('rendered'),
+            ViewModel: {
+                connectedCallback: function(element) {
+                    this.listenTo(map,"foo", function(){});
+                }
+            }
+        });
+        var template = stache("<connected-component-listen/>");
+        var frag = template();
+        var first = frag.firstChild;
+        domMutateNode.appendChild.call(this.fixture, frag);
+
+        helpers.afterMutation(function(){
+
+            domMutateNode.removeChild.call(first.parentNode, first);
+            helpers.afterMutation(function(){
+                QUnit.notOk( canReflect.isBound(map), "stopListening no matter what on vm");
+                QUnit.start();
+            });
+        });
+    });
 
 });

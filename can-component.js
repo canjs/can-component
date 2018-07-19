@@ -455,6 +455,7 @@ var Component = Construct.extend(
 			this.viewModel = viewModel;
 
 			el[viewModelSymbol] = viewModel;
+			el.viewModel = viewModel;
 			domData.set.call(el, "preventDataBindings", true);
 
 			// ## Helpers
@@ -558,6 +559,8 @@ var Component = Construct.extend(
 				}
 				if(disconnectedCallback) {
 					disconnectedCallback(el);
+				} else if(typeof viewModel.stopListening === "function"){
+					viewModel.stopListening();
 				}
 			}, componentTagData.parentNodeList || true, false);
 			nodeList.expression = "<" + this.tag + ">";
