@@ -52,7 +52,7 @@
     "can-namespace": "1.0.0",
     "can-observation": "^4.0.0",
     "can-queues": "^1.0.0",
-    "can-reflect": "^1.6.0",
+    "can-reflect": "1.17.0",
     "can-simple-map": "^4.1.0",
     "can-simple-observable": "^2.0.0",
     "can-stache": "^4.10.0",
