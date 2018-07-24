@@ -211,3 +211,38 @@ it produces:
 ```html
 <my-greeting><h1>Hello World</h1></my-greeting>
 ```
+
+### Omitting view entirely
+
+If the user does not provide a view property,
+the content -whether defined or passed inline, will be rendered instead.
+
+This means a component like this:
+
+```js
+Component.extend({
+	tag: "my-greeting",
+})
+```
+
+will cause `<my-greeting>Hello Friend</my-greeting>` to render like:
+
+```html
+<my-greeting>Hello Friend</my-greeting>
+```
+
+and 
+
+```js
+Component.extend({
+	tag: "my-greeting",
+	content: "Hello World"
+})
+```
+
+to render like:
+
+
+```html
+<my-greeting>Hello World</my-greeting>
+```

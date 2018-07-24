@@ -273,6 +273,36 @@ Changes `<hello-world>Hi There</hello-world>` into:
 <hello-world><h1>Hi There</h1></hello-world>
 ```
 
+Essentially, the children of the component tag will be treated as it's [can-component/content], 
+to be rendered wherever the tag is provided in the component view.
+
+If no view is provided to a Component, it will render it's content naively.
+
+A component like this:
+
+```js
+Component.extend({
+  tag: "can-el",
+  ViewModel: {
+    hovMessage: {
+        default: "I'm from can-el viewModel",
+    }
+  }
+});
+```
+
+Can be rendered like: `<can-el>Here's my content!</can-el>` into exactly what it looks like:
+
+```html
+<can-el>Here's my content!</can-el>
+```
+
+or you can render viewModel properties using magic tags like : `<can-el>{{hovMessage}}</can-el>`, which renders like:
+
+```html
+<can-el>I'm from can-el viewModel</can-el>
+```
+
 ### ViewModel
 
 A component’s [can-component::ViewModel ViewModel] defines a constructor that creates
@@ -620,6 +650,8 @@ This would make `helloWorldInstance.element` a fragment with the following struc
 ```html
 <hello-world>Hello <em>mundo</em></hello-world>
 ```
+
+
 
 ### scope
 
