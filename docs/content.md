@@ -35,3 +35,29 @@ Component.extend( {
 	view: "<h1><content>Hi There!</content></h1>"
 } );
 ```
+
+The children of `<content>` can be used as a default value for rendering in the case that no content is passed.
+
+for example: 
+```js
+Component.extend( {
+    tag: "my-tag",
+    view: stache( "<h1><content>Hello world</content></h1>" )
+} );
+```
+
+used like `<my-tag></my-tag>`
+
+will render:
+
+```html
+<my-tag><h1>Hello world</h1></my-tag>
+```
+
+When the content is specified, those children will be ignored: 
+
+`<my-tag>Hello friend</my-tag>` will render:
+
+```html
+<my-tag><h1>Hello friend</h1></my-tag>
+```
