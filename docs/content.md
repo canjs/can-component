@@ -36,11 +36,7 @@ Component.extend( {
 } );
 ```
 
-<<<<<<< HEAD
 The children of `<content>` can be used as a default value for rendering in the case that no content is passed.
-=======
-the `<content>` tag works like it's own component and will not render it's own `LIGHT_DOM` if not accounted for in it's markup
->>>>>>> eefd91b9fe075fbf206222d0ac208e6b7dd1fd85
 
 for example: 
 ```js
@@ -58,15 +54,9 @@ will render:
 <my-tag><h1>Hello world</h1></my-tag>
 ```
 
-<<<<<<< HEAD
 When the content is specified, those children will be ignored: 
 
 `<my-tag>Hello friend</my-tag>` will render:
-=======
-however, used like `<my-tag>Hello friend</my-tag>`
-
-will render:
->>>>>>> eefd91b9fe075fbf206222d0ac208e6b7dd1fd85
 
 ```html
 <my-tag><h1>Hello friend</h1></my-tag>

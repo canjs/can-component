@@ -244,6 +244,7 @@ reference to the viewModel instance and modify it. This can be seen in the
 following example:
 
 @demo demos/can-component/accordion.html
+@codepen
 
 Clicking the __Change title__ button sets a `<my-panel>` element’s `title`
 attribute like:
@@ -286,6 +287,7 @@ Component.extend( {
 ViewModel methods get called back with the current context, the element that you are listening to and the event that triggered the callback.
 
 @demo demos/can-component/paginate_next.html
+@codepen
 
 ## Publishing events on ViewModels
 
@@ -317,3 +319,4 @@ The following demo uses this ability to create a close button that
 hides the player editor:
 
 @demo demos/can-component/paginate_next_event.html
+@codepen

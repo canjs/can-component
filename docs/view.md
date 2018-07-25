@@ -48,6 +48,7 @@ There are three things to understand about a [can-component]’s view:
 The following example demonstrates all three features:
 
 @demo demos/can-component/my_greeting_full.html
+@codepen
 
 The following explains how each part works:
 

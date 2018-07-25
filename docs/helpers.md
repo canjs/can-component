@@ -19,3 +19,4 @@ uses an `isSelected` helper to render content for selected items. Click
 one of the following libraries to toggle them within the `selected` array.
 
 @demo demos/can-component/selected.html
+@codepen

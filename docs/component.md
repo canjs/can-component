@@ -189,7 +189,7 @@ document.body.appendChild( renderer( { } ) );
 Check this out here:
 
 @demo demos/can-component/click_me.html
-
+@codepen
 
 Typically, you do not append a single component at a time.  Instead,
 you’ll render a view with many custom tags like:
@@ -722,6 +722,7 @@ The following demos a tabs widget.  Click “Add Vegetables”
 to add a new tab.
 
 @demo demos/can-component/tabs.html
+@codepen
 
 An instance of the tabs widget is created by creating `<my-tabs>` and `<my-panel>`
 elements like:
@@ -756,6 +757,7 @@ vm.addPanel( this.viewModel );
 The following tree combo lets people walk through a hierarchy and select locations.
 
 @demo demos/can-component/treecombo.html
+@codepen
 
 The secret to this widget is the viewModel’s `breadcrumb` property, which is an array
 of items the user has navigated through, and `selectableItems`, which represents the children of the
@@ -804,6 +806,7 @@ The following example shows 3
 widget-like components: a grid, next / prev buttons, and a page count indicator. And, it shows an application component that puts them all together.
 
 @demo demos/can-component/paginate.html
+@codepen
 
 This demo uses a `Paginate` [can-define/map/map] to assist with maintaining a paginated state:
 
