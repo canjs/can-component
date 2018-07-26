@@ -215,7 +215,7 @@ it produces:
 
 ### Omitting view entirely
 
-If the user does not provide a view property,
+If the Component does not contain a view property,
 the content -whether defined or passed inline, will be rendered instead.
 
 This means a component like this:

@@ -36,13 +36,13 @@ Component.extend( {
 } );
 ```
 
-The children of `<content>` can be used as a default value for rendering in the case that no content is passed.
+The children of `<content>` present a `SHADOW_DOM` for rendering in the case that no `LIGHT_DOM` is passed and no `content` is defined.
 
 for example: 
 ```js
 Component.extend( {
     tag: "my-tag",
-    view: stache( "<h1><content>Hello world</content></h1>" )
+    view: "<h1><content>Hello world</content></h1>"
 } );
 ```
 

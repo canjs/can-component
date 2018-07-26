@@ -273,12 +273,12 @@ Changes `<hello-world>Hi There</hello-world>` into:
 <hello-world><h1>Hi There</h1></hello-world>
 ```
 
-Essentially, the children of the component tag will be treated as it's [can-component/content], 
-to be rendered wherever the tag is provided in the component view.
+Essentially, the children(`<h1>Hi There</h1>` above) of the Component tag(`<hello-world />` above) will be treated as its [can-component/content], 
+to be rendered wherever the tag is provided in the Component view.
 
-If no view is provided to a Component, it will render it's content naively.
+If a Component is defined without a view property, it will simply render whatever `LIGHT_DOM` it is given.
 
-A component like this:
+A Component like this:
 
 ```js
 Component.extend({
@@ -297,10 +297,36 @@ Can be rendered like: `<can-el>Here's my content!</can-el>` into exactly what it
 <can-el>Here's my content!</can-el>
 ```
 
-or you can render viewModel properties using magic tags like : `<can-el>{{hovMessage}}</can-el>`, which renders like:
+And a set of Components, where one lacks a view:
+
+```js
+Component.extend({
+  tag: "can-el",
+  ViewModel: {
+    hovMessage: {
+        default: "I'm from can-el",
+    }
+  }
+});
+Component.extend({
+  tag: "can-simple",
+  view: "<can-el>{{hovMessage}}</can-el>",
+  ViewModel: {
+    hovMessage: {
+        default: "I'm from can-simple",
+    }
+  }
+});
+```
+
+can still be rendered like this `<can-simple></can-simple>`, to show:
 
 ```html
-<can-el>I'm from can-el viewModel</can-el>
+<can-simple>
+  <can-el>
+    I'm from can-el
+  </can-el>
+</can-simple>
 ```
 
 ### ViewModel
