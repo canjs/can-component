@@ -273,60 +273,70 @@ Changes `<hello-world>Hi There</hello-world>` into:
 <hello-world><h1>Hi There</h1></hello-world>
 ```
 
-Essentially, the children(`<h1>Hi There</h1>` above) of the Component tag(`<hello-world />` above) will be treated as its [can-component/content], 
-to be rendered wherever the tag is provided in the Component view.
+In the example above, the child (`<h1>Hi There</h1>`) of the component’s element
+(`<hello-world>`) is treated as its [can-component/content] and rendered
+wherever the `<content />` placeholder is provided in the component’s `view`.
 
-If a Component is defined without a view property, it will simply render whatever `LIGHT_DOM` it is given.
-
-A Component like this:
-
-```js
-Component.extend({
-  tag: "can-el",
-  ViewModel: {
-    hovMessage: {
-        default: "I'm from can-el viewModel",
-    }
-  }
-});
-```
-
-Can be rendered like: `<can-el>Here's my content!</can-el>` into exactly what it looks like:
-
-```html
-<can-el>Here's my content!</can-el>
-```
-
-And a set of Components, where one lacks a view:
+If a component is defined **without** a [can-component.prototype.view] property,
+it will render whatever `LIGHT_DOM` it is given. For example, a component as
+follows:
 
 ```js
 Component.extend({
-  tag: "can-el",
-  ViewModel: {
-    hovMessage: {
-        default: "I'm from can-el",
-    }
-  }
-});
-Component.extend({
-  tag: "can-simple",
-  view: "<can-el>{{hovMessage}}</can-el>",
-  ViewModel: {
-    hovMessage: {
-        default: "I'm from can-simple",
-    }
-  }
+	tag: "my-el",
+	events: {
+		click: function() {
+			// Fired when the <my-el> element is clicked
+		}
+	}
 });
 ```
 
-can still be rendered like this `<can-simple></can-simple>`, to show:
+…used like so:
 
 ```html
-<can-simple>
-  <can-el>
-    I'm from can-el
-  </can-el>
-</can-simple>
+<my-el>Here’s my content!</my-el>
+```
+
+…will be rendered as:
+
+```html
+<my-el>Here’s my content!</my-el>
+```
+
+With [can-component.prototype.leakScope] enabled, the component’s ViewModel can
+provide data to the LIGHT_DOM it contains, such that components like this:
+
+```js
+Component.extend({
+	leakScope: true,
+	tag: "my-el",
+	ViewModel: {
+		message: {
+			default: "I’m from my-el",
+		}
+	}
+});
+
+Component.extend({
+	tag: "my-app",
+	view: "<my-el>{{message}}</my-el>",
+	ViewModel: {
+		message: {
+			default: "I’m from my-app",
+		}
+	}
+});
+```
+
+…will be rendered as:
+
+```html
+<my-app>
+  <my-el>
+    I’m from my-el
+  </my-el>
+</my-app>
 ```
 
 ### ViewModel
