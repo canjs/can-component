@@ -215,8 +215,8 @@ it produces:
 
 ### Omitting view entirely
 
-If the Component does not contain a view property,
-the content -whether defined or passed inline, will be rendered instead.
+If a component does not have a `view` defined,
+the content (whether defined or passed inline) will be rendered instead.
 
 This means a component like this:
 
@@ -226,23 +226,22 @@ Component.extend({
 })
 ```
 
-will cause `<my-greeting>Hello Friend</my-greeting>` to render like:
+…will cause `<my-greeting>Hello Friend</my-greeting>` to render like:
 
 ```html
 <my-greeting>Hello Friend</my-greeting>
 ```
 
-and 
+The following component:
 
 ```js
 Component.extend({
 	tag: "my-greeting",
-	content: "Hello World"
+	view: "Hello World"
 })
 ```
 
-to render like:
-
+…will render like:
 
 ```html
 <my-greeting>Hello World</my-greeting>
