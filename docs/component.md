@@ -615,7 +615,7 @@ const helloWorldInstance = new HelloWorld({
 });
 ```
 
-This would make `helloWorldInstance.element` a fragment with the following structure:
+This would make `helloWorldInstance.element` an element with the following structure:
 
 ```html
 <hello-world>Hello <em>mundo</em></hello-world>
