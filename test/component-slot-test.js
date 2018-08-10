@@ -6,8 +6,6 @@ var DefineMap = require('can-define/map/map');
 var viewModel = require("can-view-model");
 var canSymbol = require("can-symbol");
 
-window.queues = require("can-queues");
-
 
 QUnit.module("can-components - can-slots");
 
