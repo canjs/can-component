@@ -67,9 +67,13 @@ function addContext(el, tagData, insertionElementTagData) {
 
 	// insertionElementTagData is where the <content> element is in the shadow dom
 	// it should be used for bindings
-	var teardown = stacheBindings.behaviors.viewModel(el, insertionElementTagData, function(initialData) {
+	var teardown = stacheBindings.behaviors.viewModel(el, insertionElementTagData, function(initialData, hasDataBinding, bindingState) {
 		// Create a compute responsible for keeping the vm up-to-date
-		return vm = new SimpleObservable(initialData);
+		if(bindingState && bindingState.isSettingOnViewModel === true) {
+			return vm = new SimpleMap(initialData);
+		} else {
+			return vm = new SimpleObservable(initialData);
+		}
 	}, undefined, true);
 
 

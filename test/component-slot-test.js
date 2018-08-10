@@ -17,7 +17,7 @@ test("<can-slot> Works", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			default:"Hello World"
+			default: "Hello World"
 		},
 		body: {
 			default: "Later Gator"
@@ -25,8 +25,8 @@ test("<can-slot> Works", function() {
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="subject" />' +
 			'<can-slot name="body" />'
 		),
@@ -36,12 +36,12 @@ test("<can-slot> Works", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject">' +
-				'{{subject}}' +
-			'</can-template>' +
-			'<can-template name="body">' +
-				'{{body}}' +
-			'</can-template>' +
+		'<can-template name="subject">' +
+		'{{subject}}' +
+		'</can-template>' +
+		'<can-template name="body">' +
+		'{{body}}' +
+		'</can-template>' +
 		'</my-email>'
 	);
 
@@ -56,7 +56,7 @@ test("<can-slot> leakScope false acts as expected", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			default:"Hello World"
+			default: "Hello World"
 		},
 		body: {
 			default: "Later Gator"
@@ -64,8 +64,8 @@ test("<can-slot> leakScope false acts as expected", function() {
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="subject" />' +
 			'<can-slot name="body" />'
 		),
@@ -74,12 +74,12 @@ test("<can-slot> leakScope false acts as expected", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject">' +
-				'{{subject}}' +
-			'</can-template>' +
-			'<can-template name="body">' +
-				'{{body}}' +
-			'</can-template>' +
+		'<can-template name="subject">' +
+		'{{subject}}' +
+		'</can-template>' +
+		'<can-template name="body">' +
+		'{{body}}' +
+		'</can-template>' +
 		'</my-email>'
 	);
 
@@ -97,7 +97,7 @@ test("<can-slot> Re-use templates", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			default:"Hello World"
+			default: "Hello World"
 		},
 		body: {
 			default: "Later Gator"
@@ -105,8 +105,8 @@ test("<can-slot> Re-use templates", function() {
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="subject" />' +
 			'<can-slot name="subject" />'
 		),
@@ -116,9 +116,9 @@ test("<can-slot> Re-use templates", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject">' +
-				'{{subject}}' +
-			'</can-template>' +
+		'<can-template name="subject">' +
+		'{{subject}}' +
+		'</can-template>' +
 		'</my-email>'
 	);
 
@@ -134,10 +134,10 @@ test("<can-slot> Works with default content", function() {
 	var ViewModel = DefineMap.extend({});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="subject">' +
-				'Default Content' +
+			'Default Content' +
 			'</can-slot>'
 		),
 		ViewModel: ViewModel
@@ -145,7 +145,7 @@ test("<can-slot> Works with default content", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject" />' +
+		'<can-template name="subject" />' +
 		'</my-email>'
 	);
 
@@ -160,10 +160,10 @@ test("<can-slot> Works in a self-closing template", function() {
 	var ViewModel = DefineMap.extend({});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="subject">' +
-				'Default Content' +
+			'Default Content' +
 			'</can-slot>'
 		),
 		ViewModel: ViewModel
@@ -181,15 +181,15 @@ test("<can-slot> Works in a self-closing template", function() {
 test("<can-slot> Context one-way binding works", function() {
 	/*Passing in a custom context like <can-slot name='subject' {context}='value' />*/
 
-	var ViewModel = DefineMap.extend("MyEmailVM",{
+	var ViewModel = DefineMap.extend("MyEmailVM", {
 		subject: {
 			default: "Hello World"
 		}
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="foo" this:from="subject" />'
 		),
 		ViewModel: ViewModel
@@ -197,7 +197,7 @@ test("<can-slot> Context one-way binding works", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><span>{{this}}</span></can-template>' +
+		'<can-template name="foo"><span>{{this}}</span></can-template>' +
 		'</my-email>'
 	);
 
@@ -222,16 +222,16 @@ test("<can-slot> Context two-way binding works", function() {
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="foo" this:bind="subject" />'
 		),
 		ViewModel: ViewModel
 	});
 
 	Component.extend({
-		tag : 'my-subject',
-		view : stache(
+		tag: 'my-subject',
+		view: stache(
 			'{{subject}}'
 		),
 		ViewModel: DefineMap.extend("SubjectVM")
@@ -239,7 +239,7 @@ test("<can-slot> Context two-way binding works", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject subject:bind="this" /></can-template>' +
+		'<can-template name="foo"><my-subject subject:bind="this" /></can-template>' +
 		'</my-email>'
 	);
 
@@ -268,16 +268,16 @@ test("<can-slot> Context child-to-parent binding works", function() {
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="foo" this:to="subject" />'
 		),
 		ViewModel: ViewModel
 	});
 
 	Component.extend({
-		tag : 'my-subject',
-		view : stache(
+		tag: 'my-subject',
+		view: stache(
 			'{{subject}}'
 		),
 		ViewModel: DefineMap.extend({
@@ -289,7 +289,7 @@ test("<can-slot> Context child-to-parent binding works", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="foo"><my-subject subject:to="this" /></can-template>' +
+		'<can-template name="foo"><my-subject subject:to="this" /></can-template>' +
 		'</my-email>'
 	);
 
@@ -311,7 +311,7 @@ test("<can-slot> Works alongside <content>", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			default:"Hello World"
+			default: "Hello World"
 		},
 		body: {
 			default: "Later Gator"
@@ -319,8 +319,8 @@ test("<can-slot> Works alongside <content>", function() {
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="subject" />' +
 			'<content />'
 		),
@@ -330,10 +330,10 @@ test("<can-slot> Works alongside <content>", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject">' +
-				'<p>{{subject}}</p>' +
-			'</can-template>' +
-			'<span>Some content</span>' +
+		'<can-template name="subject">' +
+		'<p>{{subject}}</p>' +
+		'</can-template>' +
+		'<span>Some content</span>' +
 		'</my-email>'
 	);
 
@@ -348,7 +348,7 @@ test("<can-slot> Works alongside <content> with default content", function() {
 
 	var ViewModel = DefineMap.extend({
 		subject: {
-			default:"Hello World"
+			default: "Hello World"
 		},
 		body: {
 			default: "Later Gator"
@@ -356,8 +356,8 @@ test("<can-slot> Works alongside <content> with default content", function() {
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'<can-slot name="subject" />' +
 			'<content>Default content</content>'
 		),
@@ -367,9 +367,9 @@ test("<can-slot> Works alongside <content> with default content", function() {
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject">' +
-				'<p>{{subject}}</p>' +
-			'</can-template>' +
+		'<can-template name="subject">' +
+		'<p>{{subject}}</p>' +
+		'</can-template>' +
 		'</my-email>'
 	);
 
@@ -381,7 +381,7 @@ test("<can-slot> Works alongside <content> with default content", function() {
 
 test("<can-slot> Can be used conditionally and will remove bindings", function() {
 
-	var ViewModel = DefineMap.extend("MyEmailVM",{
+	var ViewModel = DefineMap.extend("MyEmailVM", {
 		subject: {
 			default: "Hello World"
 		},
@@ -391,8 +391,8 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 	});
 
 	Component.extend({
-		tag : 'my-email',
-		view : stache(
+		tag: 'my-email',
+		view: stache(
 			'{{#if showSubject}}<can-slot name="subject" this:from="subject" />{{/if}}'
 		),
 		ViewModel: ViewModel
@@ -400,9 +400,9 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 
 	var renderer = stache(
 		'<my-email>' +
-			'<can-template name="subject">' +
-				'<p>{{this}}</p>' +
-			'</can-template>' +
+		'<can-template name="subject">' +
+		'<p>{{this}}</p>' +
+		'</can-template>' +
 		'</my-email>'
 	);
 
@@ -424,21 +424,21 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 		var handlers = vm[canSymbol.for('can.meta')].handlers;
 		QUnit.equal(handlers.get(['subject']).length, 0);
 		QUnit.start();
-	},50);
+	}, 50);
 });
 
 
-test("blocks directly nested within template", function(){
+test("blocks directly nested within template", function() {
 
 	var template = stache(
-		'<home-page>'+
-			'<can-template name="stuff">'+
-				'{{#if(showIf)}}'+
-					'<span>.showIf is true</span>'+
-				'{{else}}'+
-					'<span>.showIf is false</span>'+
-				'{{/if}}'+
-			'</can-template>'+
+		'<home-page>' +
+		'<can-template name="stuff">' +
+		'{{#if(showIf)}}' +
+		'<span>.showIf is true</span>' +
+		'{{else}}' +
+		'<span>.showIf is false</span>' +
+		'{{/if}}' +
+		'</can-template>' +
 		'</home-page>');
 
 	var viewModel = new DefineMap({
@@ -447,8 +447,8 @@ test("blocks directly nested within template", function(){
 	});
 	Component.extend({
 		tag: 'home-page',
-		view: stache("{{#if(showSlot)}}"+
-	  		'<can-slot name="stuff" this:from="this"/>'+
+		view: stache("{{#if(showSlot)}}" +
+			'<can-slot name="stuff" this:from="this"/>' +
 			'{{/if}}'),
 		viewModel: viewModel
 	});
@@ -461,4 +461,34 @@ test("blocks directly nested within template", function(){
 
 	var spans = homePage.getElementsByTagName("span");
 	QUnit.equal(spans.length, 0, "all spans removed");
+});
+
+QUnit.test("able to pass individual values (#291)", function() {
+	Component.extend({
+		tag: "pass-values-to-slots",
+		view: '<can-slot name="countDisplay" count:from="count"/>',
+		ViewModel: {
+			count: {
+				type: "number",
+				default: 0
+			},
+			add: function(increment) {
+				this.count += increment;
+			}
+		}
+	});
+
+	var template = stache("<pass-values-to-slots count:from='5'>"+
+			"<can-template name='countDisplay'>"+
+				"<span class='count'>{{count}}</span>"+
+			"</can-template>"+
+		"</pass-values-to-slots>");
+
+	var frag = template();
+
+	var passValuesToSlots = frag.firstElementChild;
+	passValuesToSlots.viewModel.add(5);
+	var count = passValuesToSlots.querySelector(".count");
+
+	QUnit.equal(count.innerHTML, "10", "updated count value");
 });
