@@ -168,8 +168,8 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 		// Loop through all the props to create the new binding and get the initial
 		// values (so the viewModel can be created with the initial values)
 		canReflect.eachKey(componentInitVM, function(parent, propName) {
-			var canGetParentValue = parent === null ? false : !!parent[getValueSymbol];
-			var canSetParentValue = parent === null ? false : parent[setValueSymbol];
+			var canGetParentValue = parent != null && !!parent[getValueSymbol];
+			var canSetParentValue = parent != null && !!parent[setValueSymbol];
 
 			// If we can get or set the value, then we’ll create a binding
 			if (canGetParentValue === true || canSetParentValue) {
