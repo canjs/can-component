@@ -159,7 +159,12 @@ QUnit.test("Components can be instantiated with viewModel", function() {
 			fromChildProp: "string",
 			plainProp: "string",
 			toParentProp: "string",
-			twoWayProp: "string"
+			twoWayProp: "string",
+			nullProp: {
+				default: function() {
+					return 'bar';
+				}
+			}
 		}
 	});
 
@@ -170,7 +175,8 @@ QUnit.test("Components can be instantiated with viewModel", function() {
 			plainProp: "plain value",
 			fromChildProp: value.from(fromMap, "inner.key"),
 			toParentProp: value.to(toMap, "inner.key"),
-			twoWayProp: value.bind(bindMap, "inner.key")
+			twoWayProp: value.bind(bindMap, "inner.key"),
+			nullProp: null
 		}
 	});
 	var element = componentInstance.element;
@@ -181,6 +187,7 @@ QUnit.test("Components can be instantiated with viewModel", function() {
 	QUnit.equal(viewModel.plainProp, "plain value", "plainProp init");
 	QUnit.equal(viewModel.toParentProp, undefined, "toParentProp init");
 	QUnit.equal(viewModel.twoWayProp, "original bind value", "twoWayProp init");
+	QUnit.equal(viewModel.nullProp, null, "nullProp init");
 
 	// Updating the fromChildProp
 	fromMap.get("inner").set("key", "new from value");
