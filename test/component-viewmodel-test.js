@@ -202,19 +202,22 @@ helpers.makeTests("can-component viewModels", function(){
 			if (timesComputeIsCalled === 1) {
 				ok(true, "reading initial value to set as years");
 			} else if (timesComputeIsCalled === 3) {
-				ok(true, "updating value to 31");
+				ok(true, "called back another time after set to get the value");
 			} else {
-                ok(false, "You've called the callback " + timesComputeIsCalled + " times");
+          debugger;
+                ok(false, "(getter) You've called the callback " + timesComputeIsCalled + " times");
             }
 
+      console.log("Getting, " + sourceAge.get());
 			return sourceAge.get();
 
 		}, function(newVal){
+      console.log("Setting, " + newVal)
             timesComputeIsCalled++;
             if (timesComputeIsCalled === 2) {
-				ok(true, "called back another time after set to get the value");
+				ok(true, "updating value to " + newVal);
 			} else {
-				ok(false, "You've called the callback " + timesComputeIsCalled + " times");
+				ok(false, "(setter) You've called the callback " + timesComputeIsCalled + " times");
 			}
             sourceAge.set(newVal);
         });
@@ -455,9 +458,10 @@ helpers.makeTests("can-component viewModels", function(){
 
 
 	test("conditional attributes (#2077)", function(){
+    
 		Component.extend({
 			tag: 'some-comp',
-            ViewModel: observe.Object.extend({})
+            ViewModel: DefineMap.extend({ seal: false }, {})
 		});
 		var renderer = stache("<some-comp "+
 			"{{#if preview}}next:from='nextPage'{{/if}} "+
@@ -522,19 +526,19 @@ helpers.makeTests("can-component viewModels", function(){
 
         Component.extend({
             tag: "outer-noleak",
-            ViewModel: observe.Object.extend("Outer",{},{
-                name: "outer"
+            ViewModel: DefineMap.extend("Outer", {}, {
+                name: { default: "outer" },
+                myChild: { default: null }
             }),
             leakScope: false
         });
         Component.extend({
             tag: "my-child",
-            ViewModel : observe.Object.extend("Inner",{},{
-                name: "inner"
+            ViewModel : DefineMap.extend("Inner", {}, {
+                name: { default: "inner" }
             }),
             leakScope: false
         });
-
 
         var renderer = stache("<outer-noleak><my-child this:to='myChild'/></outer-noleak>");
         var frag = renderer();
@@ -554,7 +558,7 @@ helpers.makeTests("can-component viewModels", function(){
 		var el = document.createElement("div");
 		var callback = tag("prevent-data-bindings");
 
-		var vm = new observe.Object({ value: "it worked" });
+		var vm = new DefineMap({ value: "it worked" });
 		el[canSymbol.for('can.viewModel')] = vm;
 		canData.set.call(el, "preventDataBindings", true);
 		callback(el, {
@@ -570,7 +574,7 @@ helpers.makeTests("can-component viewModels", function(){
 			tag: "can-map-viewmodel",
 			view: stache("{{name}}"),
 			viewModel: {
-                name: "Matthew"
+        name: "Matthew"
 			}
 		});
 

@@ -170,7 +170,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         Component.extend({
             tag: 'child-tag',
 
-            ViewModel: SimpleMap.extend({
+            ViewModel: DefineMap.extend({
                 init: function () {
                     inited++;
                 }
@@ -187,8 +187,8 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
             view: stache('{{#shown}}<child-tag></child-tag>{{/shown}}'),
 
-            viewModel: observe.Object.extend("ParentTag",{},{
-                shown: false
+            viewModel: DefineMap.extend("ParentTag",{},{
+                shown: { default: false }
             }),
             events: {
                 ' inserted': function () {
