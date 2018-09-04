@@ -206,12 +206,9 @@ helpers.makeTests("can-component viewModels", function(){
 		} else {
 			ok(false, "(getter) You've called the callback " + timesComputeIsCalled + " times");
 		}
-
-		console.log("Getting, " + sourceAge.get());
 		return sourceAge.get();
 
 	}, function(newVal){
-		console.log("Setting, " + newVal)
 		timesComputeIsCalled++;
 		if (timesComputeIsCalled === 2) {
 			ok(true, "updating value to " + newVal);
