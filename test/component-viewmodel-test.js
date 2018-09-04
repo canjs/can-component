@@ -204,7 +204,6 @@ helpers.makeTests("can-component viewModels", function(){
 			} else if (timesComputeIsCalled === 3) {
 				ok(true, "called back another time after set to get the value");
 			} else {
-          debugger;
                 ok(false, "(getter) You've called the callback " + timesComputeIsCalled + " times");
             }
 
