@@ -204,7 +204,7 @@ QUnit.test("ViewModel properties default to DefineList if set to an Array (#225)
 		view: "Hello, World",
 		ViewModel: {
 			items: {
-				default() {
+				default: function() {
 					return [ "one", "two" ];
 				}
 			}

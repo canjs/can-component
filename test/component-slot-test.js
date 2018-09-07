@@ -486,7 +486,7 @@ QUnit.test("able to pass individual values (#291)", function() {
 
 	var frag = template();
 
-	var passValuesToSlots = frag.firstElementChild;
+	var passValuesToSlots = frag.firstElementChild || frag.firstChild;
 	passValuesToSlots.viewModel.add(5);
 	var count = passValuesToSlots.querySelector(".count");
 
