@@ -42,7 +42,7 @@
     "can-child-nodes": "^1.0.0",
     "can-construct": "^3.2.0",
     "can-control": "^4.0.0",
-    "can-define": "^2.0.0",
+    "can-define": "^2.5.12",
     "can-dom-data-state": "^1.0.1",
     "can-dom-events": "^1.1.0",
     "can-dom-mutate": "^1.0.0",
