@@ -54,7 +54,7 @@
     "can-queues": "^1.0.0",
     "can-reflect": "^1.6.0",
     "can-simple-map": "^4.1.0",
-    "can-simple-observable": "^2.0.0",
+    "can-simple-observable": "^2.3.0",
     "can-stache": "^4.10.0",
     "can-stache-bindings": "^4.4.0",
     "can-stache-key": "^1.0.0",
