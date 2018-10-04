@@ -71,8 +71,8 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 			leakScope: true,
 			view: stache("{{greeting}} <content>World</content>{{../exclamation}}"),
 			viewModel: function(){
-                return new SimpleMap({greeting: "Hello"});
-            }
+				return new SimpleMap({greeting: "Hello"});
+			}
 		});
 
 		var renderer = stache("<hello-world>{{greeting}}</hello-world>");

@@ -73,7 +73,7 @@ helpers.makeTests("can-component examples", function(doc) {
 
 	test("treecombo", function() {
 
-		var TreeComboViewModel = DefineMap.extend({
+		var TreeComboViewModel = DefineMap.extend("TreeComboViewModel",{
 			items: {
 				Default: DefineList
 			},
@@ -150,8 +150,8 @@ helpers.makeTests("can-component examples", function(doc) {
 		});
 
 		var renderer = stache("<treecombo items:bind='locations' title:from='\"Locations\"'></treecombo>");
-
-		var base = new DefineMap({});
+		var BaseViewModel = DefineMap.extend("BaseViewModel",{seal: false},{});
+		var base = new BaseViewModel({});
 
 		var frag = renderer(base);
 		var root = doc.createElement("div");
@@ -222,7 +222,6 @@ helpers.makeTests("can-component examples", function(doc) {
 		stop();
 
 		setTimeout(function() {
-
 			base.set('locations', items);
 
 			var itemsList = base.get('locations');
