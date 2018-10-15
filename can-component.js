@@ -42,7 +42,8 @@ var domEvents = require('can-dom-events');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require('can-symbol');
-var DOCUMENT = require('can-globals/document/document');
+var globals  = require('can-globals');
+var DOCUMENT = globals.getKeyValue('document') 
 
 // Symbols
 var createdByCanComponentSymbol = canSymbol("can.createdByCanComponent");
