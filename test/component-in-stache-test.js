@@ -8,6 +8,8 @@ var QUnit = require("steal-qunit");
 var viewModel = require("can-view-model");
 var canDev = require("can-log/dev/dev");
 var testHelpers = require("can-test-helpers");
+var domMutate = require("can-dom-mutate");
+var globals = require("can-globals");
 
 QUnit.module("can-component can be rendered by can-stache");
 
@@ -116,4 +118,29 @@ QUnit.test("Component can be removed from the page", 3, function(){
 
 	prop.set(4);
 	QUnit.equal(frag.firstChild.getElementsByTagName("to-be-removed")[0].innerHTML, "4");
+});
+
+QUnit.test("Cleans up itself on the documentElement removal", function() {
+	Component.extend({
+		tag: "ssr-cleanup",
+		view: "hello world",
+		ViewModel: {}
+	});
+
+	var doc = document.implementation.createHTMLDocument("Test");
+	var realDoc = globals.getKeyValue("document");
+	globals.setKeyValue("document", doc);
+
+	var frag = stache("<ssr-cleanup />")({});
+	doc.body.appendChild(frag);
+
+	domMutate.onNodeRemoval(doc.body.firstChild, function() {
+		globals.setKeyValue("document", realDoc);
+		QUnit.ok(true, "Called back without throwing");
+		start();
+	})
+
+	stop();
+
+	doc.removeChild(doc.documentElement);
 });

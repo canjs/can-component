@@ -488,7 +488,9 @@ var Component = Construct.extend(
 				});
 			} else {
 				var removalDisposal = domMutate.onNodeRemoval(el, function () {
-					if (!el.ownerDocument.documentElement.contains(el)) {
+					var doc = el.ownerDocument;
+					var rootNode = doc.contains ? doc : doc.documentElement;
+					if (!rootNode.contains(el)) {
 						removalDisposal();
 						callTeardownFunctions();
 					}
