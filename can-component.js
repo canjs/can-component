@@ -29,6 +29,7 @@ var DefineMap = require("can-define/map/map");
 var canLog = require('can-log');
 var canDev = require('can-log/dev/dev');
 var assign = require('can-assign');
+var ObservationRecorder = require("can-observation-recorder");
 require('can-view-model');
 
 // DefineList must be imported so Arrays on the ViewModel
@@ -160,7 +161,7 @@ function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leak
 // function and returning a function that can be used to set up the bindings
 function getSetupFunctionForComponentVM(componentInitVM) {
 	// componentInitVM is the viewModel in `new ComponentConstructor({ viewModel: {...} })`
-	return function(el, makeViewModel, initialVMData) {
+	return ObservationRecorder.ignore(function(el, makeViewModel, initialVMData) {
 		var onCompleteBindings = [];
 		var onTeardowns = [];
 		var viewModel;// This will be created after getting all the initial values
@@ -233,7 +234,7 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 				onTeardown();
 			});
 		};
-	};
+	});
 }
 
 var Component = Construct.extend(

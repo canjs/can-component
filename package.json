@@ -51,6 +51,7 @@
     "can-log": "^1.0.0",
     "can-namespace": "1.0.0",
     "can-observation": "^4.0.0",
+    "can-observation-recorder": "^1.2.0",
     "can-queues": "^1.0.0",
     "can-reflect": "^1.6.0",
     "can-simple-map": "^4.1.0",
