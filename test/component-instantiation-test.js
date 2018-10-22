@@ -273,13 +273,12 @@ QUnit.test("Component binding instantiation works as documented", function() {
 
 	// Create a new instance of our component
 	var componentInstance = new NameComponent({
-	  viewModel: {
-	    givenName: value.from(appVM, "family.first"),
-	    familyName: value.bind(appVM, "family.last"),
-	    fullName: value.to(appVM, "family.full")
-	  }
+		viewModel: {
+			givenName: value.from(appVM, "family.first"),
+			familyName: value.bind(appVM, "family.last"),
+			fullName: value.to(appVM, "family.full")
+		}
 	});
-	var element = componentInstance.element;
 	var viewModel = componentInstance.viewModel;
 
 	// Initial component values are correct
@@ -292,4 +291,44 @@ QUnit.test("Component binding instantiation works as documented", function() {
 	QUnit.equal(family.get("last"), "Flanders", "map “bind” prop is correct");
 	QUnit.equal(family.get("first"), "Milo", "map “from” prop is correct");
 	QUnit.equal(family.get("full"), "Milo Flanders", "map “to” prop is correct");
+});
+
+QUnit.test("component instantiation is not observable", function(){
+
+	var innerViewModel;
+	var InnerComponent = Component.extend({
+		tag: "inner-component-to-make",
+		view: "{{this.innerValue}}",
+		ViewModel: {
+			init: function(){
+				innerViewModel = this;
+			},
+			innerValue: "any"
+		}
+	});
+
+	var count = 0;
+
+	Component.extend({
+		tag: "outer-component-creator",
+		view: "{{{ this.innerComponent }}}",
+		ViewModel: {
+			get innerComponent() {
+				count++;
+				return new InnerComponent({
+					viewModel: {
+						innerValue: value.bind(this, "outerValue")
+					}
+				});
+			},
+			outerValue: "any"
+		}
+	});
+
+	var view = stache("<outer-component-creator/>");
+	frag = view();
+
+	innerViewModel.innerValue = "SOME-VALUE";
+
+	QUnit.equal(count, 1, "only updated once");
 });
