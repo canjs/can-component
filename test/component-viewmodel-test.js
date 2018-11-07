@@ -16,7 +16,6 @@ var canSymbol = require('can-symbol');
 var domEvents = require('can-dom-events');
 var domMutateNode = require('can-dom-mutate/node');
 var Construct = require("can-construct");
-var observe = require("can-observe");
 var tag = require('can-view-callbacks').tag;
 
 var innerHTML = function(el){
