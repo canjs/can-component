@@ -5,9 +5,6 @@ var stache = require("can-stache");
 var canReflect = require("can-reflect");
 var QUnit = require("steal-qunit");
 
-var viewModel = require("can-view-model");
-var canDev = require("can-log/dev/dev");
-var testHelpers = require("can-test-helpers");
 var domMutate = require("can-dom-mutate");
 var globals = require("can-globals");
 
@@ -138,7 +135,7 @@ QUnit.test("Cleans up itself on the documentElement removal", function() {
 		globals.setKeyValue("document", realDoc);
 		QUnit.ok(true, "Called back without throwing");
 		start();
-	})
+	});
 
 	stop();
 

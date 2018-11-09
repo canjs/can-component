@@ -3,7 +3,6 @@ var Component = require("can-component");
 var helpers = require("./helpers");
 var QUnit = require("steal-qunit");
 var SimpleMap = require("can-simple-map");
-var stache = require("can-stache");
 var value = require("can-value");
 
 QUnit.module("can-component integration with can-bind");

@@ -200,7 +200,7 @@ helpers.makeTests("can-component events", function(){
 
 
     QUnit.test('DOM trees not releasing when referencing CanMap inside CanMap in view (#1593)', function() {
-		var undo = domEvents.addEvent(removedEvent)
+		var undo = domEvents.addEvent(removedEvent);
 
         var baseTemplate = stache('{{#if show}}<my-outside></my-outside>{{/if}}'),
             show = new SimpleObservable(true),

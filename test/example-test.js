@@ -1,6 +1,6 @@
 var QUnit = require("steal-qunit");
 
-var helpers = require("./helpers")
+var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");

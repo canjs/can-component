@@ -266,8 +266,6 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         equal( innerHTML(frag.firstChild), '', 'child component is removed');
     });
 
-    var queues = require("can-queues");
-
     QUnit.test("references scopes are available to bindings nested in components (#2029)", function(){
 
         var renderer = stache('<export-er value:to="scope.vars.reference" />'+
