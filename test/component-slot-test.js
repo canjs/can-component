@@ -210,7 +210,6 @@ test("<can-slot> Context one-way binding works", function() {
 
 	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
 });
-var queues = require("can-queues");
 
 test("<can-slot> Context two-way binding works", function() {
 	/*Passing in a custom context like <can-slot name='subject' {(context)}='value' />*/

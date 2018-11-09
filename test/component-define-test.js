@@ -220,7 +220,7 @@ QUnit.test("ViewModel properties default to DefineList if set to an Array (#225)
 });
 
 testHelpers.dev.devOnlyTest("filename should be passed to stache() for inline views", function() {
-	var MyComponent = Component.extend({
+	Component.extend({
 		tag: "my-filename-component",
 		ViewModel: {},
 		view: "{{scope.filename}}"

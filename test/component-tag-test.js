@@ -1,17 +1,9 @@
 var QUnit = require("steal-qunit");
 
-var helpers = require("./helpers")
+var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
-var canViewModel = require('can-view-model');
-var SetterObservable = require("can-simple-observable/setter/setter");
-var SimpleObservable = require("can-simple-observable");
-var domMutateNode = require('can-dom-mutate/node');
-
-var innerHTML = function(el){
-    return el && el.innerHTML;
-};
 
 helpers.makeTests("can-component tag", function(){
 

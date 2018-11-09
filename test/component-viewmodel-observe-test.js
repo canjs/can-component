@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 var QUnit = require("steal-qunit");
 
 var helpers = require("./helpers");
@@ -6,10 +7,6 @@ var Component = require("can-component");
 var domEvents = require('can-dom-events');
 var domMutateNode = require('can-dom-mutate/node');
 var observe = require("can-observe");
-
-var innerHTML = function(el){
-    return el && el.innerHTML;
-};
 
 var classSupport = (function() {
 	try {
@@ -52,7 +49,7 @@ helpers.makeTests("can-component viewModels with observe", function(){
 
             class Add extends observe.Object{
                 constructor(props) {
-                    super(props)
+                    super(props);
                     this.count = 0;
                 }
                 add(){
@@ -90,7 +87,7 @@ helpers.makeTests("can-component viewModels with observe", function(){
                         QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "connectedCallback");
                         return function(){
                             QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "disconnectedCallback");
-                        }
+                        };
                     }
                 }
             });

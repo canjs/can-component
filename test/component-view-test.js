@@ -14,7 +14,6 @@ var queues = require("can-queues");
 var getFragment = require("can-fragment");
 var viewCallbacks = require("can-view-callbacks");
 var Scope = require("can-view-scope");
-var observe = require("can-observe");
 
 var innerHTML = function(el){
     return el && el.innerHTML;
@@ -266,8 +265,6 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
         equal( innerHTML(frag.firstChild), '', 'child component is removed');
     });
-
-    var queues = require("can-queues");
 
     QUnit.test("references scopes are available to bindings nested in components (#2029)", function(){
 

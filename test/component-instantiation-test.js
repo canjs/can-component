@@ -179,7 +179,6 @@ QUnit.test("Components can be instantiated with viewModel", function() {
 			nullProp: null
 		}
 	});
-	var element = componentInstance.element;
 	var viewModel = componentInstance.viewModel;
 
 	// Initial values are correct
@@ -326,7 +325,7 @@ QUnit.test("component instantiation is not observable", function(){
 	});
 
 	var view = stache("<outer-component-creator/>");
-	frag = view();
+	view();
 
 	innerViewModel.innerValue = "SOME-VALUE";
 
