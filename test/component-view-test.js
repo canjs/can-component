@@ -14,7 +14,6 @@ var queues = require("can-queues");
 var getFragment = require("can-fragment");
 var viewCallbacks = require("can-view-callbacks");
 var Scope = require("can-view-scope");
-var observe = require("can-observe");
 
 var innerHTML = function(el){
     return el && el.innerHTML;
