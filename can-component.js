@@ -490,7 +490,7 @@ var Component = Construct.extend(
 				var removalDisposal = domMutate.onNodeRemoval(el, function () {
 					var doc = el.ownerDocument;
 					var rootNode = doc.contains ? doc : doc.documentElement;
-					if (!rootNode.contains(el)) {
+					if (!rootNode || !rootNode.contains(el)) {
 						removalDisposal();
 						callTeardownFunctions();
 					}
