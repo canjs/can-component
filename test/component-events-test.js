@@ -181,12 +181,12 @@ helpers.makeTests("can-component events", function(){
 			tag: 'rebind-viewmodel',
 			events: {
 				init: function(){
-					this.viewModel.set("item" , new SimpleMap({}) );
+					this.viewModel.set("anItem" , new SimpleMap({}) );
 				},
-				'{scope.item} name': function() {
+				'{scope.anItem} name': function() {
 					ok(true, 'Change event on scope');
 				},
-				'{viewModel.item} name': function() {
+				'{viewModel.anItem} name': function() {
 					ok(true, 'Change event on viewModel');
 				}
 			}
@@ -195,12 +195,12 @@ helpers.makeTests("can-component events", function(){
 		var rebind = frag.firstChild;
 		domMutateNode.appendChild.call(this.fixture, rebind);
 
-		canViewModel(rebind).get("item").set('name', 'CDN');
+		canViewModel(rebind).get("anItem").set('name', 'CDN');
 	});
 
 
     QUnit.test('DOM trees not releasing when referencing CanMap inside CanMap in view (#1593)', function() {
-		var undo = domEvents.addEvent(removedEvent)
+		var undo = domEvents.addEvent(removedEvent);
 
         var baseTemplate = stache('{{#if show}}<my-outside></my-outside>{{/if}}'),
             show = new SimpleObservable(true),

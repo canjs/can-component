@@ -5,9 +5,6 @@ var stache = require("can-stache");
 var canReflect = require("can-reflect");
 var QUnit = require("steal-qunit");
 
-var viewModel = require("can-view-model");
-var canDev = require("can-log/dev/dev");
-var testHelpers = require("can-test-helpers");
 var domMutate = require("can-dom-mutate");
 var globals = require("can-globals");
 
@@ -69,14 +66,22 @@ QUnit.test("wrapped in a conditional", function (assert) {
 	assert.equal(fragment.textContent, "Hello world", "fragment has correct text content after updating componentVM");
 
 	// Listen for when the viewmodel is bound; need to make sure it isn’t at the end
+	var waitingCount = 0;
+	function finishOn2(){
+		waitingCount++;
+		if(waitingCount === 2) {
+			done();
+		}
+	}
 	canReflect.onInstanceBoundChange(ComponentConstructor.ViewModel, function(instance, isBound) {
 		assert.equal(isBound, false, "view model is no longer bound");
-		done();
+		finishOn2();
 	});
 
 	// Hide the component
 	templateVM.set("showComponent", false);
 	assert.equal(fragment.textContent, "", "fragment ends without content");
+	finishOn2();
 });
 
 QUnit.test("Component can be removed from the page", 3, function(){
@@ -138,7 +143,7 @@ QUnit.test("Cleans up itself on the documentElement removal", function() {
 		globals.setKeyValue("document", realDoc);
 		QUnit.ok(true, "Called back without throwing");
 		start();
-	})
+	});
 
 	stop();
 
