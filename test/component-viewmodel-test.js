@@ -454,7 +454,7 @@ helpers.makeTests("can-component viewModels", function(){
 
 
 		test("conditional attributes (#2077)", function(){
-			
+
 			Component.extend({
 			 tag: 'some-comp',
 			 ViewModel: DefineMap.extend({ seal: false }, {})
@@ -614,6 +614,39 @@ helpers.makeTests("can-component viewModels", function(){
 					QUnit.start();
 				});
 			});
+		});
+
+		QUnit.test("double parent update", function() {
+			var parentVM = new SimpleMap({
+				parentValue: ""
+			});
+			Component.extend({
+				tag: "parent-that-gets",
+				viewModel: parentVM,
+				view: stache('<child-that-updates child:to="this.parentValue"/>')
+			});
+
+			Component.extend({
+				tag: "child-that-updates",
+				viewModel: new SimpleMap({
+					child: "CHILD1"
+				}),
+				view: stache('<gc-that-updates gc:to="this.child"/>')
+			});
+
+			Component.extend({
+				tag: "gc-that-updates",
+				viewModel: new SimpleMap({
+					gc: "gc"
+				})
+			});
+
+			var template = stache("{{# if(this.show) }}<parent-that-gets/>{{/if}}");
+			var root = new SimpleMap({show: false});
+			template(root);
+			root.set("show", true);
+
+			QUnit.equal(parentVM.get("parentValue"), "gc")
 		});
 
 	});
