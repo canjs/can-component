@@ -64,7 +64,7 @@
     "can-view-callbacks": "^4.2.0",
     "can-view-model": "^4.0.0",
     "can-view-nodelist": "^4.1.0",
-    "can-view-scope": "^4.7.0"
+    "can-view-scope": "^4.13.0"
   },
   "devDependencies": {
     "can-observe": "^2.0.0",
