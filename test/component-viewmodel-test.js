@@ -453,7 +453,7 @@ helpers.makeTests("can-component viewModels", function(){
 
 
 		test("conditional attributes (#2077)", function(){
-			
+
 			Component.extend({
 			 tag: 'some-comp',
 			 ViewModel: DefineMap.extend({ seal: false }, {})

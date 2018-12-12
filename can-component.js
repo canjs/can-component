@@ -30,6 +30,7 @@ var canLog = require('can-log');
 var canDev = require('can-log/dev/dev');
 var assign = require('can-assign');
 var ObservationRecorder = require("can-observation-recorder");
+var queues = require("can-queues");
 require('can-view-model');
 
 // DefineList must be imported so Arrays on the ViewModel
@@ -330,14 +331,28 @@ var Component = Construct.extend(
 					this.renderer = stache(viewName, this.renderer);
 				}
 
-				// Register this component to be created when its `tag` is found.
-				viewCallbacks.tag(this.prototype.tag, function(el, tagData) {
+				var renderComponent = function(el, tagData) {
 					// Check if a symbol already exists on the element; if it does, then
 					// a new instance of the component has already been created
 					if (el[createdByCanComponentSymbol] === undefined) {
 						new self(el, tagData);
 					}
-				});
+				};
+
+				//!steal-remove-start
+				if (process.env.NODE_ENV !== 'production') {
+					Object.defineProperty(renderComponent, "name",{
+						value: "render <"+this.prototype.tag+">",
+						configurable: true
+					});
+					renderComponent = queues.runAsTask(renderComponent, function(el, tagData) {
+						return ["Rendering", el, "with",tagData.scope];
+					});
+				}
+				//!steal-remove-end
+
+				// Register this component to be created when its `tag` is found.
+				viewCallbacks.tag(this.prototype.tag, renderComponent);
 			}
 		}
 	}, {
