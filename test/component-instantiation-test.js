@@ -4,6 +4,7 @@ var QUnit = require("steal-qunit");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var value = require("can-value");
+var globals = require("can-globals");
 
 QUnit.module("can-component instantiation");
 
@@ -330,4 +331,29 @@ QUnit.test("component instantiation is not observable", function(){
 	innerViewModel.innerValue = "SOME-VALUE";
 
 	QUnit.equal(count, 1, "only updated once");
+});
+
+QUnit.test("Can render in a document with no body", function() {
+	var doc = document.implementation.createHTMLDocument("Testing");
+	globals.setKeyValue("document", doc);
+
+	doc.documentElement.removeChild(doc.body);
+
+	var ComponentConstructor = Component.extend({
+		tag: "with-no-body",
+		view: "test",
+		ViewModel: {
+			connectedCallback: function() {}
+		}
+	});
+
+	try {
+		new ComponentConstructor();
+		QUnit.ok(true, "rendered without throwing");
+	} catch(e){
+		QUnit.ok(false, "threw" + e.toString());
+	}
+	finally {
+		globals.setKeyValue("document", document);
+	}
 });
