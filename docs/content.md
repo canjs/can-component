@@ -35,3 +35,30 @@ Component.extend( {
 	view: "<h1><content>Hi There!</content></h1>"
 } );
 ```
+
+The children of `<content>` present a `SHADOW_DOM` for rendering in the case that no `LIGHT_DOM` is passed and no `content` is defined.
+
+For example:
+
+```js
+Component.extend( {
+    tag: "my-tag",
+    view: "<h1><content>Hello world</content></h1>"
+} );
+```
+
+…used like `<my-tag></my-tag>` will render:
+
+```html
+<my-tag><h1>Hello world</h1></my-tag>
+```
+
+When the content is specified, the children of `<content>` will be ignored such
+that `<my-tag>Hello friend</my-tag>` will render:
+
+```html
+<my-tag><h1>Hello friend</h1></my-tag>
+```
+
+If you need to provide multiple pieces of content to a component, you should use
+[can-component/can-slot] and [can-component/can-template].

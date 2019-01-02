@@ -45,11 +45,13 @@ while still accessing the `Component`’s [can-component::ViewModel].  The follo
 example listens to clicks on elements with `className="next"` and calls `.next()` on the component’s viewModel.
 
 @demo demos/can-component/paginate_events_next.html
+@codepen
 
 The events object can also listen to objects or properties on the component’s [can-component::ViewModel] instance. For instance, instead
 of using live-binding, we could listen to when offset changes and update the page manually:
 
 @demo demos/can-component/paginate_events_next_update_page.html
+@codepen
 
 ### Special events: inserted and removed
 

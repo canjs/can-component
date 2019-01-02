@@ -48,6 +48,7 @@ There are three things to understand about a [can-component]’s view:
 The following example demonstrates all three features:
 
 @demo demos/can-component/my_greeting_full.html
+@codepen
 
 The following explains how each part works:
 
@@ -210,4 +211,38 @@ it produces:
 
 ```html
 <my-greeting><h1>Hello World</h1></my-greeting>
+```
+
+### Omitting view entirely
+
+If a component does not have a `view` defined,
+the content (whether defined or passed inline) will be rendered instead.
+
+This means a component like this:
+
+```js
+Component.extend({
+	tag: "my-greeting",
+})
+```
+
+…will cause `<my-greeting>Hello Friend</my-greeting>` to render like:
+
+```html
+<my-greeting>Hello Friend</my-greeting>
+```
+
+The following component:
+
+```js
+Component.extend({
+	tag: "my-greeting",
+	view: "Hello World"
+})
+```
+
+…will render like:
+
+```html
+<my-greeting>Hello World</my-greeting>
 ```
