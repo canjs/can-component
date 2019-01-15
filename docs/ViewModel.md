@@ -1,12 +1,9 @@
 @property {Object|function} can-component.prototype.ViewModel ViewModel
-@parent can-component.prototype
+@parent can-component.define 3
 
 @description
 
-Provides or describes a constructor function that provides values and methods
-to the component’s [can-component::view view]. The constructor function
-is initialized with values specified by the component element’s
-[can-stache-bindings data bindings].
+Provides or describes a constructor function that provides values and methods to the component’s [can-component::view view]. The constructor function is initialized with values specified by the component element’s [can-stache-bindings data bindings].
 
 @type {Object} An object that will be passed to [can-define/map/map.extend DefineMap.extend] and
 used to create a new observable instance accessible by the component’s [can-component::view].

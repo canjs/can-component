@@ -1,5 +1,5 @@
 @typedef {can-stache.sectionRenderer} can-component/content <content>
-@parent can-component.elements
+@parent can-component.deprecated
 
 Positions the `LIGHT_DOM` within a component’s [can-component.prototype.view].
 

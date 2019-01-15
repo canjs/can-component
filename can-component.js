@@ -331,6 +331,8 @@ var Component = Construct.extend(
 					this.renderer = stache(viewName, this.renderer);
 				}
 
+				this.view = this.renderer;
+
 				var renderComponent = function(el, tagData) {
 					// Check if a symbol already exists on the element; if it does, then
 					// a new instance of the component has already been created

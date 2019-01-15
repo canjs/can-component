@@ -5,153 +5,237 @@
 @collection can-core
 @release 2.0
 @link ../docco/component/component.html docco
-@group can-component.static 0 static
-@group can-component.prototype 1 prototype
+@group can-component.define 0 define
+@group can-component.create 1 create
 @group can-component.elements 2 elements
+@group can-component.create
 @group can-component.lifecycle 3 lifecycle hooks
 @group can-component.events 4 special events
+@group can-component.deprecated 5 deprecated
 @package ../package.json
+@outline 2
 
 @description Create a custom element that can be used to manage widgets
 or application logic.
 
-@signature `<TAG BINDINGS...>[TEMPLATES][LIGHT_DOM]</TAG>`
+@signature `Component`
 
-Create an instance of a component on a particular tag in a [can-stache] view.
-Use the [can-stache-bindings bindings] syntaxes to set up bindings.
+  `can-component` exports a `Component` [can-construct Construct] constructor function used to
+  define custom elements.
 
-The following creates a `my-autocomplete` element and passes the `my-autocomplete`’s
-[can-component.prototype.ViewModel] the `Search` model as its `source` property and
-a [can-component/can-template] that is used to render the search results:
+  Call [can-component.extend Component.extend] to define a custom element. Components are
+  extended with a:
 
-```html
-<my-autocomplete source:from="Search">
-	<can-template name="search-results">
-		<li>{{name}}</li>
-	</can-template>
-</my-autocomplete>
-```
+  - [can-component.prototype.tag] - The custom element tag name.
+  - [can-component.prototype.ViewModel] - The methods and properties that manage the
+    logic of the component. This is usually a [can-define/map/map DefineMap] class.
+  - [can-component.prototype.view] - A template that writes the the inner HTML of
+    the custom element given the `ViewModel`. This is usually a [can-stache] template.
 
-	@release 2.3
+  The following defines a  `<my-counter>` element:
 
-	@param {String} TAG An HTML tag name that matches the [can-component::tag tag]
-	property of the component. Tag names should include a hyphen (`-`) or a colon (`:`) like:
-	`acme-tabs` or `acme:tabs`.
+  ```js
+  const MyCounter = Component.extend({
+    tag: "my-counter",
+    view: `
+      Count: <span>{{this.count}}</span>
+      <button on:click="this.increment()">+1</button>
+    `,
+    ViewModel: {
+      count: {default: 0},
+      increment() {
+        this.count++;
+      }
+    }
+  });
+  ```
 
-	@param {can-stache-bindings} [BINDINGS] Use the following binding syntaxes
-	to connect the component’s [can-component::ViewModel] to the view’s [can-view-scope scope]:
+  To create a component instance, either:
 
-	 - [can-stache-bindings.toChild]=[can-stache.expressions expression] — one-way data binding to child
-	 - [can-stache-bindings.toParent]=[can-stache.expressions expression] — one-way data binding to parent
-	 - [can-stache-bindings.twoWay]=[can-stache.expressions expression] — two-way data binding child to parent
-	 - [can-stache-bindings.event]=[can-stache/expressions/call expression] — event binding on the view model
-
-	 @param {can-stache.sectionRenderer} [TEMPLATES] Between the starting and ending tag
-	 can exist one or many [can-component/can-template] elements.  Use [can-component/can-template] elements
-	 to pass custom templates to child components.  Each `<can-template>`
-	 is given a `name` attribute and can be rendered by a corresponding [can-component/can-slot]
-	 in the component’s [can-component.prototype.view].
-
-	 For example, the following passes how each search result should look and an error message if
-	 the source is unable to request data:
-
-	 ```html
-	 <my-autocomplete source:from="Search">
-		 <can-template name="search-results">
-			 <li>{{name}}</li>
-		 </can-template>
-		 <can-template name="search-error">
-			 <div class="error">{{message}}</div>
-		 </can-template>
-	 </my-autocomplete>
-	 ```
-
-	 @param {can-stache.sectionRenderer} [LIGHT_DOM] The content between the starting and ending
-	 tag. For example, `Hello <b>World</b>` is the `LIGHT_DOM` in the following:
-
-	 ```html
-	 <my-tag>Hello <b>World</b></my-tag>
-	 ```
-
-	 The `LIGHT_DOM` can be positioned with a component’s [can-component.prototype.view] with
-	 the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
-	 with [can-component.prototype.leakScope].
-
-@signature `new Component([options])`
-
-Create an instance of a component without rendering it in a template. This is
-useful when you:
-
-- have complex logic for switching between different components (e.g. routing)
-- want to create components without adding them to the page (e.g. testing)
-
-The following defines a `MyGreeting` component and creates a `my-greeting`
-element by calling `new` on the component’s constructor function:
-
-```js
-const HelloWorld = Component.extend({
-	tag: "hello-world",
-	view: `
-		<can-slot name="greetingTemplate" />
-		<content>world</content>
-		<ul>{{#each(items)}} {{this}} {{/each}}</ul>
-	`,
-	ViewModel: {
-		items: {}
-	}
-});
-
-// Create a new instance of our component
-const componentInstance = new HelloWorld({
-
-	// values with which to initialize the component’s view model
-	viewModel: {
-		items: ["eat"]
-	},
-
-	// can-stache template to replace any <content> elements in the component’s view
-	content: "<em>{{message}}</em>",
-
-	// <can-template> strings rendered by can-stache with the scope
-	templates: {
-		greetingTemplate: "{{greeting}}"
-	},
-
-	// scope with which to render the <content> and templates
-	scope: {
-		greeting: "Hello",
-		message: "friend"
-	}
-});
-
-myGreetingInstance.element; // is like <my-greeting>Hello <em>friend</em> <ul> <li>eat</li> </ul></my-greeting>
-
-myGreetingInstance.viewModel; // is HelloWorld.ViewModel{items: ["eat"]}
-```
-
-Changing the component’s view model will cause its element and any bindings to
-be updated:
-
-```js
-myGreetingInstance.viewModel.items.push("sleep");
-
-myGreetingInstance.element; // is like <my-greeting>Hello <em>friend</em> <ul> <li>eat</li> <li>sleep</li> </ul></my-greeting>
-```
-
-See the [Programmatically instantiating a component](#Programmaticallyinstantiatingacomponent)
-section for details.
-
-@param {Object} [options] Options for rendering the component, including:
-- **content** `{String|Function}`: Similar to the [can-component/content] tag, the `LIGHT_DOM` to be rendered between the component’s starting and ending tags; can either be a string (which will be parsed by [can-stache] by default) or a [can-stache.renderer] function.
-- **scope** `{Object}`: An object that is the scope with which the content should be rendered.
-- **templates** `{Object<String,String|Function>}`: An object that has keys that are [can-component/can-template] names and values that are either plain strings (parsed by [can-stache] by default) or [can-stache.renderer] functions.
-- **viewModel** `{Object}`: An object with values to bind to the component’s view model.
-
-  @release 4.3
+  - Write the element [can-component/component-element tag and bindings] in a [can-stache] template like:
+    ```html
+    <my-counter count:from="5"/>
+    ```
+  - Write the component tag in an HTML page and it will be mounted automatically:
+    ```html
+    <my-counter></my-counter>
+    ```
+  - Create a [can-component.new] programatically like:
+    ```html
+    var myCounter = new MyCounter({
+      viewModel: {
+        count: 6
+      }
+    });
+    myCounter.element   //-> <my-counter>
+    myCounter.viewModel //-> MyCounterVM{count:6}
+    ```
 
 @body
 
+
+## Purpose
+
+`Component` is used to define custom elements.  Those custom elements are
+used for many different layers within your application:
+
+- __Application Component__ - A component that houses global state, for example [can-route.data route data] and
+  session data, and selects different pages
+  based upon the url, session and other information.  Example: `<my-app>`
+- __Page Component__ - Components that contain the functionality for a page.  Example: `<todos-page>`
+- Functional Components - Component that provide functionality for a segment of a page.  Example: `<todos-list>`, `<todos-create>`
+- __Widget/UI Components__ - Components that create controls that could be used many places. Example: `<ui-slider>`, `<ui-tabs>`
+
+`Component` is designed to be:
+
+- __Testable__ - Components separate their logic into independently testable [can-component.prototype.view] and [can-component.prototype.ViewModel] pieces.
+- __Flexible__ - There are many ways to manage logic in a component.  Components can be:
+  - _dumb_ - Get passed their data and can only call functions passed to them to change state.
+  - _smart_ - Manage their own state and request data.
+
+  Components can also:
+  - Access their DOM element through [can-component/connectedCallback]. This is an escape hatch when
+    the [can-component.prototype.view] is unable to update the DOM in a way you need.
+  - Support alternate [can-component.prototype.ViewModel]s types like [can-observe].
+
+- __A bridge to web components__ - In browsers that support
+  [custom elements](https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements), [can-component.extend] will create a custom element. We've also adopted many custom element
+  conventions such as:
+
+  - [connectedCallback](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks) - Component's [can-component/connectedCallback] lifecycle hook
+  - [slots](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot) - [can-component/can-slot <can-slot>]
+  - [template](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template) - [can-component/can-template <can-slot>]
+  - [content](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/content) - [can-component/content <content>] (_now obsolete_)
+
+
+## Overview
+
+> If you haven't already, we suggest reading through the [guides/html] guide to get a background
+> on `Component` and other related CanJS technology. The following briefly summarizes
+> that content.
+
+On a high level using `Component` is consists of two steps:
+
+1. Extend `Component` with a [can-component.prototype.tag], [can-component.prototype.view]
+   and [can-component.prototype.ViewModel] to create a custom element:
+
+   ```js
+   Component.extend({
+     tag: "my-counter",
+     view: `
+       Count: <span>{{this.count}}</span>
+       <button on:click="this.increment()">+1</button>
+     `,
+     ViewModel: {
+       count: {default: 0},
+       increment() {
+         this.count++;
+       }
+     }
+   });
+   ```
+
+2. Use that element in your HTML or within another `Component`'s [can-component.prototype.view] and
+   use [can-stache-bindings] to pass values into or out of your component:
+
+   ```js
+   <my-counter count:from="1"/>
+   ```
+
+The following video walks through how this component works:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3zMwoEuyX9g" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Learn
+
+Learning `Component` mostly means learning:
+
+- [can-define/map/map DefineMap] which serves
+  as Component's [can-component.prototype.ViewModel]s.
+- [can-stache] which serves as Component's [can-component.prototype.view]s.
+- [can-stache-bindings] which enable event binding and value passing between components and
+  values in [can-stache] templates.
+
+These [guides/logic], [guides/testing], [guides/forms]
+
+The important thing is to
+
+Component is the ""
+
+
+- approach ... write out the view ... make it read nice, then
+
+## Approach
+
+## Lifecycle / Timing
+
+1. Collect binding values
+2. Create an instance of the ViewModel
+   - `init`
+3. Render the view model into a document fragment
+   -
+4. Insert the fragment into the element
+5. Mutation observers fire `connectedCallback`
+
+## Passing a view / customizing
+
+- inline partials
+- can-slot / can-template
+
+
 ## Use
+
+
+
+
+The following list many use cases of
+
+
+Learning `Component` begin with learning
+
+- [can-define/map/map DefineMap]
+- [can-stache]
+
+
+
+
+
+building block
+
+
+
+Extend `Component`
+
+
+
+
+On a high level using `Component` is rather straightforward.  You will:
+
+1. Define a component with:
+   1. A tag name
+   2. A [can-stache stache] [can-component.prototype.view] that specifies the HTML content
+      within the component element.
+   2. A [can-component.prototype.ViewModel]
+
+`Component` has _many_ use cases, so learning Component can be challenging.  
+
+
+Fortunately,
+at its core, there's only three technologies that make
+
+At it's core,
+
+
+
+Using component effectively is
+a combination of using:
+
+- [can-stache]
+- [can-define]
+- [can-stache-bindings]
+
+As
+
 
 To create a Component, you must first [can-component.extend extend] `Component`
 with the methods and properties of how your component behaves:
@@ -396,289 +480,9 @@ side-effects < vm event bindings < listenTo in connectedCallback < streams
 
 `connectedCallback` is named as such to match the [web components](https://developers.google.com/web/fundamentals/web-components/customelements#reactions) spec for the same concept.
 
-### Events
-
-A component’s [can-component::events events] object is used to listen to events (that are not
-listened to with [can-stache-bindings view bindings]). The following component
-adds “!” to the message every time `<hello-world>` is clicked:
-
-```js
-Component.extend( {
-	tag: "hello-world",
-	view: "<h1>{{message}}</h1>",
-	events: {
-		"click": function() {
-			const currentMessage = this.viewModel.message;
-			this.viewModel.message = currentMessage + "!";
-		}
-	}
-} );
-```
-
-Use [can-component/connectedCallback] to listen to when an component’s element
-is inserted or removed from the DOM.
 
 
-### Helpers
 
-A component’s [can-component::helpers helpers] object provides [can-stache.helper stache helper] functions
-that are available within the component’s view.  The following component
-only renders friendly messages:
-
-```js
-Component.extend( {
-	tag: "hello-world",
-	view: `
-		{{#isFriendly message}}
-			<h1>{{message}}</h1>
-		{{/isFriendly}}
-	`
-	helpers: {
-		isFriendly: function( message, options ) {
-			if ( /hi|hello|howdy/.test( message ) ) {
-				return options.fn();
-			} else {
-				return options.inverse();
-			}
-		}
-	}
-} );
-```
-
-Generally speaking, helpers should only be used for view related functionality, like
-formatting a date.  Data related methods should be in the view model or models.
-
-## Programmatically instantiating a component
-
-You can also instantiate new component instances programmatically by using the
-component’s constructor function. This is useful when you:
-
-- have complex logic for switching between different components (e.g. routing)
-- want to create components without adding them to the page (e.g. testing)
-
-The following defines a `MyGreeting` component and creates a `my-greeting`
-element by calling `new` on the component’s constructor function:
-
-```js
-import Component from "can-component";
-
-const MyGreeting = Component.extend({
-  tag: "my-greeting",
-  view: "Hello {{subject}}",
-  ViewModel: {
-    subject: "string"
-  }
-});
-
-const myGreetingInstance = new MyGreeting({
-  viewModel: {
-    subject: "friend"
-  }
-});
-
-myGreetingInstance.element; // is <my-greeting>Hello friend</my-greeting>
-
-myGreetingInstance.viewModel; // is MyGreeting.ViewModel{subject: "friend"}
-```
-
-In the example above, the `viewModel` is passed in as an option to the
-component’s constructor function.
-
-In addition to `viewModel`, there are `templates`, `scope`, and `content`
-options. Read below for details on all the options.
-
-### viewModel
-
-The `viewModel` option is used to create the component’s view model and bind to
-it. For example:
-
-```js
-import Component from "can-component";
-import DefineMap from "can-define/map/map";
-import value from "can-value";
-
-const appVM = new DefineMap({
-  association: "friend"
-});
-
-const MyGreeting = Component.extend({
-  tag: "my-greeting",
-  view: "{{greeting}} {{subject}}",
-  ViewModel: {
-    greeting: "string",
-    subject: "string"
-  }
-});
-
-const myGreetingInstance = new MyGreeting({
-  viewModel: {
-    greeting: "Hello",
-    subject: value.bind(appVM, "association")
-  }
-});
-
-myGreetingInstance.element; // is <my-greeting>Hello friend</my-greeting>
-
-myGreetingInstance.viewModel; // is MyGreeting.ViewModel{subject: "friend"}
-```
-
-The way the component is instantiated above is similar to this example below,
-assuming it’s rendered by [can-stache] with `appVM` as the current scope:
-
-```html
-<my-greeting greeting:raw="Hello" subject:bind="association"></my-greeting>
-```
-
-You can recreate one-way and two-way bindings with [can-value], which has
-[can-value.bind], [can-value.from], and [can-value.to] methods for creating
-two-way, one-way parent-to-child, and one-way child-to-parent bindings,
-respectively.
-
-```js
-const appVM = new DefineMap({
-  family: {
-    first: "Milo",
-    last: "Flanders"
-  }
-});
-
-const NameComponent = Component.extend({
-  tag: "name-component",
-  view: "{{fullName}}",
-  ViewModel: {
-    givenName: "string",
-    familyName: "string",
-    get fullName() {
-      return this.givenName + " " + this.familyName;
-    }
-  }
-});
-
-const componentInstance = new NameComponent({
-  viewModel: {
-    givenName: value.from(appVM, "family.first"),
-    familyName: value.bind(appVM, "family.last"),
-    fullName: value.to(appVM, "family.full"),
-  }
-});
-```
-
-The way the component is instantiated above is similar to this example below,
-assuming it’s rendered by [can-stache] with `appVM` as the current scope:
-
-```html
-<my-greeting
-  givenName:from="family.first"
-  familyName:bind="family.last"
-  fullName:to="family.full"
-></my-greeting>
-```
-
-This will result in an `appVM` with the following data:
-
-```js
-{
-  family: {
-    first: "Milo",
-    full: "Milo Flanders",
-    last: "Flanders"
-  }
-}
-```
-
-Changing the component’s view model will cause its element and any bindings to
-be updated:
-
-```js
-componentInstance.viewModel.familyName = "Smith";
-
-componentInstance.element; // is <name-component>Milo Smith</name-component>
-
-appVM.family.last; // is "Smith"
-```
-
-### content
-
-The `content` option is used to pass `LIGHT_DOM` into a component when it is
-instantiated, similar to the [can-component/content] tag.
-
-```js
-import Component from "can-component";
-
-const HelloWorld = Component.extend({
-  tag: "hello-world",
-  view: "Hello <content>world</content>"
-});
-
-const helloWorldInstance = new HelloWorld({
-  content: "<em>mundo</em>"
-});
-```
-
-This would make `helloWorldInstance.element` an element with the following structure:
-
-```html
-<hello-world>Hello <em>mundo</em></hello-world>
-```
-
-### scope
-
-You can also provide a `scope` with which the content should be rendered:
-
-```js
-import Component from "can-component";
-
-const HelloWorld = Component.extend({
-  tag: "hello-world",
-  view: "Hello <content>world</content>"
-});
-
-const helloWorldInstance = new HelloWorld({
-  content: "<em>{{message}}</em>",
-  scope: {
-    message: "mundo"
-  }
-});
-```
-
-This would make `helloWorldInstance.element` a fragment with the following structure:
-
-```html
-<hello-world>Hello <em>mundo</em></hello-world>
-```
-
-### templates
-
-The `templates` option is used to pass a [can-component/can-template] into a
-component when it is instantiated.
-
-```js
-import Component from "can-component";
-
-const TodosPage = Component.extend({
-	tag: "todos-page",
-	view: "<ul><can-slot name='itemList' /></ul>"
-});
-
-const todosPageInstance = new TodosPage({
-	scope: {
-		items: ["eat"]
-	},
-	templates: {
-		itemList: "{{#each(items)}} <li>{{this}}</li> {{/each}}"
-	}
-});
-```
-
-This would make `todosPageInstance.element` a fragment with the following structure:
-
-```html
-<todos-page>
-  <ul>
-    <li>eat</li>
-  </ul>
-</todos-page>
-```
 
 ## Examples
 

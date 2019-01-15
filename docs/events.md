@@ -1,5 +1,5 @@
 @property {Object} can-component.prototype.events events
-@parent can-component.prototype
+@parent can-component.deprecated
 
 Listen to events on elements and observables.
 
