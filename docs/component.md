@@ -185,7 +185,22 @@ Component is the ""
 
 ## Use
 
+### Defining a component
 
+A component is mostly a tag, view and ViewModel.  Read their docs to find out:
+
+- The types of tags that are allowed.
+- How the ViewModel is used to render the view.
+- How to write maintainable and testable ViewModels
+- How to communicate with ViewModels.
+
+### Creating a component
+
+- How to mount a component in the page
+
+### Customizing a component's view
+
+### Creating
 
 
 The following list many use cases of
@@ -643,3 +658,30 @@ its sub-components:
 	<page-count page:from="paginate.page" count:from="paginate.pageCount"></page-count>
 </my-app>
 ```
+
+
+## Otherwise
+
+components are the heart of a canjs application.  They combine the use of three different
+primary CanJS technologies:
+
+
+- [can-define/map/map DefineMap] - Writing observable logic in ViewModels.
+- [can-stache stache] - Updating the DOM when that observable logic changes.
+- [can-stache-bindings stacheBindings] - Passing values between the ViewModel and
+  other observables (ViewModels or Models) or the DOM.
+
+This guide will cover how component uses these technologies, but not cover use
+cases of each technology.
+
+On each of those documentation pages, you will find the use cases that most
+pertain to those sub technologies.
+
+[can-stache] - How to update the DOM when the ViewModel changes.
+
+[can-stache-bindings] - How to setup component to component communication.
+
+[can-define/map/map] - How to write ViewModels / logic.  Logic guide and testing guide ... how to write them.
+
+
+## How it works

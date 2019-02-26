@@ -476,7 +476,7 @@ helpers.makeTests("can-component viewModels", function(){
 			var threads = [
 			function(){
 
-				equal(vm.next, 2, "has binding");
+				equal(vm.next, 2, "has binding initially");
 				equal(vm.swap, true, "swap - has binding");
 				//equal(vm.get("checked"), "", "attr - has binding"); (commented out because we don't do this sort of binding)
 				map.attr("preview", false);

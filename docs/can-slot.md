@@ -1,185 +1,364 @@
 @typedef {can-stache.sectionRenderer} can-component/can-slot <can-slot>
 @parent can-component.elements
 
-@description Position the content of [can-component/can-template] elements.
+@description Position the content of [can-component/can-template <can-template>] elements.
 
-@signature `<can-slot name='NAME' BINDING>DEFAULT_CONTENT</can-slot>`
+@signature `<can-slot name='NAME' BINDINGS>DEFAULT_CONTENT</can-slot>`
 
-Replaces any `<can-slot name='NAME' />` element found in a component's view with the rendered contents
-of the `<can-template />` element from the `LIGHT_DOM` that has a matching [TEMPLATE_NAME] attribute. Uses the scope of
-the `LIGHT_DOM` by default.
+`<can-slot>` and [can-component/can-template <can-template>] are used together to
+customize the layout of a component.
 
-```js
-import Component from "can-component";
-import stache from "can-stache";
+`<can-slot>` renders a matching `<can-template name='name'/>` element from the `LIGHT_DOM`, or
+if there is no matching `<can-template>`, renders the `DEFAULT_CONTENT` instead.
 
-Component.extend( {
-	tag: "my-email",
-	view: `
-		<can-slot name="subject" />
-	`
-} );
+For example, the following `<my-counter>` component allows users to customize the
+button that increments the count:
 
-const renderer = stache(`
-	<my-email>
-		<can-template name="subject">
-			{{subject}}
-		</can-template>
-	</my-email>
-`);
+  ```html
+  <my-app></my-app>
+  <script type="module">
+  import {Component} from "can";
 
-renderer( {
-	subject: "Hello World"
-} );
+  Component.extend({
+  	tag: "my-counter",
+  	view: `
+  		<form on:submit="this.increment(scope.event)">
+  			Count: <span>{{this.count}}</span>
 
-//-> <my-email>Hello World</my-email>
-```
+  			<can-slot name="incrementButton"/>
+  		</form>
+  	`,
+  	ViewModel: {
+  		count: {type: "number", default: 0},
+  		increment(event) {
+			event.preventDefault();
+  			this.count++;
+  		}
+  	}
+  });
+
+
+  Component.extend({
+  	tag: "my-app",
+  	view: `
+  		<my-counter>
+  			<can-template name="incrementButton">
+  				<button>Add One</button>
+  			</can-template>
+  		</my-counter>
+  	`
+  });
+  </script>
+  ```
+  @codepen
+  @highlight 11,28-30
+
 
 @param {String} NAME The name of the [can-component/can-template] to render in place of the `<can-slot>`.
 
-@param {can-stache-bindings} BINDING You can bind to the context (also known as [can-stache/keys/this])
-of of the corresponding [can-component/can-template].  This lets you pass data to the
-template. The following passes `user` as `this` to the corresponding `<can-template name="user-details">`:
+@param {can-stache-bindings} BINDINGS You can pass values to the `<can-template>`.
+The following passes `count` as `number` to `<can-template name="displayCount">`:
 
-```html
-<can-slot name="user-details" this:from="user">
-```
 
-[can-stache-bindings.toChild], [can-stache-bindings.toParent] and [can-stache-bindings.twoWay] with `this`
-all work.
+  ```html
+  <my-app></my-app>
+  <script type="module">
+  import {Component} from "can";
 
-@param {can-stache.sectionRenderer} [DEFAULT_CONTENT] The content that should be
-used if there is no content in the matching `<can-template>`.
+  Component.extend({
+  	tag: "my-counter",
+  	view: `
+  		<form on:submit="this.increment(scope.event)">
+  			<can-slot name="displayCount"
+  				number:from="this.count" />
+
+  			<can-slot name="incrementButton" />
+  		</form>
+  	`,
+  	ViewModel: {
+  		count: {type: "number", default: 0},
+  		increment(event) {
+  			event.preventDefault();
+  			this.count++;
+  		}
+  	}
+  });
+
+
+  Component.extend({
+  	tag: "my-app",
+  	view: `
+  		<my-counter>
+  			<can-template name="displayCount">
+  				Your number is <b>{{number}}</b>
+  			</can-template>
+  			<can-template name="incrementButton">
+  				<button>Add One</button>
+  			</can-template>
+  		</my-counter>
+  	`
+  });
+  </script>
+
+  ```
+  @codepen
+  @highlight 9-10,29-31,only
+
+  The [can-stache-bindings.toChild], [can-stache-bindings.toParent] and [can-stache-bindings.twoWay]
+  bindings all work.  
+
+  > NOTE: You are also able to set the `this` of the template like:
+  > `this:from="value"`. This is an older way of passing values and
+  > should be avoided.
+
+
+  @param {can-stache.sectionRenderer} [DEFAULT_CONTENT]
+  The content that should be used if there is no content in the matching `<can-template>`.  
+
+  The following provides a default `displayCount`. Notice that there is no _displayCount_
+  `<can-template>`:
+
+  ```html
+  <my-app></my-app>
+  <script type="module">
+  import {Component} from "can";
+
+  Component.extend({
+  	tag: "my-counter",
+  	view: `
+  		<form on:submit="this.increment(scope.event)">
+  			<can-slot name="displayCount"
+  				number:from="this.count">
+  				Count: {{this.count}}
+  			</can-slot>
+
+  			<can-slot name="incrementButton" />
+  		</form>
+  	`,
+  	ViewModel: {
+  		count: {type: "number", default: 0},
+  		increment(event) {
+  			event.preventDefault();
+  			this.count++;
+  		}
+  	}
+  });
+
+  Component.extend({
+  	tag: "my-app",
+  	view: `
+  		<my-counter>
+  			<can-template name="incrementButton">
+  				<button>Add One</button>
+  			</can-template>
+  		</my-counter>
+  	`
+  });
+  </script>
+
+  ```
+  <div class="codepen"></div>
+  <div line-highlight="11,29-33,only"></div>
+
+
 
 @body
 
 ## Use
 
-To use `<can-slot>` we can create a Component that has `<can-slot>` elements in it's view
-and render that component with <can-template> elements in the `LIGHT_DOM`.
+`<can-slot>` and [can-component/can-template <can-template>] are used together to
+customize the layout of a component.
 
-Any `<can-slot>` that has a name attribute matching the name attribute of a `<can-template>` will be
-replaced by the rendered inner contents of the <can-template>.
+`<can-template>` is used to provide custom layout to a component.  `<can-slot>` positions that
+layout within a component's [can-component.prototype.view].  One way to think about it is that
+`<can-template>` is an argument to a component.  Component uses `<can-slot>` to look up
+that argument and use it.
 
-```js
-import Component from "can-component";
-import stache from "can-stache";
+`<can-template>` and `<can-slot>`s must have a _name_ attribute like:
 
-Component.extend( {
-	tag: "my-email",
-	view: `
-		<can-slot name="subject" />
-		<p>My Email</p>
-		<can-slot name="body" />
-	`
-} );
+```html
+<can-template name="someName">...</can-template>
 
-const renderer = stache(`
-	<my-email>
-		<can-template name="subject">
-			<h1>{{subject}}</h1>
-		</can-template>
-		<can-template name="body">
-			<span>{{body}}</span>
-		</can-template>
-	</my-email>
-`);
-
-renderer( {
-	subject: "Hello World",
-	body: "The email body"
-} );
-
-/*
-<my-email>
-	<h1>Hello World</h1>
-	<p>My Email</p>
-	<span>The email body</span>
-</my-email>
-*/
+<can-slot name="someName">...</can-slot>
 ```
 
-### Passing context
+Those _names_ are used to match a `<can-slot>` to a user provided `<can-template>`.
 
-Context ([can-stache/keys/this]) can be bound to and passed to a template. The following
-passes `<my-email>`'s `subject` and `body` to the `subject` and `body` templates.  Notice
-how `subject` and `body` are read by `{{this}}`.
+For example, `<can-template name="incrementButton">` passes an `incrementButton`
+template to the `<my-counter>` element below:
 
-```js
-import Component from "can-component";
-import stache from "can-stache";
+```html
+<my-app></my-app>
+<script type="module">
+import {Component} from "can";
 
-Component.extend( {
-	tag: "my-email",
+Component.extend({
+	tag: "my-counter",
 	view: `
-		<can-slot name="subject" this:from="subject" />
-		<can-slot name="body" this:from="body" />
+		<form on:submit="this.increment(scope.event)">
+			Count: <span>{{this.count}}</span>
+
+			<can-slot name="incrementButton"/>
+		</form>
 	`,
 	ViewModel: {
-		subject: {
-			default: "Hello World"
-		},
-		body: {
-			default: "Later Gator"
+		count: {type: "number", default: 0},
+		increment(event) {
+		event.preventDefault();
+			this.count++;
 		}
 	}
-} );
+});
 
-const renderer = stache(`
-	<my-email>
-		<can-template name="subject">
-			<h1>{{this}}</h1>
-		</can-template>
-		<can-template name="body">
-			<span>{{this}}</span>
-		</can-template>
-	</my-email>
-`);
 
-const testView = renderer( {
-	subject: "Hello World",
-	body: "This is a greeting."
-} );
-
-/*
-<my-email>
-	<h1>Hello World</h1>
-	<p>This is a greeting.</p>
-</my-email>
-*/
-```
-
-### Default content
-
-Default content can be specified to be used if there is no matching `<can-template>`
-or the matching `<can-template>` has no inner content.
-
-```js
-import Component from "can-component";
-import stache from "can-stache";
-
-Component.extend( {
-	tag: "my-email",
+Component.extend({
+	tag: "my-app",
 	view: `
-		<can-slot name="subject">
-			<p>This is the default {{subject}}</p>
-		</can-slot>
+		<my-counter>
+			<can-template name="incrementButton">
+				<button>Add One</button>
+			</can-template>
+		</my-counter>
 	`
-} );
-
-const renderer = stache(`
-	<my-email>
-		<can-template name="subject" />
-	</my-email>
-`);
-
-const testView = renderer( {
-	subject: "content"
-} );
-
-/*
-<my-email>
-	<p>This is the default content</p>
-</my-email>
-*/
+});
+</script>
 ```
+@codepen
+@highlight 11,28-30,only
+
+## Passing values
+
+By default, `<can-template>`s are rendered with the same scope as
+the surrounding content. For example, `{{this.word}}`
+is available but `{{count}}` is not:
+
+```html
+<my-app></my-app>
+<script type="module">
+import {Component} from "can";
+
+Component.extend({
+	tag: "my-counter",
+	view: `
+		<form on:submit="this.increment(scope.event)">
+		<can-slot name="displayCount"/>
+
+		<button>+1</button>
+		</form>
+	`,
+	ViewModel: {
+		count: {type: "number", default: 0},
+		increment(event) {
+			event.preventDefault();
+			this.count++;
+		}
+	}
+});
+
+Component.extend({
+	tag: "my-app",
+	view: `
+		<my-counter>
+			<can-template name="displayCount">
+				Your {{this.word}} is <b>{{count}}</b>
+			</can-template>
+		</my-counter>
+	`,
+	ViewModel: {
+		word: {default: "number"}
+	}
+});
+</script>
+```
+@codepen
+@highlight 28
+
+You can use [can-stache-bindings.toChild] or [can-stache-bindings.twoWay] to pass
+values to the `<can-template>`'s content.  The following passes `count` as `number` to `<can-template name="displayCount">`:
+
+```html
+<my-app></my-app>
+<script type="module">
+import {Component} from "can";
+
+Component.extend({
+	tag: "my-counter",
+	view: `
+		<form on:submit="this.increment(scope.event)">
+			<can-slot name="displayCount"
+				number:from="this.count" />
+
+			<button>+1</button>
+		</form>
+	`,
+	ViewModel: {
+		count: {type: "number", default: 0},
+		increment(event) {
+			event.preventDefault();
+			this.count++;
+		}
+	}
+});
+
+Component.extend({
+	tag: "my-app",
+	view: `
+		<my-counter>
+			<can-template name="displayCount">
+				Your {{this.word}} is <b>{{number}}</b>
+			</can-template>
+		</my-counter>
+	`,
+	ViewModel: {
+		word: {default: "number"}
+	}
+});
+</script>
+
+```
+@codepen
+@highlight 9-10,29,only
+
+Functions can be passed to. The following shows passing `<my-counter>`'s
+`add` method:
+
+```html
+<my-app></my-app>
+<script type="module">
+import {Component} from "can";
+
+Component.extend({
+	tag: "my-counter",
+	view: `
+		<can-slot name="incrementButton"
+			add:from="this.add"/>
+		<can-slot name="countDisplay"
+			count:from="this.count"/>
+	`,
+	ViewModel: {
+		count: {type: "number", default: 0},
+		add(increment){
+			this.count += increment;
+		}
+	}
+});
+
+
+Component.extend({
+	tag: "my-app",
+	view: `
+		<my-counter count:from="5">
+			<can-template name="incrementButton">
+				<button on:click="add(5)">ADD 5!</button>
+			</can-template>
+			<can-template name="countDisplay">
+				You have counted to {{count}}!
+			</can-template>
+		</my-counter>
+	`
+});
+</script>
+
+```
+@codepen
+@highlight 8-9,26-28,only

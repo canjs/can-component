@@ -94,7 +94,7 @@ document.body.innerHTML = "<my-component></my-component>";
 @codepen
 
 Notice that the view is rendered with an __instance__ of the ViewModel, not the ViewModel constructor
-function.  For example, the following shows independent age values:
+function. A new ViewModel instance is created for each element. For example, the following shows independent age values:
 
 ```js
 import {Component} from "can";
@@ -151,7 +151,7 @@ Produces the following html:
 </header>
 ```
 
-However, if there was existing content within the source html, like:
+If there is existing content within the source html, like:
 
 ```html
 <header>
@@ -166,6 +166,8 @@ However, if there was existing content within the source html, like:
 	<my-greeting><h1>Hello There</h1></my-greeting>
 </header>
 ```
+
+Use `<can-slot>` to position content within the source html.
 
 ## <can-slot> elements
 

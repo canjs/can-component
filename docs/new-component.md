@@ -80,17 +80,17 @@ section for details.
 
 ## Use
 
-You can also instantiate new component instances programmatically by using the
+You can instantiate new component instances programmatically by using the
 component’s constructor function. This is useful when you:
 
-- have complex logic for switching between different components (e.g. routing)
-- want to create components without adding them to the page (e.g. testing)
+- have complex logic for switching between different components (e.g. [guides/routing])
+- want to create components without adding them to the page (e.g. [guides/testing])
 
 The following defines a `MyGreeting` component and creates a `my-greeting`
 element by calling `new` on the component’s constructor function:
 
 ```js
-import Component from "can-component";
+import {Component} from "can";
 
 const MyGreeting = Component.extend({
   tag: "my-greeting",
@@ -106,10 +106,13 @@ const myGreetingInstance = new MyGreeting({
   }
 });
 
-myGreetingInstance.element; // is <my-greeting>Hello friend</my-greeting>
+console.log( myGreetingInstance.element );
+// logs <my-greeting>Hello friend</my-greeting>
 
-myGreetingInstance.viewModel; // is MyGreeting.ViewModel{subject: "friend"}
+console.log( myGreetingInstance.viewModel );
+// logs MyGreeting.ViewModel{subject: "friend"}
 ```
+@codepen
 
 In the example above, the `viewModel` is passed in as an option to the
 component’s constructor function.
@@ -119,13 +122,11 @@ options. Read below for details on all the options.
 
 ### viewModel
 
-The `viewModel` option is used to create the component’s view model and bind to
+The `viewModel` option is used to create the component’s ViewModel instance and bind to
 it. For example:
 
 ```js
-import Component from "can-component";
-import DefineMap from "can-define/map/map";
-import value from "can-value";
+import {Component, DefineMap, value} from "can";
 
 const appVM = new DefineMap({
   association: "friend"
@@ -147,10 +148,13 @@ const myGreetingInstance = new MyGreeting({
   }
 });
 
-myGreetingInstance.element; // is <my-greeting>Hello friend</my-greeting>
+console.log( myGreetingInstance.element );
+// logs <my-greeting>Hello friend</my-greeting>
 
-myGreetingInstance.viewModel; // is MyGreeting.ViewModel{subject: "friend"}
+console.log( myGreetingInstance.viewModel );
+// logs MyGreeting.ViewModel{subject: "friend"}
 ```
+@codepen
 
 The way the component is instantiated above is similar to this example below,
 assuming it’s rendered by [can-stache] with `appVM` as the current scope:
@@ -186,8 +190,11 @@ const NameComponent = Component.extend({
 
 const componentInstance = new NameComponent({
   viewModel: {
+    // like givenName:from="family.first"
     givenName: value.from(appVM, "family.first"),
+    // like familyName:bind="family.last"
     familyName: value.bind(appVM, "family.last"),
+    // like fullName:to="family.full"
     fullName: value.to(appVM, "family.full"),
   }
 });
@@ -227,13 +234,50 @@ componentInstance.element; // is <name-component>Milo Smith</name-component>
 appVM.family.last; // is "Smith"
 ```
 
+### templates
+
+The `templates` option is used to pass a [can-component/can-template] into a
+component when it is instantiated.
+
+```js
+import {Component} from "can";
+
+const TodosPage = Component.extend({
+	tag: "todos-page",
+	view: `<ul><can-slot name='itemList' /></ul>`
+});
+
+const todosPageInstance = new TodosPage({
+	scope: {
+		items: ["eat"]
+	},
+	templates: {
+		itemList: `{{#for(item of items)}} <li>{{item}}</li> {{/for}}`
+	}
+});
+
+document.body.appendChild(todosPageInstance.element);
+```
+@codepen
+
+This makes `todosPageInstance.element` a fragment with the following structure:
+
+```html
+<todos-page>
+  <ul>
+    <li>eat</li>
+  </ul>
+</todos-page>
+```
+
+
 ### content
 
 The `content` option is used to pass `LIGHT_DOM` into a component when it is
 instantiated, similar to the [can-component/content] tag.
 
 ```js
-import Component from "can-component";
+import {Component} from "can";
 
 const HelloWorld = Component.extend({
   tag: "hello-world",
@@ -243,9 +287,12 @@ const HelloWorld = Component.extend({
 const helloWorldInstance = new HelloWorld({
   content: "<em>mundo</em>"
 });
-```
 
-This would make `helloWorldInstance.element` an element with the following structure:
+document.body.appendChild(helloWorldInstance.element);
+```
+@codepen
+
+This makes `helloWorldInstance.element` an element with the following structure:
 
 ```html
 <hello-world>Hello <em>mundo</em></hello-world>
@@ -256,7 +303,7 @@ This would make `helloWorldInstance.element` an element with the following struc
 You can also provide a `scope` with which the content should be rendered:
 
 ```js
-import Component from "can-component";
+import {Component} from "can";
 
 const HelloWorld = Component.extend({
   tag: "hello-world",
@@ -269,43 +316,14 @@ const helloWorldInstance = new HelloWorld({
     message: "mundo"
   }
 });
-```
 
-This would make `helloWorldInstance.element` a fragment with the following structure:
+document.body.appendChild(helloWorldInstance.element);
+```
+@codepen
+
+
+This makes `helloWorldInstance.element` a fragment with the following structure:
 
 ```html
 <hello-world>Hello <em>mundo</em></hello-world>
-```
-
-### templates
-
-The `templates` option is used to pass a [can-component/can-template] into a
-component when it is instantiated.
-
-```js
-import Component from "can-component";
-
-const TodosPage = Component.extend({
-	tag: "todos-page",
-	view: "<ul><can-slot name='itemList' /></ul>"
-});
-
-const todosPageInstance = new TodosPage({
-	scope: {
-		items: ["eat"]
-	},
-	templates: {
-		itemList: "{{#each(items)}} <li>{{this}}</li> {{/each}}"
-	}
-});
-```
-
-This would make `todosPageInstance.element` a fragment with the following structure:
-
-```html
-<todos-page>
-  <ul>
-    <li>eat</li>
-  </ul>
-</todos-page>
 ```

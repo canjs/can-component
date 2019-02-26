@@ -1,6 +1,7 @@
 @typedef {can-stache.sectionRenderer} can-component/component-element <tag bindings...>
 @parent can-component.create 0
 
+@description Create a component using HTML and [can-stache-bindings].
 
 @signature `<TAG BINDINGS...>[TEMPLATES][LIGHT_DOM]</TAG>`
 
@@ -12,7 +13,7 @@ The following creates a `my-autocomplete` element and passes the `my-autocomplet
 a [can-component/can-template] that is used to render the search results:
 
 ```html
-<my-autocomplete source:from="Search">
+<my-autocomplete source:from="this.Search">
 	<can-template name="search-results">
 		<li>{{name}}</li>
 	</can-template>
@@ -53,13 +54,83 @@ a [can-component/can-template] that is used to render the search results:
 	 </my-autocomplete>
 	 ```
 
-	 @param {can-stache.sectionRenderer} [LIGHT_DOM] The content between the starting and ending
-	 tag. For example, `Hello <b>World</b>` is the `LIGHT_DOM` in the following:
+@body
 
-	 ```html
-	 <my-tag>Hello <b>World</b></my-tag>
-	 ```
+## Use
 
-	 The `LIGHT_DOM` can be positioned with a component’s [can-component.prototype.view] with
-	 the [can-component/content] element.  The data accessible to the `LIGHT_DOM` can be controlled
-	 with [can-component.prototype.leakScope].
+To create a component instance, add its tag to your html page or a
+[can-stache stache] view. For example, the following has a `<my-counter>`
+element in the page:
+
+```html
+<my-counter count:from="2"></my-counter>
+
+<script type="module">
+import {Component} from "can";
+
+Component.extend( {
+	tag: "my-counter",
+	view: `
+		Count: {{this.count}}.
+		<button on:click="this.increment()">+1</button>
+	`,
+	ViewModel: {
+		count: {default: 0},
+		increment(){
+			this.count++;
+		}
+	}
+} );
+</script>
+```
+@codepen
+
+When [can-component.extend Component.extend] defines the `my-counter` element,
+a component instance will be created.  Creating a component instance involves creating
+a new [can-component::ViewModel] and rendering the [can-component::view].
+
+## Differences between components in `stache` and HTML
+
+Currently, components embedded in your pages HTML have limited abilities compared to those
+embedded in stache templates. Components embedded in HTML:
+
+- Must have a closing tag like `<my-counter></my-counter>`. Tags like `<my-counter/>`
+  are allowed in [can-stache stache].
+- Are _currently_ unable to use [can-component/can-template <can-template>] or pass light DOM to
+  be used by [can-component/content <content>].
+- Do not have a [can-view-scope scope], so they are unable to pass anything other
+  than primitives. For example, `<my-counter count:from="myNumber"></my-counter>` will
+  not be able to look up a `myNumber`.
+
+
+Components embedded in your pages should usually be the root component and be used to create
+other components.  For example, the following `<my-app>` component creates
+the `<hello-world/>` and `<goodbye-moon/>` elements:
+
+```html
+<my-app></my-app>
+
+<script type="module">
+import {Component} from "can";
+
+Component.extend({
+	tag: "hello-world",
+	view: `Hello World!`
+});
+
+Component.extend({
+	tag: "goodbye-moon",
+	view: `Goodbye Moon.`
+})
+
+
+Component.extend( {
+	tag: "my-app",
+	view: `
+		<p><hello-world/></p>
+		<p><goodbye-moon/></p>
+	`
+} );
+</script>
+```
+@codepen
