@@ -19,8 +19,6 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 var canReflect = require("can-reflect");
-var observeReader = require("can-stache-key");
-var SettableObservable = require("can-simple-observable/setter/setter");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
 var DefineMap = require("can-define/map/map");
@@ -269,7 +267,7 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 
 		// Initialize the viewModel
 		var initializeData = stacheBindings.behaviors.initializeViewModel(bindings, initialVMData, function(properties){
-			return bindingContext.viewModel = makeViewModel(properties)
+			return bindingContext.viewModel = makeViewModel(properties);
 		}, bindingContext);
 
 		// Return a teardown function
