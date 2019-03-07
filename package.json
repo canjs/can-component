@@ -23,7 +23,9 @@
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
     "develop": "done-serve --static --develop --port 8080",
-    "detect-cycle": "detect-cyclic-packages --ignore done-serve"
+    "detect-cycle": "detect-cyclic-packages --ignore done-serve",
+    "docco": "docco -o docco can-component.js",
+    "docco:publish": "npm run docco && gh-pages -d docco"
   },
   "main": "can-component",
   "keywords": [
@@ -38,7 +40,7 @@
   },
   "dependencies": {
     "can-assign": "^1.1.1",
-    "can-bind": "<2.0.0",
+    "can-bind": "^1.4.0",
     "can-child-nodes": "^1.0.0",
     "can-construct": "^3.2.0",
     "can-control": "^4.0.0",
@@ -57,7 +59,7 @@
     "can-simple-map": "^4.1.0",
     "can-simple-observable": "^2.0.0",
     "can-stache": "^4.10.0",
-    "can-stache-bindings": "^4.4.0",
+    "can-stache-bindings": "^4.9.0",
     "can-stache-key": "^1.0.0",
     "can-string": "<2.0.0",
     "can-symbol": "^1.4.1",
@@ -72,7 +74,10 @@
     "can-value": "<2.0.0",
     "can-vdom": "^4.0.0",
     "detect-cyclic-packages": "^1.1.0",
-    "done-serve": "^3.0.0",
+    "docco": "^0.8.0",
+    "highlight.js": "9.12.0",
+    "done-serve": "^2.0.0",
+    "gh-pages": "^2.0.1",
     "jshint": "^2.9.1",
     "steal": "^1.0.0",
     "steal-qunit": "^1.0.0",

@@ -491,3 +491,31 @@ QUnit.test("able to pass individual values (#291)", function() {
 
 	QUnit.equal(count.innerHTML, "10", "updated count value");
 });
+
+QUnit.test("slots are passed as variables", function() {
+	Component.extend({
+		tag: "pass-values-to-slots",
+		view: '<can-slot name="countDisplay" count:from="count"/>',
+		ViewModel: {
+			count: {
+				type: "number",
+				default: 0
+			}
+		}
+	});
+
+	var template = stache("<pass-values-to-slots>"+
+			"<can-template name='countDisplay'>"+
+				"<span class='count'>{{count}}-{{this.count}}</span>"+
+			"</can-template>"+
+		"</pass-values-to-slots>");
+
+	var frag = template({
+		count: 1
+	});
+
+	var passValuesToSlots = frag.firstElementChild || frag.firstChild;
+	var count = passValuesToSlots.querySelector(".count");
+
+	QUnit.equal(count.innerHTML, "0-1", "updated count value");
+});

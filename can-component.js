@@ -1,7 +1,7 @@
 "use strict";
 /* jshint -W079 */
-// # can/component/component.js
-//
+
+// # can-component.js
 // This implements the `Component` which allows you to create widgets
 // that use a view, a view-model, and custom tags.
 //
@@ -10,9 +10,7 @@
 //
 // `Component.setup` prepares everything needed by the `Component.prototype.setup`
 // to hookup the component.
-var ComponentControl = require("./control/control");
 var namespace = require('can-namespace');
-
 var Bind = require("can-bind");
 var Construct = require("can-construct");
 var stache = require("can-stache");
@@ -21,8 +19,6 @@ var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
 var nodeLists = require("can-view-nodelist");
 var canReflect = require("can-reflect");
-var observeReader = require("can-stache-key");
-var SettableObservable = require("can-simple-observable/setter/setter");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
 var DefineMap = require("can-define/map/map");
@@ -31,12 +27,6 @@ var canDev = require('can-log/dev/dev');
 var assign = require('can-assign');
 var ObservationRecorder = require("can-observation-recorder");
 var queues = require("can-queues");
-require('can-view-model');
-
-// DefineList must be imported so Arrays on the ViewModel
-// will be converted to DefineLists automatically
-require("can-define/list/list");
-
 var domData = require('can-dom-data-state');
 var getChildNodes = require('can-child-nodes');
 var string = require("can-string");
@@ -46,81 +36,128 @@ var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require('can-symbol');
 var DOCUMENT = require('can-globals/document/document');
 
-// Symbols
+var ComponentControl = require("./control/control");
+
+// #### Side effects
+
+require('can-view-model');
+// DefineList must be imported so Arrays on the ViewModel
+// will be converted to DefineLists automatically
+require("can-define/list/list");
+
+// Makes sure bindings are added simply by importing component.
+stache.addBindings(stacheBindings);
+
+// #### Symbols
 var createdByCanComponentSymbol = canSymbol("can.createdByCanComponent");
 var getValueSymbol = canSymbol.for("can.getValue");
 var setValueSymbol = canSymbol.for("can.setValue");
 var viewInsertSymbol = canSymbol.for("can.viewInsert");
 var viewModelSymbol = canSymbol.for('can.viewModel');
 
-stache.addBindings(stacheBindings);
 
-// For insertion elements like <can-slot> and <context>, this will add
-// a compute viewModel to the top of the context if
-// a binding like {this}="value" is present.
+// ## Helpers
+var noop = function(){};
+// ### addContext
+// For replacement elements like `<can-slot>` and `<context>`, this is used to
+// figure out what data they should render with.  Slots can have bindings like
+// `this:from="value"` or `x:from="y"`.
+//
+// If `this` is set, a compute is created for the context.
+// If variables are set, a variable scope is created.
+//
+// Arguments:
+//
 // - el - the insertion element
 // - tagData - the tagData the insertion element will be rendered with
-// - insertionElementTagData - the tagData found at the insertion element
-// `returns` - the tagData the template should be rendered with.
+// - insertionElementTagData - the tagData found at the insertion element.
+//
+// Returns: the tagData the template should be rendered with.
 function addContext(el, tagData, insertionElementTagData) {
-	var vm;
+	var vm,
+		newScope;
 
+	// Prevent setting up bindings manually.
 	domData.set.call(el, "preventDataBindings", true);
 
-	// insertionElementTagData is where the <content> element is in the shadow dom
-	// it should be used for bindings
-	var teardown = stacheBindings.behaviors.viewModel(el, insertionElementTagData, function(initialData, hasDataBinding, bindingState) {
-		// Create a compute responsible for keeping the vm up-to-date
-		if(bindingState && bindingState.isSettingOnViewModel === true) {
-			return vm = new SimpleMap(initialData);
-		} else {
-			return vm = new SimpleObservable(initialData);
-		}
-	}, undefined, true);
+	var teardown = stacheBindings.behaviors.viewModel(el, insertionElementTagData,
+		// `createViewModel` is used to create the ViewModel that the
+		// bindings will operate on.
+		function createViewModel(initialData, hasDataBinding, bindingState) {
 
+			if(bindingState && bindingState.isSettingOnViewModel === true) {
+				// If we are setting a value like `x:from="y"`,
+				// we need to make a variable scope.
+				newScope = tagData.scope.addLetContext(initialData);
+				return newScope._context;
+
+			} else {
+				// If we are setting the ViewModel itself, we
+				// stick the value in an observable: `this:from="value"`.
+				return vm = new SimpleObservable(initialData);
+			}
+		}, undefined, true);
 
 	if(!teardown) {
-		// if no teardown, there's no bindings, no need to change the scope
+		// If no teardown, there's no bindings, no need to change the scope.
 		return tagData;
 	} else {
+		// Copy `tagData` and overwrite the scope.
 		return assign( assign({}, tagData), {
 			teardown: teardown,
-			scope: tagData.scope.add(vm)
+			scope: newScope || tagData.scope.add(vm)
 		});
 	}
-
 }
 
-// Returns a hookupFuction that gets the proper tagData in a template, renders it, and adds it to nodeLists
-function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leakScope, getPrimaryTemplate) {
+// ### makeReplacementTagCallback
+// Returns a `viewCallbacks.tag` function for `<can-slot>` or `<content>`.
+// The `replacementTag` function:
+// - gets the proper tagData
+// - renders it the template
+// - adds the rendered result to the page using nodeLists
+//
+// Arguments:
+// - `tagName` - the tagName being created (`"can-slot"`).
+// - `componentTagData` - the component's tagData, including its scope.
+// - `shadowTagData` - the tagData where the element was found.
+// - `leakScope` - how scope is being leaked.
+// - `getPrimaryTemplate(el)` - a function to call to get the template to be rendered.
+function makeReplacementTagCallback(tagName, componentTagData, shadowTagData, leakScope, getPrimaryTemplate) {
+
 	var options = shadowTagData.options;
 
-	return function hookupFunction(el, insertionElementTagData) {
+	// `replacementTag` is called when `<can-slot>` is found.
+	// Arguments:
+	// - `el` - the element
+	// - `insertionElementTagData` - the tagData where the element was found.
+	return function replacementTag(el, insertionElementTagData) {
+
+		// If there's no template to be rendered, we'll render what's inside the
+		// element. This is usually default content.
 		var template = getPrimaryTemplate(el) || insertionElementTagData.subtemplate,
+			// `true` if we are rendering something the user "passed" to this component.
 			renderingLightContent = template !== insertionElementTagData.subtemplate;
 
+		// If there's no template and no default content, we will do nothing. If
+		// there is a template to render, lets render it!
 		if (template) {
-			// However, `_tags.[tagName]` is going to point to this current content callback.  We need to
-			// remove that so it will walk up the chain
+
+			// It's possible that rendering the contents of a `<can-slot>` will end up
+			// rendering another `<can-slot>`.  We should make sure we can't render ourselves.
 			delete options.tags[tagName];
 
-			// By default, light dom scoping is
-			// dynamic. This means that any `{{foo}}`
-			// bindings inside the "light dom" content of
-			// the component will have access to the
-			// internal viewModel. This can be overridden to be
-			// lexical with the leakScope option.
+			// First, lets figure out what we should be rendering
+			// the template with.
 			var tagData;
 
+			// If we are rendering something the user passed.
 			if( renderingLightContent ) {
 
 				if(leakScope.toLightContent) {
-					// render with the component's viewModel mixed in, however
-					// we still want the outer refs to be used, NOT the component's refs
-					// <component> {{some value }} </component>
-					// To fix this, we
-					// walk down the scope to the component's ref, clone scopes from that point up
-					// use that as the new scope.
+					// We want to render with the same scope as the
+					// `insertionElementTagData.scope`, but we don't want the
+					// TemplateContext of the component's view included.
 					tagData = addContext(el, {
 						scope: insertionElementTagData.scope.cloneFromRef(),
 						options: insertionElementTagData.options
@@ -131,19 +168,21 @@ function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leak
 					tagData = addContext(el, componentTagData, insertionElementTagData);
 				}
 			} else {
-				// we are rendering default content so this content should
+				// We are rendering default content so this content should
 				// use the same scope as the <content> tag was found within.
 				tagData = addContext(el, insertionElementTagData, insertionElementTagData);
 			}
 
 
-			// the `el` is part of some parent node list
+			// Now we need to render the right template and insert its result in the page.
+			// We need to teardown any bindings created too so we create a nodeList
+			// to do this.
 
-			var nodeList = nodeLists.register([el], function() {
-				if(tagData.teardown) {
-					tagData.teardown();
-				}
-			}, insertionElementTagData.parentNodeList || true, insertionElementTagData.directlyNested);
+			var nodeList = nodeLists.register([el],
+				tagData.teardown || noop,
+				insertionElementTagData.parentNodeList || true,
+				insertionElementTagData.directlyNested);
+
 			nodeList.expression = "<can-slot name='"+el.getAttribute('name')+"'/>";
 
 			var frag = template(tagData.scope, tagData.options, nodeList);
@@ -151,25 +190,36 @@ function makeInsertionTagCallback(tagName, componentTagData, shadowTagData, leak
 			var oldNodes = nodeLists.update(nodeList, newNodes);
 			nodeLists.replace(oldNodes, frag);
 
-
 			// Restore the proper tag function so it could potentially be used again (as in lists)
-			options.tags[tagName] = hookupFunction;
+			options.tags[tagName] = replacementTag;
 		}
 	};
 }
-
-// Helper function for taking a viewModel passed into a component’s constructor
-// function and returning a function that can be used to set up the bindings
+// ### getSetupFunctionForComponentVM
+// This helper function is used to setup a Component when `new Component({viewModel})`
+// is called.
+// Arguments:
+// - `componentInitVM` - The `viewModel` object used to initialize the actual viewModel.
+// Returns: A component viewModel setup function.
 function getSetupFunctionForComponentVM(componentInitVM) {
-	// componentInitVM is the viewModel in `new ComponentConstructor({ viewModel: {...} })`
-	return ObservationRecorder.ignore(function(el, makeViewModel, initialVMData) {
-		var onCompleteBindings = [];
-		var onTeardowns = [];
-		var viewModel;// This will be created after getting all the initial values
 
-		// Loop through all the props to create the new binding and get the initial
-		// values (so the viewModel can be created with the initial values)
+
+	return ObservationRecorder.ignore(function(el, componentTagData, makeViewModel, initialVMData) {
+
+		var bindingContext = {
+			element: el,
+			scope: componentTagData.scope,
+			parentNodeList: componentTagData.parentNodeList,
+			viewModel: undefined
+		};
+
+		var bindingSettings = {};
+
+		var bindings = [];
+
+		// Loop through all viewModel props and create dataBindings.
 		canReflect.eachKey(componentInitVM, function(parent, propName) {
+
 			var canGetParentValue = parent != null && !!parent[getValueSymbol];
 			var canSetParentValue = parent != null && !!parent[setValueSymbol];
 
@@ -177,15 +227,10 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 			if (canGetParentValue === true || canSetParentValue) {
 
 				// Create an observable for reading/writing the viewModel
-				var keysToRead = observeReader.reads(propName);
-				var child = new SettableObservable(
-					function() {
-						return observeReader.read(viewModel, keysToRead).value;
-					},
-					function(newValue) {
-						canReflect.setKeyValue(viewModel, propName, newValue);
-					}
-				);
+				// even though it doesn't exist yet.
+				var child = stacheBindings.getObservableFrom.viewModel({
+					name: propName,
+				}, bindingContext, bindingSettings);
 
 				// Create the binding similar to what’s in can-stache-bindings
 				var canBinding = new Bind({
@@ -201,19 +246,20 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 					//!steal-remove-end
 				});
 
-				// Immediately bind to the parent
-				canBinding.startParent();
-
-				// If we can get the value, we want to instantiate the viewModel with it
-				if (canGetParentValue === true) {
-					initialVMData[propName] = canBinding.parentValue;
-				}
-
-				// Like can-stache-bindings, delay starting the rest of the binding
-				onCompleteBindings.push(canBinding.start.bind(canBinding));
-
-				// We’ll want to turn off the bindings when the component is destroyed
-				onTeardowns.push(canBinding.stop.bind(canBinding));
+				bindings.push({
+					binding: canBinding,
+					siblingBindingData: {
+						parent: {
+							source: "scope",
+							exports: canGetParentValue
+						},
+						child: {
+							source: "viewModel",
+							exports: canSetParentValue,
+							name: propName
+						}
+					}
+				});
 
 			} else {
 				// Can’t get or set the value, so assume it’s not an observable
@@ -221,19 +267,17 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 			}
 		});
 
-		// Now that we have all the initial values, create the component’s viewModel
-		viewModel = makeViewModel(initialVMData);
-
-		// Call start() on all the bindings
-		for (var i = 0, len = onCompleteBindings.length; i < len; i++) {
-			onCompleteBindings[i]();
-		}
+		// Initialize the viewModel.  Make sure you
+		// save it so the observables can access it.
+		var initializeData = stacheBindings.behaviors.initializeViewModel(bindings, initialVMData, function(properties){
+			return bindingContext.viewModel = makeViewModel(properties);
+		}, bindingContext);
 
 		// Return a teardown function
 		return function() {
-			onTeardowns.forEach(function(onTeardown) {
-				onTeardown();
-			});
+			for (var attrName in initializeData.onTeardowns) {
+				initializeData.onTeardowns[attrName]();
+			}
 		};
 	});
 }
@@ -319,17 +363,20 @@ var Component = Construct.extend(
 						canLog.warn('can-component.prototype.template: is deprecated and will be removed in a future release. Use can-component.prototype.view');
 					}
 					//!steal-remove-end
-					this.renderer = this.prototype.template;
+					this.view = this.prototype.template;
 				}
 				if (this.prototype.view) {
-					this.renderer = this.prototype.view;
+					this.view = this.prototype.view;
 				}
 
 				// default to stache if renderer is a string
-				if (typeof this.renderer === "string") {
+				if (typeof this.view === "string") {
 					var viewName = string.capitalize( string.camelize(this.prototype.tag) )+"View";
-					this.renderer = stache(viewName, this.renderer);
+					this.view = stache(viewName, this.view);
 				}
+
+				// TODO: Remove in next release.
+				this.renderer = this.view;
 
 				var renderComponent = function(el, tagData) {
 					// Check if a symbol already exists on the element; if it does, then
@@ -360,14 +407,18 @@ var Component = Construct.extend(
 		// ### setup
 		// When a new component instance is created, setup bindings, render the view, etc.
 		setup: function(el, componentTagData) {
+			// Save arguments so if this component gets re-inserted,
+			// we can setup again.
 			this._initialArgs = [el,componentTagData];
+
 			var component = this;
+
 			var options = {
 				helpers: {},
 				tags: {}
 			};
-			// If a view is not provided, we fall back to
-			// dynamic scoping regardless of settings.
+
+			// #### Clean up arguments
 
 			// If componentTagData isn’t defined, check for el and use it if it’s defined;
 			// otherwise, an empty object is needed for componentTagData.
@@ -387,7 +438,6 @@ var Component = Construct.extend(
 			}
 			this.element = el;
 
-			// Hook up any <content> with which the component was instantiated
 			var componentContent = componentTagData.content;
 			if (componentContent !== undefined) {
 				// Check if it’s already a renderer function or
@@ -399,7 +449,6 @@ var Component = Construct.extend(
 				}
 			}
 
-			// Check for the component being instantiated with a scope
 			var componentScope = componentTagData.scope;
 			if (componentScope !== undefined && componentScope instanceof Scope === false) {
 				componentTagData.scope = new Scope(componentScope);
@@ -417,34 +466,29 @@ var Component = Construct.extend(
 				});
 			}
 
-			// an array of teardown stuff that should happen when the element is removed
-			var teardownFunctions = [];
+			// #### Setup ViewModel
+			var viewModel;
 			var initialViewModelData = {};
-			var callTeardownFunctions = function() {
-					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
-						teardownFunctions[i]();
-					}
-				};
-			var preventDataBindings = domData.get.call(el, "preventDataBindings");
-			var viewModel, frag;
 
-			// ## Scope
+			var preventDataBindings = domData.get.call(el, "preventDataBindings");
+
 			var teardownBindings;
 			if (preventDataBindings) {
 				viewModel = el[viewModelSymbol];
-			} else {// Set up the bindings
+			} else {
+				// Set up the bindings
 				var setupFn;
 				if (componentTagData.setupBindings) {
-					setupFn = componentTagData.setupBindings;
+					setupFn = function(el, componentTagData, callback, initialViewModelData){
+						return componentTagData.setupBindings(el, callback, initialViewModelData);
+					};
 				} else if (componentTagData.viewModel) {
 					// Component is being instantiated with a viewModel
 					setupFn = getSetupFunctionForComponentVM(componentTagData.viewModel);
 				} else {
-					setupFn = function(el, callback, data) {
-						return stacheBindings.behaviors.viewModel(el, componentTagData, callback, data);
-					};
+					setupFn = stacheBindings.behaviors.viewModel;
 				}
-				teardownBindings = setupFn(el, function(initialViewModelData) {
+				teardownBindings = setupFn(el, componentTagData, function(initialViewModelData) {
 
 					var ViewModel = component.constructor.ViewModel,
 						viewModelHandler = component.constructor.viewModelHandler,
@@ -465,7 +509,7 @@ var Component = Construct.extend(
 					}
 
 					if(ViewModel) {
-						viewModelInstance = new component.constructor.ViewModel(initialViewModelData);
+						viewModelInstance = new ViewModel(initialViewModelData);
 					}
 					viewModel = viewModelInstance;
 					return viewModelInstance;
@@ -474,13 +518,20 @@ var Component = Construct.extend(
 
 			// Set `viewModel` to `this.viewModel` and set it to the element's `data` object as a `viewModel` property
 			this.viewModel = viewModel;
-
 			el[viewModelSymbol] = viewModel;
 			el.viewModel = viewModel;
 			domData.set.call(el, "preventDataBindings", true);
 
-			// ## Helpers
+			// an array of teardown stuff that should happen when the element is removed
+			var teardownFunctions = [];
+			var callTeardownFunctions = function() {
+					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
+						teardownFunctions[i]();
+					}
+				};
 
+			// #### Helpers
+			// TODO: remove in next release
 			// Setup helpers to callback with `this` as the component
 			if(this.helpers !== undefined) {
 				canReflect.eachKey(this.helpers, function(val, prop) {
@@ -491,8 +542,8 @@ var Component = Construct.extend(
 			}
 
 
-			// ## `events` control
-
+			// #### `events` control
+			// TODO: remove in next release
 			// Create a control to listen to events
 			if(this.constructor.Control) {
 				this._control = new this.constructor.Control(el, {
@@ -512,20 +563,21 @@ var Component = Construct.extend(
 				});
 			}
 
-			// ## Rendering
+			// #### Rendering
 
 			var leakScope = {
 				toLightContent: this.leakScope === true,
 				intoShadowContent: this.leakScope === true
 			};
 
-			var hasShadowTemplate = !!(this.constructor.renderer);
+			var hasShadowView = !!(this.constructor.view);
+			var shadowFragment;
 
 			// Get what we should render between the component tags
 			// and the data for it.
-			var betweenTagsRenderer;
+			var betweenTagsView;
 			var betweenTagsTagData;
-			if( hasShadowTemplate ) {
+			if( hasShadowView ) {
 				var shadowTagData;
 				if (leakScope.intoShadowContent) {
 					// Give access to the component's data and the VM
@@ -543,7 +595,7 @@ var Component = Construct.extend(
 				}
 
 				// Add a hookup for each <can-slot>
-				options.tags['can-slot'] = makeInsertionTagCallback('can-slot', componentTagData, shadowTagData, leakScope, function(el) {
+				options.tags['can-slot'] = makeReplacementTagCallback('can-slot', componentTagData, shadowTagData, leakScope, function(el) {
 					var templates = componentTagData.templates;
 					if (templates) {// This is undefined if the component is <self-closing/>
 						return templates[el.getAttribute("name")];
@@ -551,11 +603,11 @@ var Component = Construct.extend(
 				});
 
 				// Add a hookup for <content>
-				options.tags.content = makeInsertionTagCallback('content',  componentTagData, shadowTagData, leakScope, function() {
+				options.tags.content = makeReplacementTagCallback('content',  componentTagData, shadowTagData, leakScope, function() {
 					return componentTagData.subtemplate;
 				});
 
-				betweenTagsRenderer = this.constructor.renderer;
+				betweenTagsView = this.constructor.view;
 				betweenTagsTagData = shadowTagData;
 			}
 			else {
@@ -568,9 +620,9 @@ var Component = Construct.extend(
 					options: options
 				};
 				betweenTagsTagData = lightTemplateTagData;
-				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
+				betweenTagsView = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
-			var disconnectedCallback,
+			var viewModelDisconnectedCallback,
 				componentInPage;
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
@@ -580,8 +632,8 @@ var Component = Construct.extend(
 				if(teardownBindings) {
 					teardownBindings();
 				}
-				if(disconnectedCallback) {
-					disconnectedCallback(el);
+				if(viewModelDisconnectedCallback) {
+					viewModelDisconnectedCallback(el);
 				} else if(typeof viewModel.stopListening === "function"){
 					viewModel.stopListening();
 				}
@@ -592,24 +644,27 @@ var Component = Construct.extend(
 			});
 			this.nodeList = nodeList;
 
-			frag = betweenTagsRenderer(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
+			shadowFragment = betweenTagsView(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
+
+			// TODO: afterRender
 
 			// Append the resulting document fragment to the element
-			domMutateNode.appendChild.call(el, frag);
+			domMutateNode.appendChild.call(el, shadowFragment);
 
 			// update the nodeList with the new children so the mapping gets applied
 			nodeLists.update(nodeList, getChildNodes(el));
 
+			// Call connectedCallback
 			if(viewModel && viewModel.connectedCallback) {
 				var body = DOCUMENT().body;
 				componentInPage = body && body.contains(el);
 
 				if(componentInPage) {
-					disconnectedCallback = viewModel.connectedCallback(el);
+					viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 				} else {
 					var insertionDisposal = domMutate.onNodeInsertion(el, function () {
 						insertionDisposal();
-						disconnectedCallback = viewModel.connectedCallback(el);
+						viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 					});
 				}
 

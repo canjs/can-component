@@ -1,5 +1,5 @@
 @property {Object.<String,can-stache.helper>} can-component.prototype.helpers helpers
-@parent can-component.prototype
+@parent can-component.deprecated
 
 Helper functions used with the component’s view.
 

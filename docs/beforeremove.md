@@ -1,5 +1,5 @@
 @typedef {function} can-component/beforeremove beforeremove
-@parent can-component.events
+@parent can-component.deprecated
 
 An event called only on component’s elements before they are removed from the
 document if live binding is performing the removal. It can be listened to

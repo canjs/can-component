@@ -1,18 +1,14 @@
-@property {Object|function} can-component.prototype.ViewModel ViewModel
-@parent can-component.prototype
+@property {Object|class} can-component.prototype.ViewModel ViewModel
+@parent can-component.define 3
 
 @description
 
-Provides or describes a constructor function that provides values and methods
-to the component’s [can-component::view view]. The constructor function
-is initialized with values specified by the component element’s
-[can-stache-bindings data bindings].
+Defines a class used to provide values and methods to the component’s [can-component::view view]. The class is initialized with values specified by the component element’s [can-stache-bindings data bindings].
 
 @type {Object} An object that will be passed to [can-define/map/map.extend DefineMap.extend] and
-used to create a new observable instance accessible by the component’s [can-component::view].
+used to create class.  Instances of that class are accessible by the component’s [can-component::view].
 
-  For example, every time `<my-tag>` is found, a new [can-define/map/map DefineMap] instance
-  will be created:
+  In the following example, the object set a `ViewModel` is used to create a [can-define/map/map DefineMap]:
 
   ```html
   <my-tag></my-tag>
@@ -34,7 +30,9 @@ used to create a new observable instance accessible by the component’s [can-co
   ```
   @codepen
 
-@type {function} A constructor function (usually defined by [can-define/map/map.extend DefineMap.extend],
+  This ViewModel is equivalent to the ViewModel created in the following `class` example.
+
+@type {class} A class or constructor function (usually defined by [can-define/map/map.extend DefineMap.extend],
 or [can-observe.Object observe.Object]) that will be used to create a new observable instance accessible by the component’s [can-component::view].
 
   For example, every time `<my-tag>` is found, a new instance of `MyTagViewModel` will
@@ -88,232 +86,214 @@ and [guides/html] guides.
 
 ## Use
 
-[can-component]’s ViewModel property is used to create an __object__, typically an instance
-of a [can-define/map/map], that will be used to render the component’s
-view. This is most easily understood with an example.  The following
-component shows the current page number based off a `limit` and `offset` value:
+A component's `ViewModel` defines the logic of the component. The `ViewModel` has the
+methods and properties that the `view` reads to update the DOM.  `ViewModel` are arguably
+the most important part of a CanJS application to understand and write well.
+
+On this page we will:
+
+- Cover the basics of how a Component uses the `ViewModel` property.
+- Explain the importance of writing maintainable and testable `ViewModel`s.
+- Introduce how to communicate between the `view` and `ViewModel` and how to
+  communicate between multiple `ViewModel`s.
+
+## How Component uses the `ViewModel` property
+
+[can-component Component]’s ViewModel property is used to define a class.  Instances of that
+class will be created and used to render the component’s view.  For example, the following
+defines a `MyCounterVM` [can-define/map/map DefineMap] class and sets it as the `ViewModel`:
 
 ```html
-<my-paginate></my-paginate>
+<my-counter count:from="2"></my-counter>
 
 <script type="module">
 import {DefineMap, Component} from "can";
 
-const MyPaginateViewModel = DefineMap.extend( {
-	offset: { default: 0 },
-	limit: { default: 20 },
-	get page() {
-		return Math.floor( this.offset / this.limit ) + 1;
+const MyCounterVM = DefineMap.extend( {
+	count: {default: 0},
+	increment(){
+		this.count++;
 	}
 } );
 
 Component.extend( {
-	tag: "my-paginate",
-	ViewModel: MyPaginateViewModel,
-	view: "Page {{page}}."
+	tag: "my-counter",
+	view: `
+		Count: {{this.count}}.
+		<button on:click="this.increment()">+1</button>
+	`,
+	ViewModel: MyPaginateViewModel
 } );
 </script>
 ```
 @codepen
 
-This will result in:
+The class can be created separately as above or defined inline as follows:
 
 ```html
-<my-paginate>Page 1</my-paginate>
-```
-
-This is because the provided ViewModel object is used to create an instance of [can-define/map/map] like:
-
-```js
-const viewModel = new MyPaginateViewModel();
-```
-
-The [can-define.types.value] property definition makes offset default to 0 and limit default to 20.
-
-Next, the values are passed into `viewModel` from the [can-stache-bindings data bindings] within `<my-paginate>`
-(in this case there is none).
-
-And finally, that data is used to render the component’s view and inserted into the element using [can-view-scope] and [can-stache]:
-
-```js
-const newViewModel = new Scope( viewModel );
-const result = stache( "Page {{page}}." )( newViewModel );
-element.innerHTML = result;
-```
-
-There is a short-hand for the prototype methods and properties used to extend [can-define/map/map DefineMap]
-by setting the Component’s ViewModel to an object and using
-that anonymous type as the view model.
-
-The following does the same as above:
-
-```html
-<my-paginate></my-paginate>
+<my-counter count:from="2"></my-counter>
 
 <script type="module">
 import {Component} from "can";
 
 Component.extend( {
-	tag: "my-paginate",
+	tag: "my-counter",
+	view: `
+		Count: {{this.count}}.
+		<button on:click="this.increment()">+1</button>
+	`,
 	ViewModel: {
-		offset: { default: 0 },
-		limit: { default: 20 },
-		get page() {
-			return Math.floor( this.offset / this.limit ) + 1;
+		count: {default: 0},
+		increment(){
+			this.count++;
 		}
-	},
-	view: "Page {{page}}."
+	}
 } );
 </script>
 ```
 @codepen
 
-## Values passed from attributes
 
-Values can be "passed" into the viewModel instance of a component, similar to passing arguments into a function. Using
-[can-stache-bindings], the following binding types can be setup:
-
-- [can-stache-bindings.toChild] — Update the component’s viewModel instance when the parent scope value changes.
-- [can-stache-bindings.toParent] — Update the parent scope when the component’s viewModel instance changes.
-- [can-stache-bindings.twoWay] — Update the parent scope or the component’s viewModel instance when the other changes.
-
-Using [can-stache], values are passed into components like this:
+When a `<my-counter>` element is created like:
 
 ```html
-<my-paginate offset:from='index' limit:from='size' />
+<my-counter count:from="2"></my-counter>
 ```
 
-The above creates an offset and limit property on the component that are initialized to whatever index and size are.
-
-The following component requires an `offset` and `limit`:
+... component creates an instance of the `ViewModel` by passing it any binding values.  In this
+case, the component will create an instance of `MyCounterVM` like:
 
 ```js
+const viewModel = new MyCounterVM({
+	count: 2
+});
+```
+
+Component will then pass that component to the `view` like:
+
+```js
+const view = stache(`
+	Count: {{this.count}}.
+	<button on:click="this.increment()">+1</button>
+`);
+
+view(viewModel) //-> HTML
+```
+
+That `HTML` result of calling the `view` is inserted within the component
+element. Read more about this on the [can-component.prototype.view]'s documentation.
+
+It's important to notice that each component element will create a new and different instance
+of the `ViewModel`.  For example, the following creates three `<my-counter>` elements,
+each with unique state.  Click the __+1__ button and notice that each `<my-counter>`
+has its own `count`.
+
+```html
+<p><my-counter count:from="1"></my-counter></p>
+<p><my-counter count:from="2"></my-counter></p>
+<p><my-counter count:from="3"></my-counter></p>
+
+<script type="module">
+import {Component} from "can";
+
 Component.extend( {
-	tag: "my-paginate",
+	tag: "my-counter",
+	view: `
+		Count: {{this.count}}.
+		<button on:click="this.increment()">+1</button>
+	`,
 	ViewModel: {
-		offset: { default: 0 },
-		limit: { default: 20 },
-		get page() {
-			return Math.floor( this.offset / this.limit ) + 1;
+		count: {default: 0},
+		increment(){
+			this.count++;
 		}
-	},
-	view: "Page {{page}}."
-} );
-```
-
-If `<my-paginate>` is used like:
-
-
-```js
-const renderer = stache( "<my-paginate offset:from='index' limit:from='size' />" );
-
-const pageInfo = new DefineMap( { index: 0, size: 20 } );
-
-document.body.appendChild( renderer( pageInfo ) );
-```
-
-…`pageInfo`’s index and size are set as the component’s offset and
-limit attributes. If we were to change the value of `pageInfo`’s
-index like:
-
-```js
-pageInfo.index = 20;
-```
-
-…the component’s offset value will change and its view will update to:
-
-```html
-<my-paginate>Page 2</my-paginate>
-```
-
-### Using attribute values
-
-You can also pass a literal string value of the attribute. To do this in [can-stache],
-simply pass a quoted value not wrapped in single brackets, and the viewModel instance property will
-be initialized to this string value:
-
-```html
-<my-tag title:from="'hello'" />
-```
-
-The above will set the title property on the component’s viewModel instance to the string `hello`.
-
-If the tag’s `title` attribute is changed, it __does not__ update the viewModel
-instance property automatically. Instead, you can use [can-view-model] to get a
-reference to the viewModel instance and modify it. This can be seen in the
-following example:
-
-@demo demos/can-component/accordion.html
-
-Clicking the __Change title__ button sets a `<my-panel>` element’s `title`
-attribute like:
-
-```js
-import canViewModel from "can-view-model";
-
-out.addEventListener( "click", function( ev ) {
-	const el = ev.target;
-	const parent = canViewModel( el.parentNode );
-	if ( el.nodeName === "BUTTON" ) {
-		parent.title = "Users";
 	}
 } );
+</script>
 ```
+@codepen
 
-## Calling methods on ViewModel from events within the view
+## Writing maintainable and testable ViewModels
 
-Using html attributes like `can-EVENT-METHOD`, you can directly call a ViewModel method
-from a view. For example, we can make `<my-paginate>` elements include a next
-button that calls the ViewModel’s `next` method like:
+Component `ViewModel`s likely contain the majority of logic
+in a CanJS application.  Care should be taken to write
+`ViewModel`s in a maintainable and testable manner. We strongly encourage
+people to read the [guides/logic] and [guides/testing] guides that go into
+detail on how to write ViewModels.
 
-```js
-Component.extend( {
-	tag: "my-paginate",
-	ViewModel: {
-		offset: { default: 0 },
-		limit: { default: 20 },
-		next: function() {
-			this.offset = this.offset + this.limit;
-		},
-		get page() {
-			return Math.floor( this.offset / this.limit ) + 1;
-		}
-	},
-	view: "Page {{page}} <button on:click='next()'>Next</button>"
-} );
-```
+In short, CanJS supports two different models of writing ViewModels: imperative vs reactive.
 
-ViewModel methods get called back with the current context, the element that you are listening to and the event that triggered the callback.
-
-@demo demos/can-component/paginate_next.html
-
-## Publishing events on ViewModels
-
-DefineMaps can publish events on themselves. For instance, the following `<player-edit>` component,
-dispatches a `"close"` event when its close method is called:
-
-```js
-Component.extend( {
-	tag: "player-edit",
-	view: document.getElementById( "player-edit-stache" ).innerHTML,
-	ViewModel: DefineMap.extend( {
-		player: Player,
-		close: function() {
-			this.dispatch( "close" );
-		}
-	} )
-} );
-```
-
-These can be listened to with [can-stache-bindings.event] bindings like:
+__Imperative__ ViewModels mutate properties like the `<my-counter>` example above:
 
 ```html
-<player-edit
-	on:close="removeEdit()"
-	player:from="editingPlayer" />
+	increment(){
+		this.count++;
+	},
+	decrement(){
+		this.count--;
+	}
 ```
 
-The following demo uses this ability to create a close button that
-hides the player editor:
+Imperative programming is simple and easy for beginners to get started. However, it
+can make reasoning about the nature of your application more difficult.  For instance,
+there might be many other functions that change count.  Understanding how `count` changes
+and what caused a particular `count` to change can be hard.
 
-@demo demos/can-component/paginate_next_event.html
+__Reactive__ ViewModels derive their properties from events. For example, the following
+derives `count` reactively:
+
+```html
+<p><my-counter count:from="1"></my-counter></p>
+<p><my-counter count:from="2"></my-counter></p>
+<p><my-counter count:from="3"></my-counter></p>
+
+<script type="module">
+import {Component} from "can";
+
+Component.extend( {
+	tag: "my-counter",
+	view: `
+		Count: {{this.count}}.
+		<button on:click="this.dispatch('increment')">+1</button>
+		<button on:click="this.dispatch('decrement')">-1</button>
+	`,
+	ViewModel: {
+		count: {
+			value({listenTo, lastSet, resolve}) {
+				listenTo(lastSet, resolve);
+
+				let count = resolve(lastSet.value || 0);
+
+				listenTo("increment", function( {value} ){
+					resolve(count++);
+				});
+
+				listenTo("decrement", function( {value} ){
+					resolve(count--);
+				});
+			}
+		}
+	}
+} );
+</script>
+```
+@codepen
+
+This style of programming is more cumbersome. But it can reduce errors dramatically
+in complex code.
+
+We encourage both styles to be used in apps and even within the same ViewModel! Use __Imperative__
+techniques for managing simple code and __Reactive__ techniques for more complex code.
+
+## Communication with ViewModels
+
+ViewModels rarely exist in isolation. Instead ViewModels are constantly changing due to
+various actions:
+
+- A user clicked a button or typed something into the DOM and the ViewModel needs to update.
+- A different ViewModel changed and wants to update another ViewModel.
+
+[can-stache-bindings] has lots of documentation on how to facilitate these forms of communication.
+
+ViewModels also need to update the DOM when when their state changes.  [can-stache] has lots of
+documentation on how to update the DOM to present a ViewModel's state.
