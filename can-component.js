@@ -203,7 +203,9 @@ function makeReplacementTagCallback(tagName, componentTagData, shadowTagData, le
 // Returns: A component viewModel setup function.
 function getSetupFunctionForComponentVM(componentInitVM) {
 
+
 	return ObservationRecorder.ignore(function(el, componentTagData, makeViewModel, initialVMData) {
+
 		var bindingContext = {
 			element: el,
 			scope: componentTagData.scope,
@@ -265,7 +267,8 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 			}
 		});
 
-		// Initialize the viewModel
+		// Initialize the viewModel.  Make sure you
+		// save it so the observables can access it.
 		var initializeData = stacheBindings.behaviors.initializeViewModel(bindings, initialVMData, function(properties){
 			return bindingContext.viewModel = makeViewModel(properties);
 		}, bindingContext);
@@ -360,19 +363,20 @@ var Component = Construct.extend(
 						canLog.warn('can-component.prototype.template: is deprecated and will be removed in a future release. Use can-component.prototype.view');
 					}
 					//!steal-remove-end
-					this.renderer = this.prototype.template;
+					this.view = this.prototype.template;
 				}
 				if (this.prototype.view) {
-					this.renderer = this.prototype.view;
+					this.view = this.prototype.view;
 				}
 
 				// default to stache if renderer is a string
-				if (typeof this.renderer === "string") {
+				if (typeof this.view === "string") {
 					var viewName = string.capitalize( string.camelize(this.prototype.tag) )+"View";
-					this.renderer = stache(viewName, this.renderer);
+					this.view = stache(viewName, this.view);
 				}
 
-				this.view = this.renderer;
+				// TODO: Remove in next release.
+				this.renderer = this.view;
 
 				var renderComponent = function(el, tagData) {
 					// Check if a symbol already exists on the element; if it does, then
@@ -403,14 +407,18 @@ var Component = Construct.extend(
 		// ### setup
 		// When a new component instance is created, setup bindings, render the view, etc.
 		setup: function(el, componentTagData) {
+			// Save arguments so if this component gets re-inserted,
+			// we can setup again.
 			this._initialArgs = [el,componentTagData];
+
 			var component = this;
+
 			var options = {
 				helpers: {},
 				tags: {}
 			};
-			// If a view is not provided, we fall back to
-			// dynamic scoping regardless of settings.
+
+			// #### Clean up arguments
 
 			// If componentTagData isn’t defined, check for el and use it if it’s defined;
 			// otherwise, an empty object is needed for componentTagData.
@@ -430,7 +438,6 @@ var Component = Construct.extend(
 			}
 			this.element = el;
 
-			// Hook up any <content> with which the component was instantiated
 			var componentContent = componentTagData.content;
 			if (componentContent !== undefined) {
 				// Check if it’s already a renderer function or
@@ -442,7 +449,6 @@ var Component = Construct.extend(
 				}
 			}
 
-			// Check for the component being instantiated with a scope
 			var componentScope = componentTagData.scope;
 			if (componentScope !== undefined && componentScope instanceof Scope === false) {
 				componentTagData.scope = new Scope(componentScope);
@@ -460,22 +466,17 @@ var Component = Construct.extend(
 				});
 			}
 
-			// an array of teardown stuff that should happen when the element is removed
-			var teardownFunctions = [];
+			// #### Setup ViewModel
+			var viewModel;
 			var initialViewModelData = {};
-			var callTeardownFunctions = function() {
-					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
-						teardownFunctions[i]();
-					}
-				};
-			var preventDataBindings = domData.get.call(el, "preventDataBindings");
-			var viewModel, frag;
 
-			// ## Scope
+			var preventDataBindings = domData.get.call(el, "preventDataBindings");
+
 			var teardownBindings;
 			if (preventDataBindings) {
 				viewModel = el[viewModelSymbol];
-			} else {// Set up the bindings
+			} else {
+				// Set up the bindings
 				var setupFn;
 				if (componentTagData.setupBindings) {
 					setupFn = function(el, componentTagData, callback, initialViewModelData){
@@ -508,7 +509,7 @@ var Component = Construct.extend(
 					}
 
 					if(ViewModel) {
-						viewModelInstance = new component.constructor.ViewModel(initialViewModelData);
+						viewModelInstance = new ViewModel(initialViewModelData);
 					}
 					viewModel = viewModelInstance;
 					return viewModelInstance;
@@ -517,13 +518,20 @@ var Component = Construct.extend(
 
 			// Set `viewModel` to `this.viewModel` and set it to the element's `data` object as a `viewModel` property
 			this.viewModel = viewModel;
-
 			el[viewModelSymbol] = viewModel;
 			el.viewModel = viewModel;
 			domData.set.call(el, "preventDataBindings", true);
 
-			// ## Helpers
+			// an array of teardown stuff that should happen when the element is removed
+			var teardownFunctions = [];
+			var callTeardownFunctions = function() {
+					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
+						teardownFunctions[i]();
+					}
+				};
 
+			// #### Helpers
+			// TODO: remove in next release
 			// Setup helpers to callback with `this` as the component
 			if(this.helpers !== undefined) {
 				canReflect.eachKey(this.helpers, function(val, prop) {
@@ -534,8 +542,8 @@ var Component = Construct.extend(
 			}
 
 
-			// ## `events` control
-
+			// #### `events` control
+			// TODO: remove in next release
 			// Create a control to listen to events
 			if(this.constructor.Control) {
 				this._control = new this.constructor.Control(el, {
@@ -555,20 +563,21 @@ var Component = Construct.extend(
 				});
 			}
 
-			// ## Rendering
+			// #### Rendering
 
 			var leakScope = {
 				toLightContent: this.leakScope === true,
 				intoShadowContent: this.leakScope === true
 			};
 
-			var hasShadowTemplate = !!(this.constructor.renderer);
+			var hasShadowView = !!(this.constructor.view);
+			var shadowFragment;
 
 			// Get what we should render between the component tags
 			// and the data for it.
-			var betweenTagsRenderer;
+			var betweenTagsView;
 			var betweenTagsTagData;
-			if( hasShadowTemplate ) {
+			if( hasShadowView ) {
 				var shadowTagData;
 				if (leakScope.intoShadowContent) {
 					// Give access to the component's data and the VM
@@ -598,7 +607,7 @@ var Component = Construct.extend(
 					return componentTagData.subtemplate;
 				});
 
-				betweenTagsRenderer = this.constructor.renderer;
+				betweenTagsView = this.constructor.view;
 				betweenTagsTagData = shadowTagData;
 			}
 			else {
@@ -611,9 +620,9 @@ var Component = Construct.extend(
 					options: options
 				};
 				betweenTagsTagData = lightTemplateTagData;
-				betweenTagsRenderer = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
+				betweenTagsView = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
-			var disconnectedCallback,
+			var viewModelDisconnectedCallback,
 				componentInPage;
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
@@ -623,8 +632,8 @@ var Component = Construct.extend(
 				if(teardownBindings) {
 					teardownBindings();
 				}
-				if(disconnectedCallback) {
-					disconnectedCallback(el);
+				if(viewModelDisconnectedCallback) {
+					viewModelDisconnectedCallback(el);
 				} else if(typeof viewModel.stopListening === "function"){
 					viewModel.stopListening();
 				}
@@ -635,23 +644,26 @@ var Component = Construct.extend(
 			});
 			this.nodeList = nodeList;
 
-			frag = betweenTagsRenderer(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
+			shadowFragment = betweenTagsView(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
+
+			// TODO: afterRender
 
 			// Append the resulting document fragment to the element
-			domMutateNode.appendChild.call(el, frag);
+			domMutateNode.appendChild.call(el, shadowFragment);
 
 			// update the nodeList with the new children so the mapping gets applied
 			nodeLists.update(nodeList, getChildNodes(el));
 
+			// Call connectedCallback
 			if(viewModel && viewModel.connectedCallback) {
 				componentInPage = DOCUMENT().body.contains(el);
 
 				if(componentInPage) {
-					disconnectedCallback = viewModel.connectedCallback(el);
+					viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 				} else {
 					var insertionDisposal = domMutate.onNodeInsertion(el, function () {
 						insertionDisposal();
-						disconnectedCallback = viewModel.connectedCallback(el);
+						viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 					});
 				}
 

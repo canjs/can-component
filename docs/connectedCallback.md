@@ -1,5 +1,5 @@
 @typedef {function} can-component/connectedCallback connectedCallback
-@parent can-component.lifecycle
+@parent can-component.lifecycle 1
 
 @description A lifecycle hook called after the component's element is inserted into the document.
 

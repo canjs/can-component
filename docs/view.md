@@ -315,3 +315,34 @@ This allows:
 
 - authoring stache files in their own files
 - faster load times as the stache files are pre-parsed
+
+
+## Omitting the view
+
+If the view is omitted, the content between the component tags (user DOM) is rendered
+with the `ViewModel`. The following renders `Hi there!` between the `<no-view>`
+and `</no-view>` tags:
+
+```html
+<my-app></my-app>
+<script type="module">
+import { Component } from "can";
+
+Component.extend({
+	tag: "no-view",
+	ViewModel: {
+		message: {default: "Hi there!"}
+	}
+});
+
+Component.extend({
+	tag: "my-app",
+	view: `
+		<no-view>
+			{{this.message}}
+		</no-view>
+	`
+})
+</script>
+```
+@codepen
