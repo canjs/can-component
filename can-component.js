@@ -656,7 +656,8 @@ var Component = Construct.extend(
 
 			// Call connectedCallback
 			if(viewModel && viewModel.connectedCallback) {
-				componentInPage = DOCUMENT().body.contains(el);
+				var body = DOCUMENT().body;
+				componentInPage = body && body.contains(el);
 
 				if(componentInPage) {
 					viewModelDisconnectedCallback = viewModel.connectedCallback(el);
