@@ -1,0 +1,106 @@
+<my-app></my-app>
+<other-app></other-app>
+<script src="./node_modules/steal/steal.js">
+import Component from "can-component";
+import stache from "can-stache";
+import DefineMap from "can-define/map/map";
+
+var view = stache("Added Lifecycle Component");
+
+Component.extend({
+	tag: "lifecycle-component",
+	view: function(){
+		console.log("before the view is rendered");
+		var fragment = view.apply(this, arguments);
+		console.log("after the view is rendered");
+		return fragment;
+	},
+	ViewModel: {
+		setup: function(props){
+			console.log("before properties are set on the ViewModel");
+			return DefineMap.prototype.setup.apply(this, arguments);
+		},
+		init: function(){
+			console.log("after initial properties are set on the ViewModel");
+		},
+		connectedCallback(element) {
+			console.log("after the element is inserted in the page");
+
+			return () => {
+				console.log("after the element is removed from the page");
+				this.stopListening();
+			};
+		},
+		childProperty: {
+			value( {resolve} ){
+				console.log("childProperty bound and read");
+				resolve("childProperty");
+				return function(){
+					console.log("childProperty unbound");
+				}
+			}
+		}
+	}
+});
+
+Component.extend({
+	tag: "my-app",
+	view: `
+		<button on:click="this.toggle()">
+			{{# if(this.show) }} Remove {{else}} Add {{/}} Component
+		</button>
+		{{# if(this.show) }}
+			<lifecycle-component childProperty:bind="this.parentProperty"/>
+		{{else}}
+			Removed Lifecycle Component
+		{{/}}
+	`,
+	ViewModel: {
+		show: {default: false},
+		toggle(){
+			this.show = !this.show;
+		},
+		parentProperty: {
+			value( {resolve} ){
+				console.log("parentProperty bound and read");
+				resolve("parentProperty");
+				return function(){
+					console.log("parentProperty unbound");
+				}
+			}
+		}
+	}
+})
+
+
+
+
+let prop = 0;
+Component.extend({
+	tag: 'child-comp',
+	view: `Child rendered`,
+	ViewModel: {
+		prop: "number",
+		beforeTeardown() {
+			console.log('beforeTeardown');
+			this.prop = Math.random();
+		}
+	}
+});
+
+Component.extend({
+    tag: "other-app",
+    view: `
+        <p><button on:click='visible = not(visible)'>toggle</button></p>
+				<p>Item should be {{#if(visible)}}a number{{else}}null{{/if}}
+				<p>Item is: {{item}}</p>
+				{{#if(visible)}}
+					<p><child-comp prop:to="item" /></p>
+				{{/if}}
+    `,
+    ViewModel: {
+			visible: 'boolean',
+			item: {},
+    }
+});
+</script>
