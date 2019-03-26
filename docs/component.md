@@ -319,7 +319,7 @@ const MyCounter = Component.extend({
   ViewModel: MyCounterVM
 });
 ```
-@hihglight 16
+@highlight 16
 
 In the previous example, `MyCounterVM` has state (the `count` property) and logic
 (the `increment` method).  We could create a `MyCounterVM` instance ourselves,
