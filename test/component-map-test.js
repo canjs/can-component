@@ -1737,6 +1737,21 @@ function makeTest(name, doc, mutObs) {
 		equal(tn.nodeValue, "qux", "was bound!");
 	});
 
+	test("viewModel function should work #332", function() {
+		Component.extend({
+			tag: "foo-bar",
+			view: stache("{{foo}}"),
+			viewModel: function(attrs, parentScope, el) {
+				return CanMap.extend({
+					foo: "bar"
+				});
+			}
+		});
+		var renderer = stache("<foo-bar></foo-bar>");
+		var frag = renderer();
+		equal(frag.firstChild.innerHTML, "bar");
+	});
+
 if(System.env !== 'canjs-test') {
 		// Brittle in IE
 		test("basic tabs", function () {
