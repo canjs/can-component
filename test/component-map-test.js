@@ -1741,7 +1741,7 @@ function makeTest(name, doc, mutObs) {
 		Component.extend({
 			tag: "foo-bar",
 			view: stache("{{foo}}"),
-			viewModel: function(attrs, parentScope, el) {
+			viewModel: function(attrs) {
 				return CanMap.extend({
 					foo: "bar"
 				});
