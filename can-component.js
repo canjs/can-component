@@ -274,7 +274,7 @@ var Component = Construct.extend(
 					}
 
 					if(ViewModel) {
-						viewModelInstance = new component.constructor.ViewModel(initialViewModelData);
+						viewModelInstance = new ViewModel(initialViewModelData);
 					}
 					viewModel = viewModelInstance;
 					return viewModelInstance;
