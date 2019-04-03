@@ -1,6 +1,8 @@
 @typedef {can-stache.sectionRenderer} can-component/content <content>
 @parent can-component.deprecated
 
+@deprecated Use [can-component/can-slot] and [can-component/can-template] instead.
+
 Positions the `LIGHT_DOM` within a component’s [can-component.prototype.view].
 
 @signature `<content>DEFAULT_CONTENT</content>`

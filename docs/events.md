@@ -1,6 +1,8 @@
 @property {Object} can-component.prototype.events events
 @parent can-component.deprecated
 
+@deprecated Use [can-control] instance on the component custom tag instead.
+
 Listen to events on elements and observables.
 
 @option {Object.<can-control.eventDescription,can-control.eventHandler>} An object of event names and methods

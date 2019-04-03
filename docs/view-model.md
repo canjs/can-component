@@ -4,6 +4,8 @@
 Return the view model instance or type with which the component’s [can-component.prototype.view]
 is rendered.  This is used when more fine grained control is needed over [can-component::ViewModel].
 
+@deprecated Use [can-component.prototype.ViewModel] methods instead.
+
 @signature `function(properties, parentScope, element)`
 
 The `viewModel` function takes the `properties` and values that are used to

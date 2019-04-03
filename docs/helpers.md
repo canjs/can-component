@@ -1,6 +1,8 @@
 @property {Object.<String,can-stache.helper>} can-component.prototype.helpers helpers
 @parent can-component.deprecated
 
+@deprecated Use [can-component.prototype.ViewModel] methods instead.
+
 Helper functions used with the component’s view.
 
 @option {Object.<String,can-stache.helper>}
