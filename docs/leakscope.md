@@ -1,7 +1,7 @@
 @property {Boolean} can-component.prototype.leakScope leakScope
 @parent can-component.deprecated
 
-@deprecated Pass your values instead.
+@deprecated Use [can-stache-bindings] to pass values instead.
 
 @description Allow reading the outer scope values from a component’s view and
 a component’s viewModel values in the user content.
