@@ -1,9 +1,9 @@
 @function can-component.prototype.view-model viewModel
 @parent can-component.deprecated
 
-@deprecated Use [can-component.prototype.ViewModel] methods instead.
+@deprecated {4.0} Use [can-component.prototype.ViewModel] instead.
 
-Return the view model instance or type with which the component’s [can-component.prototype.view]
+@description Return the view model instance or type with which the component’s [can-component.prototype.view]
 is rendered.  This is used when more fine grained control is needed over [can-component::ViewModel].
 
 @signature `function(properties, parentScope, element)`

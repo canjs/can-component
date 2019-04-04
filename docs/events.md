@@ -1,9 +1,9 @@
 @property {Object} can-component.prototype.events events
 @parent can-component.deprecated
 
-@deprecated Use [can-control] instance on the component custom tag instead.
+@deprecated {4.0} Use [can-stache-bindings#Callafunctionwhenaneventhappensonanelement Call a function when an event happens on an element] instead.
 
-Listen to events on elements and observables.
+@description Listen to events on elements and observables.
 
 @option {Object.<can-control.eventDescription,can-control.eventHandler>} An object of event names and methods
 that handle the event. For example:
