@@ -1,7 +1,9 @@
 @property {Object} can-component.prototype.events events
 @parent can-component.deprecated
 
-Listen to events on elements and observables.
+@deprecated {4.0} For elements, use the [can-stache-bindings.event] syntax to [can-stache-bindings#Callafunctionwhenaneventhappensonanelement attach event listeners directly to elements] instead. For observables, use `listenTo` within [can-component/connectedCallback] instead.
+
+@description Listen to events on elements and observables.
 
 @option {Object.<can-control.eventDescription,can-control.eventHandler>} An object of event names and methods
 that handle the event. For example:

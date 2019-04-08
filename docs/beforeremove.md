@@ -1,7 +1,10 @@
 @typedef {function} can-component/beforeremove beforeremove
 @parent can-component.deprecated
 
-An event called only on component’s elements before they are removed from the
+@deprecated {4.0} Use [can-component/connectedCallback] instead. See [migrate-4#inserted_removedevent Migrating to CanJS 4’s inserted/removed event section] for more information.
+
+
+@description An event called only on component’s elements before they are removed from the
 document if live binding is performing the removal. It can be listened to
 within a component’s [can-component.prototype.events] object or on a component
 element with [can-stache-bindings.event] bindings.  This is an additional
