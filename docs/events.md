@@ -1,7 +1,7 @@
 @property {Object} can-component.prototype.events events
 @parent can-component.deprecated
 
-@deprecated {4.0} Use [can-stache-bindings#Callafunctionwhenaneventhappensonanelement Call a function when an event happens on an element] instead.
+@deprecated {4.0} For elements, use the [can-stache-bindings.event] syntax to [can-stache-bindings#Callafunctionwhenaneventhappensonanelement attach event listeners directly to elements] instead. For observables, use `listenTo` within [can-component/connectedCallback] instead.
 
 @description Listen to events on elements and observables.
 
