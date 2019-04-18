@@ -80,7 +80,7 @@
     "gh-pages": "^2.0.1",
     "jshint": "^2.9.1",
     "steal": "^1.0.0",
-    "steal-qunit": "^1.0.0",
+    "steal-qunit": "^2.0.0",
     "steal-tools": "^1.0.1",
     "testee": "^0.9.0"
   }
