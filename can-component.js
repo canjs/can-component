@@ -179,7 +179,10 @@ function makeReplacementTagCallback(tagName, componentTagData, shadowTagData, le
 			// to do this.
 
 			var nodeList = nodeLists.register([el],
-				tagData.teardown || noop,
+				function() {
+					tagData.teardown && tagData.teardown();
+					insertionElementTagData = null;
+				},
 				insertionElementTagData.parentNodeList || true,
 				insertionElementTagData.directlyNested);
 
@@ -528,6 +531,7 @@ var Component = Construct.extend(
 					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
 						teardownFunctions[i]();
 					}
+					teardownFunctions = null;
 				};
 
 			// #### Helpers
@@ -559,6 +563,8 @@ var Component = Construct.extend(
 					if (!rootNode || !rootNode.contains(el)) {
 						removalDisposal();
 						callTeardownFunctions();
+						callTeardownFunctions = null;
+						removalDisposal = null;
 					}
 				});
 			}
@@ -631,9 +637,11 @@ var Component = Construct.extend(
 				domEvents.dispatch(el, "beforeremove", false);
 				if(teardownBindings) {
 					teardownBindings();
+					teardownBindings = null;
 				}
 				if(viewModelDisconnectedCallback) {
 					viewModelDisconnectedCallback(el);
+					viewModelDisconnectedCallback = null;
 				} else if(typeof viewModel.stopListening === "function"){
 					viewModel.stopListening();
 				}
@@ -641,7 +649,8 @@ var Component = Construct.extend(
 			nodeList.expression = "<" + this.tag + ">";
 			teardownFunctions.push(function() {
 				nodeLists.unregister(nodeList);
-			});
+				this.nodeList = nodeList = null;
+			}.bind(this));
 			this.nodeList = nodeList;
 
 			shadowFragment = betweenTagsView(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
@@ -664,6 +673,7 @@ var Component = Construct.extend(
 				} else {
 					var insertionDisposal = domMutate.onNodeInsertion(el, function () {
 						insertionDisposal();
+						insertionDisposal = null;
 						viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 					});
 				}
