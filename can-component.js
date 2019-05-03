@@ -132,7 +132,6 @@ function makeReplacementTagCallback(tagName, componentTagData, shadowTagData, le
 	// - `el` - the element
 	// - `insertionElementTagData` - the tagData where the element was found.
 	return function replacementTag(el, insertionElementTagData) {
-
 		// If there's no template to be rendered, we'll render what's inside the
 		// element. This is usually default content.
 		var template = getPrimaryTemplate(el) || insertionElementTagData.subtemplate,
@@ -178,8 +177,9 @@ function makeReplacementTagCallback(tagName, componentTagData, shadowTagData, le
 			// We need to teardown any bindings created too so we create a nodeList
 			// to do this.
 
-			var nodeList = nodeLists.register([el],
-				tagData.teardown || noop,
+
+
+			var nodeList = nodeLists.register([el], tagData.teardown || noop,
 				insertionElementTagData.parentNodeList || true,
 				insertionElementTagData.directlyNested);
 
@@ -627,6 +627,12 @@ var Component = Construct.extend(
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
 			var nodeList = nodeLists.register([], function() {
+				if(removalDisposal) {
+					removalDisposal();
+					callTeardownFunctions();
+					removalDisposal = null;
+					callTeardownFunctions = null;
+				}
 				component._torndown = true;
 				domEvents.dispatch(el, "beforeremove", false);
 				if(teardownBindings) {
