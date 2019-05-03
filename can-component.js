@@ -557,8 +557,13 @@ var Component = Construct.extend(
 					var doc = el.ownerDocument;
 					var rootNode = doc.contains ? doc : doc.documentElement;
 					if (!rootNode || !rootNode.contains(el)) {
-						removalDisposal();
-						callTeardownFunctions();
+						if(removalDisposal) {
+							nodeRemoved = true;
+							removalDisposal();
+							callTeardownFunctions();
+							removalDisposal = null;
+							callTeardownFunctions = null;
+						}
 					}
 				});
 			}
@@ -623,11 +628,12 @@ var Component = Construct.extend(
 				betweenTagsView = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
 			var viewModelDisconnectedCallback,
-				componentInPage;
+				componentInPage,
+				nodeRemoved;
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
 			var nodeList = nodeLists.register([], function() {
-				if(removalDisposal) {
+				if(removalDisposal && !nodeRemoved) {
 					removalDisposal();
 					callTeardownFunctions();
 					removalDisposal = null;
