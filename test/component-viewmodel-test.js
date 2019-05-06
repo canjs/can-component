@@ -1,6 +1,6 @@
 var QUnit = require("steal-qunit");
 
-var canData = require('can-dom-data-state');
+var canData = require('can-dom-data');
 var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
@@ -555,11 +555,11 @@ helpers.makeTests("can-component viewModels", function(){
 
 			var vm = new DefineMap({ value: "it worked" });
 			el[canSymbol.for('can.viewModel')] = vm;
-			canData.set.call(el, "preventDataBindings", true);
+			canData.set(el, "preventDataBindings", true);
 			callback(el, {
 			 scope: new Scope({ value: "it did not work" })
 		 });
-			canData.set.call(el, "preventDataBindings", false);
+			canData.set(el, "preventDataBindings", false);
 
 			QUnit.equal(el.firstChild.nodeValue, "it worked");
 		});
