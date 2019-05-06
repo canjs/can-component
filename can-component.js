@@ -27,7 +27,7 @@ var canDev = require('can-log/dev/dev');
 var assign = require('can-assign');
 var ObservationRecorder = require("can-observation-recorder");
 var queues = require("can-queues");
-var domData = require('can-dom-data-state');
+var domData = require('can-dom-data');
 var getChildNodes = require('can-child-nodes');
 var string = require("can-string");
 var domEvents = require('can-dom-events');
@@ -78,7 +78,7 @@ function addContext(el, tagData, insertionElementTagData) {
 		newScope;
 
 	// Prevent setting up bindings manually.
-	domData.set.call(el, "preventDataBindings", true);
+	domData.set(el, "preventDataBindings", true);
 
 	var teardown = stacheBindings.behaviors.viewModel(el, insertionElementTagData,
 		// `createViewModel` is used to create the ViewModel that the
@@ -470,7 +470,7 @@ var Component = Construct.extend(
 			var viewModel;
 			var initialViewModelData = {};
 
-			var preventDataBindings = domData.get.call(el, "preventDataBindings");
+			var preventDataBindings = domData.get(el, "preventDataBindings");
 
 			var teardownBindings;
 			if (preventDataBindings) {
@@ -520,7 +520,7 @@ var Component = Construct.extend(
 			this.viewModel = viewModel;
 			el[viewModelSymbol] = viewModel;
 			el.viewModel = viewModel;
-			domData.set.call(el, "preventDataBindings", true);
+			domData.set(el, "preventDataBindings", true);
 
 			// an array of teardown stuff that should happen when the element is removed
 			var teardownFunctions = [];
