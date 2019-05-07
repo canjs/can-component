@@ -635,6 +635,7 @@ var Component = Construct.extend(
 				betweenTagsView = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
 			var viewModelDisconnectedCallback,
+				insertionDisposal,
 				componentInPage,
 				nodeRemoved;
 
@@ -655,6 +656,10 @@ var Component = Construct.extend(
 					viewModelDisconnectedCallback(el);
 				} else if(typeof viewModel.stopListening === "function"){
 					viewModel.stopListening();
+				}
+				if(insertionDisposal) {
+					insertionDisposal();
+					insertionDisposal = null;
 				}
 			}, componentTagData.parentNodeList || true, false);
 			nodeList.expression = "<" + this.tag + ">";
@@ -681,8 +686,9 @@ var Component = Construct.extend(
 				if(componentInPage) {
 					viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 				} else {
-					var insertionDisposal = domMutate.onNodeInsertion(el, function () {
+					insertionDisposal = domMutate.onNodeInsertion(el, function () {
 						insertionDisposal();
+						insertionDisposal = null;
 						viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 					});
 				}
