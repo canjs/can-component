@@ -94,7 +94,7 @@ QUnit.test("Component can be removed from the page", 3, function(){
 		},
 		events: {
 			"{element} beforeremove": function(){
-				QUnit.ok(true, "torn down");
+				assert.ok(true, "torn down");
 			}
 		}
 	});
@@ -117,12 +117,12 @@ QUnit.test("Component can be removed from the page", 3, function(){
 	});
 
 	show.set(false);
-	QUnit.ok(true, "got here without an error");
+	assert.ok(true, "got here without an error");
 
 	show.set(true);
 
 	prop.set(4);
-	QUnit.equal(frag.firstChild.getElementsByTagName("to-be-removed")[0].innerHTML, "4");
+	assert.equal(frag.firstChild.getElementsByTagName("to-be-removed")[0].innerHTML, "4");
 });
 
 QUnit.test("Cleans up itself on the documentElement removal", function() {
@@ -141,11 +141,11 @@ QUnit.test("Cleans up itself on the documentElement removal", function() {
 
 	domMutate.onNodeRemoval(doc.body.firstChild, function() {
 		globals.setKeyValue("document", realDoc);
-		QUnit.ok(true, "Called back without throwing");
-		start();
+		assert.ok(true, "Called back without throwing");
+		done();
 	});
 
-	stop();
+	var done = assert.async();
 
 	doc.removeChild(doc.documentElement);
 });

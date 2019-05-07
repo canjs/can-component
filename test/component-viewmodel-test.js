@@ -287,11 +287,11 @@ helpers.makeTests("can-component viewModels", function(){
 
 		attr.set(attrFun, "first-name", "Brian");
 
-		stop();
+		var done = assert.async();
 
 		setTimeout(function () {
 			equal(attrFun.firstChild.firstChild.nodeValue, "Brian Meyer");
-			start();
+			done();
 		}, 100);
 
 	});
@@ -313,10 +313,10 @@ helpers.makeTests("can-component viewModels", function(){
 				// update the class
 				className.add.call(el,"foo");
 
-				stop();
+				var done = assert.async();
 				setTimeout(function(){
 						equal(viewModel.attr('class'),undefined, "the viewModel is not updated when the class attribute changes");
-						start();
+						done();
 				}, 100);
 
 		});
@@ -503,7 +503,7 @@ helpers.makeTests("can-component viewModels", function(){
 				equal(vm.swap, 4, "swap - updated binding");
 			}
 			];
-			stop();
+			var done = assert.async();
 			var index = 0;
 			var next = function(){
 			 if(index < threads.length) {
@@ -511,7 +511,7 @@ helpers.makeTests("can-component viewModels", function(){
 				index++;
 				setTimeout(next, 150);
 			} else {
-				start();
+				done();
 			}
 		};
 		setTimeout(next, 100);
@@ -538,7 +538,7 @@ helpers.makeTests("can-component viewModels", function(){
 			var renderer = stache("<outer-noleak><my-child this:to='myChild'/></outer-noleak>");
 			var frag = renderer();
 			var vm = canViewModel(frag.firstChild);
-			QUnit.equal(vm.myChild.name,"inner", "got instance");
+			assert.equal(vm.myChild.name,"inner", "got instance");
 
 		});
 
@@ -561,7 +561,7 @@ helpers.makeTests("can-component viewModels", function(){
 		 });
 			canData.set(el, "preventDataBindings", false);
 
-			QUnit.equal(el.firstChild.nodeValue, "it worked");
+			assert.equal(el.firstChild.nodeValue, "it worked");
 		});
 
 		QUnit.test("viewModel available as viewModel property (#282)", function() {
@@ -587,7 +587,7 @@ helpers.makeTests("can-component viewModels", function(){
 		});
 
 		QUnit.test("connectedCallback without a disconnect calls stopListening", 1, function(){
-			QUnit.stop();
+			var done = assert.async();
 
 			var map = new SimpleMap();
 
@@ -610,7 +610,7 @@ helpers.makeTests("can-component viewModels", function(){
 				domMutateNode.removeChild.call(first.parentNode, first);
 				helpers.afterMutation(function(){
 					QUnit.notOk( canReflect.isBound(map), "stopListening no matter what on vm");
-					QUnit.start();
+					done();
 				});
 			});
 		});

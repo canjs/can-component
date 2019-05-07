@@ -36,11 +36,11 @@ helpers.makeTests("can-component viewModels with observe", function(){
         var buttons = frag.firstChild.getElementsByTagName("button");
         var spans = frag.firstChild.getElementsByTagName("span");
 
-        QUnit.equal(spans[0].innerHTML, "0", "first value");
+        assert.equal(spans[0].innerHTML, "0", "first value");
 
         domEvents.dispatch(buttons[0], "click");
 
-        QUnit.equal(spans[0].innerHTML, "1", "second value");
+        assert.equal(spans[0].innerHTML, "1", "second value");
 
     });
 
@@ -67,26 +67,26 @@ helpers.makeTests("can-component viewModels with observe", function(){
             var buttons = frag.firstChild.getElementsByTagName("button");
             var spans = frag.firstChild.getElementsByTagName("span");
 
-            QUnit.equal(spans[0].innerHTML, "0", "first value");
+            assert.equal(spans[0].innerHTML, "0", "first value");
 
             domEvents.dispatch(buttons[0], "click");
 
-            QUnit.equal(spans[0].innerHTML, "1", "second value");
+            assert.equal(spans[0].innerHTML, "1", "second value");
 
         });
 
         QUnit.test("connectedCallback and disconnectedCallback", 3, function(){
-            QUnit.stop();
+            var done = assert.async();
 
             Component.extend({
                 tag: "connected-component",
                 view: stache('rendered'),
                 ViewModel: class extends observe.Object {
                     connectedCallback(element) {
-                        QUnit.equal(element.innerHTML, "rendered", "rendered view");
-                        QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "connectedCallback");
+                        assert.equal(element.innerHTML, "rendered", "rendered view");
+                        assert.equal(element.nodeName, "CONNECTED-COMPONENT", "connectedCallback");
                         return function(){
-                            QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "disconnectedCallback");
+                            assert.equal(element.nodeName, "CONNECTED-COMPONENT", "disconnectedCallback");
                         };
                     }
                 }
@@ -100,7 +100,7 @@ helpers.makeTests("can-component viewModels with observe", function(){
 
                 domMutateNode.removeChild.call(first.parentNode, first);
                 helpers.afterMutation(function(){
-                    QUnit.start();
+                    done();
                 });
             });
         });

@@ -413,16 +413,16 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 
 	vm.showSubject = false;
 
-	QUnit.stop();
+	var done = assert.async();
 
-	QUnit.equal(testView.firstChild.children.length, 0);
+	assert.equal(testView.firstChild.children.length, 0);
 	// vm.__bindings.subject.handlers
 
 	setTimeout(function() {
 
 		var handlers = vm[canSymbol.for('can.meta')].handlers;
-		QUnit.equal(handlers.get(['subject']).length, 0);
-		QUnit.start();
+		assert.equal(handlers.get(['subject']).length, 0);
+		done();
 	}, 50);
 });
 
@@ -459,7 +459,7 @@ test("blocks directly nested within template", function() {
 	viewModel.showSlot = false;
 
 	var spans = homePage.getElementsByTagName("span");
-	QUnit.equal(spans.length, 0, "all spans removed");
+	assert.equal(spans.length, 0, "all spans removed");
 });
 
 QUnit.test("able to pass individual values (#291)", function() {
@@ -489,7 +489,7 @@ QUnit.test("able to pass individual values (#291)", function() {
 	passValuesToSlots.viewModel.add(5);
 	var count = passValuesToSlots.querySelector(".count");
 
-	QUnit.equal(count.innerHTML, "10", "updated count value");
+	assert.equal(count.innerHTML, "10", "updated count value");
 });
 
 QUnit.test("slots are passed as variables", function() {
@@ -517,5 +517,5 @@ QUnit.test("slots are passed as variables", function() {
 	var passValuesToSlots = frag.firstElementChild || frag.firstChild;
 	var count = passValuesToSlots.querySelector(".count");
 
-	QUnit.equal(count.innerHTML, "0-1", "updated count value");
+	assert.equal(count.innerHTML, "0-1", "updated count value");
 });

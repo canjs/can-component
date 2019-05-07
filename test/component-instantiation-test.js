@@ -22,13 +22,13 @@ QUnit.test("Components can be instantiated with new", function() {
 	var viewModel = componentInstance.viewModel;
 
 	// Basics look correct
-	QUnit.ok(element, "instance has element property");
-	QUnit.equal(element.textContent, "Hello ", "element has correct text content");
-	QUnit.ok(viewModel, "instance has viewModel property");
+	assert.ok(element, "instance has element property");
+	assert.equal(element.textContent, "Hello ", "element has correct text content");
+	assert.ok(viewModel, "instance has viewModel property");
 
 	// Updating the viewModel should update the element
 	viewModel.message = "world";
-	QUnit.equal(element.textContent, "Hello world", "element has correct text content after updating viewModel");
+	assert.equal(element.textContent, "Hello world", "element has correct text content after updating viewModel");
 });
 
 QUnit.test("Components can be instantiated with <content> - no scope", function() {
@@ -46,7 +46,7 @@ QUnit.test("Components can be instantiated with <content> - no scope", function(
 	var element = componentInstance.element;
 
 	// Basics look correct
-	QUnit.equal(element.innerHTML, "Hello <em>mundo</em>", "content is rendered");
+	assert.equal(element.innerHTML, "Hello <em>mundo</em>", "content is rendered");
 });
 
 QUnit.test("Components can be instantiated with <content> - with plain content and scope", function() {
@@ -67,7 +67,7 @@ QUnit.test("Components can be instantiated with <content> - with plain content a
 	var element = componentInstance.element;
 
 	// Basics look correct
-	QUnit.equal(element.innerHTML, "Hello <em>mundo</em>", "content is rendered");
+	assert.equal(element.innerHTML, "Hello <em>mundo</em>", "content is rendered");
 });
 
 QUnit.test("Components can be instantiated with <content> - with scope - leakScope false", function() {
@@ -89,11 +89,11 @@ QUnit.test("Components can be instantiated with <content> - with scope - leakSco
 
 	// Start off without the key defined in the scope; with leakScope false,
 	// no message will be rendered
-	QUnit.equal(element.innerHTML, "Hello <em></em>", "content is rendered with the provided scope");
+	assert.equal(element.innerHTML, "Hello <em></em>", "content is rendered with the provided scope");
 
 	// Set the key in the scope; now a message will be rendered
 	scopeVM.set("message", "mundo");
-	QUnit.equal(element.innerHTML, "Hello <em>mundo</em>", "content updates with the provided scope");
+	assert.equal(element.innerHTML, "Hello <em>mundo</em>", "content updates with the provided scope");
 });
 
 QUnit.test("Components can be instantiated with <content> - with scope - leakScope true", function() {
@@ -115,7 +115,7 @@ QUnit.test("Components can be instantiated with <content> - with scope - leakSco
 	var element = componentInstance.element;
 
 	// leakScope works
-	QUnit.equal(element.innerHTML, "Hello <em>world</em>", "content is rendered with the component’s scope");
+	assert.equal(element.innerHTML, "Hello <em>world</em>", "content is rendered with the component’s scope");
 });
 
 QUnit.test("Components can be instantiated with templates", function() {
@@ -137,12 +137,12 @@ QUnit.test("Components can be instantiated with templates", function() {
 	// Basics look correct
 	var element = componentInstance.element;
 	var inputElement = element.querySelector("input");
-	QUnit.ok(inputElement, "template rendered");
-	QUnit.equal(inputElement.value, "world", "input has correct value");
+	assert.ok(inputElement, "template rendered");
+	assert.equal(inputElement.value, "world", "input has correct value");
 
 	// Updating the scopeVM should update the template
 	scopeVM.message = "mundo";
-	QUnit.equal(inputElement.value, "mundo", "input has correct value after updating scopeVM");
+	assert.equal(inputElement.value, "mundo", "input has correct value after updating scopeVM");
 });
 
 QUnit.test("Components can be instantiated with viewModel", function() {
@@ -183,25 +183,25 @@ QUnit.test("Components can be instantiated with viewModel", function() {
 	var viewModel = componentInstance.viewModel;
 
 	// Initial values are correct
-	QUnit.equal(viewModel.fromChildProp, "original from value", "fromChildProp init");
-	QUnit.equal(viewModel.plainProp, "plain value", "plainProp init");
-	QUnit.equal(viewModel.toParentProp, undefined, "toParentProp init");
-	QUnit.equal(viewModel.twoWayProp, "original bind value", "twoWayProp init");
-	QUnit.equal(viewModel.nullProp, null, "nullProp init");
+	assert.equal(viewModel.fromChildProp, "original from value", "fromChildProp init");
+	assert.equal(viewModel.plainProp, "plain value", "plainProp init");
+	assert.equal(viewModel.toParentProp, undefined, "toParentProp init");
+	assert.equal(viewModel.twoWayProp, "original bind value", "twoWayProp init");
+	assert.equal(viewModel.nullProp, null, "nullProp init");
 
 	// Updating the fromChildProp
 	fromMap.get("inner").set("key", "new from value");
-	QUnit.equal(viewModel.fromChildProp, "new from value", "viewModel updated after fromMap set");
+	assert.equal(viewModel.fromChildProp, "new from value", "viewModel updated after fromMap set");
 
 	// Updating the toParentProp
 	viewModel.toParentProp = "new to value";
-	QUnit.equal(toMap.get("inner").get("key"), "new to value", "toMap updated after viewModel set");
+	assert.equal(toMap.get("inner").get("key"), "new to value", "toMap updated after viewModel set");
 
 	// Updating the twoWayProp
 	bindMap.get("inner").set("key", "new bind value");
-	QUnit.equal(viewModel.twoWayProp, "new bind value", "viewModel updated after bindMap set");
+	assert.equal(viewModel.twoWayProp, "new bind value", "viewModel updated after bindMap set");
 	viewModel.twoWayProp = "newest bind value";
-	QUnit.equal(bindMap.get("inner").get("key"), "newest bind value", "bindMap updated after viewModel set");
+	assert.equal(bindMap.get("inner").get("key"), "newest bind value", "bindMap updated after viewModel set");
 });
 
 QUnit.test("Components can be instantiated with all options", function() {
@@ -232,16 +232,16 @@ QUnit.test("Components can be instantiated with all options", function() {
 	var viewModel = componentInstance.viewModel;
 
 	// Basics look correct
-	QUnit.equal(
+	assert.equal(
 		element.innerHTML,
 		"Hello <em>friend</em> <ul> <li>eat</li> </ul>",
 		"element renders correctly"
 	);
-	QUnit.equal(viewModel.items.length, 1, "viewModel has items");
+	assert.equal(viewModel.items.length, 1, "viewModel has items");
 
 	// Changing the view model updates the element
 	viewModel.items.push("sleep");
-	QUnit.equal(
+	assert.equal(
 		element.innerHTML,
 		"Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li> </ul>",
 		"element updates correctly"
@@ -282,15 +282,15 @@ QUnit.test("Component binding instantiation works as documented", function() {
 	var viewModel = componentInstance.viewModel;
 
 	// Initial component values are correct
-	QUnit.equal(viewModel.familyName, "Flanders", "component “bind” prop is correct");
-	QUnit.equal(viewModel.givenName, "Milo", "component “from” prop is correct");
-	QUnit.equal(viewModel.fullName, "Milo Flanders", "component “to” prop is correct");
+	assert.equal(viewModel.familyName, "Flanders", "component “bind” prop is correct");
+	assert.equal(viewModel.givenName, "Milo", "component “from” prop is correct");
+	assert.equal(viewModel.fullName, "Milo Flanders", "component “to” prop is correct");
 
 	// Initial map values are correct
 	var family = appVM.get("family");
-	QUnit.equal(family.get("last"), "Flanders", "map “bind” prop is correct");
-	QUnit.equal(family.get("first"), "Milo", "map “from” prop is correct");
-	QUnit.equal(family.get("full"), "Milo Flanders", "map “to” prop is correct");
+	assert.equal(family.get("last"), "Flanders", "map “bind” prop is correct");
+	assert.equal(family.get("first"), "Milo", "map “from” prop is correct");
+	assert.equal(family.get("full"), "Milo Flanders", "map “to” prop is correct");
 });
 
 QUnit.test("component instantiation is not observable", function(){
@@ -330,7 +330,7 @@ QUnit.test("component instantiation is not observable", function(){
 
 	innerViewModel.innerValue = "SOME-VALUE";
 
-	QUnit.equal(count, 1, "only updated once");
+	assert.equal(count, 1, "only updated once");
 });
 
 QUnit.test("Can render in a document with no body", function() {
@@ -349,9 +349,9 @@ QUnit.test("Can render in a document with no body", function() {
 
 	try {
 		new ComponentConstructor();
-		QUnit.ok(true, "rendered without throwing");
+		assert.ok(true, "rendered without throwing");
 	} catch(e){
-		QUnit.ok(false, "threw" + e.toString());
+		assert.ok(false, "threw" + e.toString());
 	}
 	finally {
 		globals.setKeyValue("document", document);
@@ -371,11 +371,11 @@ QUnit.test("{initializeBindings: false} prevents setting up bindings until inser
 		initializeBindings: false
 	});
 
-	QUnit.equal(inst.viewModel.color, undefined, "ViewModel not yet setup");
+	assert.equal(inst.viewModel.color, undefined, "ViewModel not yet setup");
 
 	var view = stache("{{component}}");
 	var frag = view({ component: inst });
 
-	QUnit.equal(inst.viewModel.color, "red", "is red");
-	QUnit.equal(frag.firstChild.firstChild.data, "red", "Now it is setup");
+	assert.equal(inst.viewModel.color, "red", "is red");
+	assert.equal(frag.firstChild.firstChild.data, "red", "Now it is setup");
 });

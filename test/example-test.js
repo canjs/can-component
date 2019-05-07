@@ -219,7 +219,7 @@ helpers.makeTests("can-component examples", function(doc) {
 			}]
 		}];
 
-		stop();
+		var done = assert.async();
 
 		setTimeout(function() {
 			base.set('locations', items);
@@ -281,7 +281,7 @@ helpers.makeTests("can-component examples", function(doc) {
 			equal(breadcrumbLIs().length, 1, "Only the default title is shown");
 			equal(innerHTML(breadcrumbLIs()[0]), "Locations", "The correct title from the attribute is shown");
 
-			start();
+			done();
 
 		}, 100);
 
@@ -384,7 +384,7 @@ helpers.makeTests("can-component examples", function(doc) {
 
 		equal(gridScope.get("waiting"), true, "The grid is initially waiting on the deferreddata to resolve");
 
-		stop();
+		var done = assert.async();
 		var self = this;
 
 		var waitingHandler = function() {
@@ -399,7 +399,7 @@ helpers.makeTests("can-component examples", function(doc) {
 						setTimeout(function() {
 							tds = self.fixture.getElementsByTagName("td");
 							equal(innerHTML(tds[0]), "Brian", "td changed to brian");
-							start();
+							done();
 						}, 100);
 
 					}
@@ -574,7 +574,7 @@ helpers.makeTests("can-component examples", function(doc) {
 
 			var testArea = this.fixture;
 
-			stop();
+			var done = assert.async();
 
 			helpers.runTasks([
 				function() {

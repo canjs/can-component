@@ -34,7 +34,7 @@ QUnit.test("Using can-bind in connectedCallback works as documented", function(a
 					parent: value.from(this, "eventualProp"),
 					child: value.to(this, "object.prop")
 				});
-				binding.start();
+				binding.done();
 				return binding.stop.bind(binding);
 			}
 		}

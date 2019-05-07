@@ -199,7 +199,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         var frag = stache("<parent-tag id='pt'></parent-tag>")({});
 
         domMutateNode.appendChild.call(this.fixture, frag);
-        stop();
+        var done = assert.async();
 
         var attempts = 0;
         function checkCount(){
@@ -207,7 +207,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
                 equal(inited, 1, "inited");
 				equal(inserted, 1, "inserted");
 				undo();
-                start();
+                done();
             } else {
                 attempts += 1;
                 setTimeout(checkCount,30);
@@ -279,14 +279,14 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
             events : {
                 "init" : function() {
                     var self = this.viewModel;
-                    stop();
+                    var done = assert.async();
                     setTimeout(function() {
                         self.set("value" , 100);
                         var wrapper = frag.lastChild,
                             simpleExample = wrapper.firstChild,
                             textNode = simpleExample.firstChild;
                         equal(textNode.nodeValue, "100", "updated value with reference");
-                        start();
+                        done();
                     }, 100);
 
                 }
@@ -460,7 +460,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         var frag = template();
 
 		var span = frag.firstChild.getElementsByTagName("span")[0];
-        QUnit.equal(span.innerHTML, "CT-OUTER-LIGHT-DOM");
+        assert.equal(span.innerHTML, "CT-OUTER-LIGHT-DOM");
 
 
 	});

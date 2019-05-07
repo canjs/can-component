@@ -100,16 +100,16 @@ helpers.makeTests("can-component events", function(){
         var renderer = stache("<can-parent-stache></can-parent-stache>");
 
         domMutateNode.appendChild.call(this.fixture, renderer());
-        stop();
+        var done = assert.async();
         setTimeout(function () {
 			undo();
-			start();
+			done();
 		}, 100);
     });
 
 
     QUnit.test('viewModel objects with Constructor functions as properties do not get converted (#1261)', 1, function(){
-        stop();
+        var done = assert.async();
         var HANDLER;
         var Test = SimpleMap.extend({
             addEventListener: function(ev, handler){
@@ -134,7 +134,7 @@ helpers.makeTests("can-component events", function(){
             events: {
                 '{MyConstruct} something': function() {
                     ok(true, 'Event got triggered');
-                    start();
+                    done();
                 }
             }
         });
@@ -169,10 +169,10 @@ helpers.makeTests("can-component events", function(){
         domMutateNode.appendChild.call(this.fixture,frag);
 
         domMutateNode.removeChild.call(this.fixture, this.fixture.firstChild);
-        stop();
+        var done = assert.async();
         helpers.afterMutation(function(){
             ok(state.attr('product') == null, 'product was removed');
-            start();
+            done();
         });
     });
 
@@ -247,7 +247,7 @@ helpers.makeTests("can-component events", function(){
 			undo();
         }]);
 
-        stop();
+        var done = assert.async();
 
     });
 

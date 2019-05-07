@@ -40,15 +40,15 @@ QUnit.test('Works with can-define', function () {
 
 	var vm = viewModel(frag.firstChild);
 
-	QUnit.ok(vm instanceof VM, 'Constructor was called');
-	QUnit.equal(vm.firstName, 'Chris', 'ViewModel was set from scope');
-	QUnit.equal(vm.lastName, 'Gomez', 'ViewModel was set from scope');
-	QUnit.equal(frag.firstChild.innerHTML, 'Name: Chris Gomez', 'Rendered fullName');
+	assert.ok(vm instanceof VM, 'Constructor was called');
+	assert.equal(vm.firstName, 'Chris', 'ViewModel was set from scope');
+	assert.equal(vm.lastName, 'Gomez', 'ViewModel was set from scope');
+	assert.equal(frag.firstChild.innerHTML, 'Name: Chris Gomez', 'Rendered fullName');
 
 	vm.firstName = 'Justin';
 	vm.lastName = 'Meyer';
 
-	QUnit.equal(frag.firstChild.innerHTML, 'Name: Justin Meyer', 'Rendered fullName after change');
+	assert.equal(frag.firstChild.innerHTML, 'Name: Justin Meyer', 'Rendered fullName after change');
 });
 
 
@@ -58,7 +58,7 @@ QUnit.test('scope method works', function () {
 	Component.extend({
 		tag: "my-element",
 		viewModel: function(properties, scope, element){
-			QUnit.deepEqual(properties, {first: "Justin", last: "Meyer"});
+			assert.deepEqual(properties, {first: "Justin", last: "Meyer"});
 			return new DefineMap(properties);
 		}
 	});
@@ -109,7 +109,7 @@ QUnit.test("helpers do not leak when leakscope is false (#77)", function () {
 	var renderer = stache("<outer-el>");
 
 	renderer();
-	QUnit.equal(called, 0, "Outer helper not called");
+	assert.equal(called, 0, "Outer helper not called");
 });
 
 QUnit.test("helpers do leak when leakscope is true (#77)", function () {
@@ -133,7 +133,7 @@ QUnit.test("helpers do leak when leakscope is true (#77)", function () {
 	var renderer = stache("<outer-el/>");
 
 	renderer();
-	QUnit.equal(called, 1, "Outer helper called once");
+	assert.equal(called, 1, "Outer helper called once");
 });
 
 if(System.env.indexOf("production") < 0) {
@@ -141,7 +141,7 @@ if(System.env.indexOf("production") < 0) {
 		QUnit.expect(1);
 		var oldwarn = canDev.warn;
 		canDev.warn = function(mesg) {
-			QUnit.equal(mesg, "can-component: Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html", "Warning is expected message");
+			assert.equal(mesg, "can-component: Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html", "Warning is expected message");
 		};
 
 		// should issue a warning
@@ -187,15 +187,15 @@ QUnit.test("ViewModel defaults to DefineMap if set to an Object", function() {
 
 	var vm = viewModel(frag.firstChild);
 
-	QUnit.ok(vm instanceof DefineMap, 'vm is a DefineMap');
-	QUnit.equal(vm.firstName, 'Chris', 'ViewModel was set from scope');
-	QUnit.equal(vm.lastName, 'Gomez', 'ViewModel was set from scope');
-	QUnit.equal(frag.firstChild.innerHTML, 'Name: Chris Gomez', 'Rendered fullName');
+	assert.ok(vm instanceof DefineMap, 'vm is a DefineMap');
+	assert.equal(vm.firstName, 'Chris', 'ViewModel was set from scope');
+	assert.equal(vm.lastName, 'Gomez', 'ViewModel was set from scope');
+	assert.equal(frag.firstChild.innerHTML, 'Name: Chris Gomez', 'Rendered fullName');
 
 	vm.firstName = 'Justin';
 	vm.lastName = 'Meyer';
 
-	QUnit.equal(frag.firstChild.innerHTML, 'Name: Justin Meyer', 'Rendered fullName after change');
+	assert.equal(frag.firstChild.innerHTML, 'Name: Justin Meyer', 'Rendered fullName after change');
 });
 
 QUnit.test("ViewModel properties default to DefineList if set to an Array (#225)", function() {
@@ -216,7 +216,7 @@ QUnit.test("ViewModel properties default to DefineList if set to an Array (#225)
 	var fragOne = renderer();
 	var vm = viewModel(fragOne.firstChild);
 
-	QUnit.ok(vm.items instanceof define.DefineList, 'vm is a DefineList');
+	assert.ok(vm.items instanceof define.DefineList, 'vm is a DefineList');
 });
 
 testHelpers.dev.devOnlyTest("filename should be passed to stache() for inline views", function() {
@@ -229,5 +229,5 @@ testHelpers.dev.devOnlyTest("filename should be passed to stache() for inline vi
 	var renderer = stache("<my-filename-component></my-filename-component>");
 	var frag = renderer();
 
-	QUnit.equal(frag.firstChild.innerHTML, "MyFilenameComponentView", "filename was provided to stache()");
+	assert.equal(frag.firstChild.innerHTML, "MyFilenameComponentView", "filename was provided to stache()");
 });
