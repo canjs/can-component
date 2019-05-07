@@ -377,5 +377,5 @@ QUnit.test("{initializeBindings: false} prevents setting up bindings until inser
 	var frag = view({ component: inst });
 
 	QUnit.equal(inst.viewModel.color, "red", "is red");
-	QUnit.equal(frag.firstElementChild.firstChild.data, "red", "Now it is setup");
+	QUnit.equal(frag.firstChild.firstChild.data, "red", "Now it is setup");
 });
