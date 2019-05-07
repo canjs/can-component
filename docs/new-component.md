@@ -327,3 +327,27 @@ This makes `helloWorldInstance.element` a fragment with the following structure:
 ```html
 <hello-world>Hello <em>mundo</em></hello-world>
 ```
+
+### initializeBindings
+
+By default bindings are initialized when a component is created. For most components this is what you want. However if you are only conditionally inserting a component it can leak memory if bindings are setup. Setting `initializeBindings: false` prevents the setting up of bindings until the component is inserted into a view.
+
+```js
+import {Component, stache} from "can";
+
+const HelloWorld = Component.extend({
+  tag: "hello-world",
+  view: "Hello world"
+});
+
+const helloWorldInstance = new HelloWorld({
+  initializeBindings: false
+});
+
+// Bindings are not setup.
+
+const view = stache("{{component}}");
+document.body.append(view({ component: helloWorldInstance }));
+
+// Now they are!
+```

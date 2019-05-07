@@ -357,3 +357,25 @@ QUnit.test("Can render in a document with no body", function() {
 		globals.setKeyValue("document", document);
 	}
 });
+
+QUnit.test("{initializeBindings: false} prevents setting up bindings until insert", function() {
+	var ComponentConstructor = Component.extend({
+		tag: "some-random-tag",
+		view: "{{color}}",
+		ViewModel: {
+			color: { default: "red" }
+		}
+	});
+
+	var inst = new ComponentConstructor({
+		initializeBindings: false
+	});
+
+	QUnit.equal(inst.viewModel.color, undefined, "ViewModel not yet setup");
+
+	var view = stache("{{component}}");
+	var frag = view({ component: inst });
+
+	QUnit.equal(inst.viewModel.color, "red", "is red");
+	QUnit.equal(frag.firstElementChild.firstChild.data, "red", "Now it is setup");
+});

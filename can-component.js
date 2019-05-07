@@ -438,6 +438,13 @@ var Component = Construct.extend(
 			}
 			this.element = el;
 
+			if(componentTagData.initializeBindings === false && !this._skippedSetup) {
+				// Temporary, will be overridden.
+				this._skippedSetup = this._torndown = true;
+				this.viewModel = Object.create(null);
+				return;
+			}
+
 			var componentContent = componentTagData.content;
 			if (componentContent !== undefined) {
 				// Check if it’s already a renderer function or
