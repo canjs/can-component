@@ -7,7 +7,7 @@ var Component = require("can-component");
 
 helpers.makeTests("can-component tag", function(){
 
-    QUnit.test("hyphen-less tag names", function () {
+    QUnit.test("hyphen-less tag names", function(assert) {
 		Component.extend({
 			tag: "foobar",
 			view: stache("<div>{{name}}</div>"),
@@ -22,7 +22,7 @@ helpers.makeTests("can-component tag", function(){
 
 		var frag = renderer();
 
-		equal(frag.lastChild.firstChild.firstChild.nodeValue, "Brian");
+		assert.equal(frag.lastChild.firstChild.firstChild.nodeValue, "Brian");
 
 	});
 });
