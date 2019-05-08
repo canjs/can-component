@@ -9,7 +9,7 @@ var canSymbol = require("can-symbol");
 
 QUnit.module("can-components - can-slots");
 
-test("<can-slot> Works", function() {
+QUnit.test("<can-slot> Works", function(assert) {
 	/*The <can-slot> elements within a renderer will replace itself with any
 	<can-template> elements found in the component who have a matching 'name'
 	attribute. Default dynamic scope is used unless passed into the <can-slot>
@@ -47,11 +47,11 @@ test("<can-slot> Works", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.childNodes[0].nodeValue, 'Hello World');
-	equal(testView.firstChild.childNodes[1].nodeValue, 'Later Gator');
+	assert.equal(testView.firstChild.childNodes[0].nodeValue, 'Hello World');
+	assert.equal(testView.firstChild.childNodes[1].nodeValue, 'Later Gator');
 });
 
-test("<can-slot> leakScope false acts as expected", function() {
+QUnit.test("<can-slot> leakScope false acts as expected", function(assert) {
 	/*The <can-slot> elements don't have access to component viewModel without leakScope*/
 
 	var ViewModel = DefineMap.extend({
@@ -88,11 +88,11 @@ test("<can-slot> leakScope false acts as expected", function() {
 		body: 'bar'
 	});
 
-	equal(testView.firstChild.childNodes[0].nodeValue, 'foo');
-	equal(testView.firstChild.childNodes[1].nodeValue, 'bar');
+	assert.equal(testView.firstChild.childNodes[0].nodeValue, 'foo');
+	assert.equal(testView.firstChild.childNodes[1].nodeValue, 'bar');
 });
 
-test("<can-slot> Re-use templates", function() {
+QUnit.test("<can-slot> Re-use templates", function(assert) {
 	/*The <can-slot> elements can reuse a template*/
 
 	var ViewModel = DefineMap.extend({
@@ -124,11 +124,11 @@ test("<can-slot> Re-use templates", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.childNodes[0].nodeValue, 'Hello World');
-	equal(testView.firstChild.childNodes[1].nodeValue, 'Hello World');
+	assert.equal(testView.firstChild.childNodes[0].nodeValue, 'Hello World');
+	assert.equal(testView.firstChild.childNodes[1].nodeValue, 'Hello World');
 });
 
-test("<can-slot> Works with default content", function() {
+QUnit.test("<can-slot> Works with default content", function(assert) {
 	/*The <can-slot> elements will render default content if no template renderer is present*/
 
 	var ViewModel = DefineMap.extend({});
@@ -151,10 +151,10 @@ test("<can-slot> Works with default content", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.innerHTML, 'Default Content');
+	assert.equal(testView.firstChild.innerHTML, 'Default Content');
 });
 
-test("<can-slot> Works in a self-closing template", function() {
+QUnit.test("<can-slot> Works in a self-closing template", function(assert) {
 	/* A component like <hello-world/> can be rendered like <hello-world></hello-world> */
 
 	var ViewModel = DefineMap.extend({});
@@ -175,10 +175,10 @@ test("<can-slot> Works in a self-closing template", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.innerHTML, 'Default Content');
+	assert.equal(testView.firstChild.innerHTML, 'Default Content');
 });
 
-test("<can-slot> Context one-way binding works", function() {
+QUnit.test("<can-slot> Context one-way binding works", function(assert) {
 	/*Passing in a custom context like <can-slot name='subject' {context}='value' />*/
 
 	var ViewModel = DefineMap.extend("MyEmailVM", {
@@ -204,14 +204,14 @@ test("<can-slot> Context one-way binding works", function() {
 	var frag = renderer();
 	var vm = viewModel(frag.firstChild);
 
-	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
+	assert.equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
 
 	vm.subject = "Later Gator";
 
-	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
+	assert.equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
 });
 
-test("<can-slot> Context two-way binding works", function() {
+QUnit.test("<can-slot> Context two-way binding works", function(assert) {
 	/*Passing in a custom context like <can-slot name='subject' {(context)}='value' />*/
 
 	var ViewModel = DefineMap.extend('MyEmailVM', {}, {
@@ -246,18 +246,18 @@ test("<can-slot> Context two-way binding works", function() {
 	var vm = viewModel(frag.firstChild);
 	var childVM = viewModel(frag.firstChild.firstChild);
 
-	equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
+	assert.equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
 
 	vm.subject = "Later Gator";
 
-	equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
+	assert.equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
 
 	childVM.subject = "After a while crocodile";
 
-	equal(vm.subject, "After a while crocodile");
+	assert.equal(vm.subject, "After a while crocodile");
 });
 
-test("<can-slot> Context child-to-parent binding works", function() {
+QUnit.test("<can-slot> Context child-to-parent binding works", function(assert) {
 	/*Passing in a custom context like <can-slot name='subject' {^context}='value' />*/
 
 	var ViewModel = DefineMap.extend({
@@ -296,16 +296,16 @@ test("<can-slot> Context child-to-parent binding works", function() {
 	var vm = viewModel(frag.firstChild);
 	var childVM = viewModel(frag.firstChild.firstChild);
 
-	equal(frag.firstChild.firstChild.innerHTML, 'Yo');
+	assert.equal(frag.firstChild.firstChild.innerHTML, 'Yo');
 
 	childVM.subject = "bar";
 
-	equal(frag.firstChild.firstChild.innerHTML, 'bar');
+	assert.equal(frag.firstChild.firstChild.innerHTML, 'bar');
 
-	equal(vm.subject, "bar");
+	assert.equal(vm.subject, "bar");
 });
 
-test("<can-slot> Works alongside <content>", function() {
+QUnit.test("<can-slot> Works alongside <content>", function(assert) {
 	/*Will still render <content> in the right place*/
 
 	var ViewModel = DefineMap.extend({
@@ -338,11 +338,11 @@ test("<can-slot> Works alongside <content>", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.childNodes[0].firstChild.nodeValue, 'Hello World');
-	equal(testView.firstChild.childNodes[1].firstChild.nodeValue, 'Some content');
+	assert.equal(testView.firstChild.childNodes[0].firstChild.nodeValue, 'Hello World');
+	assert.equal(testView.firstChild.childNodes[1].firstChild.nodeValue, 'Some content');
 });
 
-test("<can-slot> Works alongside <content> with default content", function() {
+QUnit.test("<can-slot> Works alongside <content> with default content", function(assert) {
 	/*Will still render default <content> in the right place*/
 
 	var ViewModel = DefineMap.extend({
@@ -374,11 +374,11 @@ test("<can-slot> Works alongside <content> with default content", function() {
 
 	var testView = renderer();
 
-	equal(testView.firstChild.childNodes[0].firstChild.nodeValue, 'Hello World');
-	equal(testView.firstChild.childNodes[1].nodeValue, 'Default content');
+	assert.equal(testView.firstChild.childNodes[0].firstChild.nodeValue, 'Hello World');
+	assert.equal(testView.firstChild.childNodes[1].nodeValue, 'Default content');
 });
 
-test("<can-slot> Can be used conditionally and will remove bindings", function() {
+QUnit.test("<can-slot> Can be used conditionally and will remove bindings", function(assert) {
 
 	var ViewModel = DefineMap.extend("MyEmailVM", {
 		subject: {
@@ -407,27 +407,27 @@ test("<can-slot> Can be used conditionally and will remove bindings", function()
 
 	var testView = renderer();
 
-	equal(testView.firstChild.firstChild.firstChild.nodeValue, 'Hello World');
+	assert.equal(testView.firstChild.firstChild.firstChild.nodeValue, 'Hello World');
 
 	var vm = viewModel(testView.firstChild);
 
 	vm.showSubject = false;
 
-	QUnit.stop();
+	var done = assert.async();
 
-	QUnit.equal(testView.firstChild.children.length, 0);
+	assert.equal(testView.firstChild.children.length, 0);
 	// vm.__bindings.subject.handlers
 
 	setTimeout(function() {
 
 		var handlers = vm[canSymbol.for('can.meta')].handlers;
-		QUnit.equal(handlers.get(['subject']).length, 0);
-		QUnit.start();
+		assert.equal(handlers.get(['subject']).length, 0);
+		done();
 	}, 50);
 });
 
 
-test("blocks directly nested within template", function() {
+QUnit.test("blocks directly nested within template", function(assert) {
 
 	var template = stache(
 		'<home-page>' +
@@ -459,10 +459,10 @@ test("blocks directly nested within template", function() {
 	viewModel.showSlot = false;
 
 	var spans = homePage.getElementsByTagName("span");
-	QUnit.equal(spans.length, 0, "all spans removed");
+	assert.equal(spans.length, 0, "all spans removed");
 });
 
-QUnit.test("able to pass individual values (#291)", function() {
+QUnit.test("able to pass individual values (#291)", function(assert) {
 	Component.extend({
 		tag: "pass-values-to-slots",
 		view: '<can-slot name="countDisplay" count:from="count"/>',
@@ -489,10 +489,10 @@ QUnit.test("able to pass individual values (#291)", function() {
 	passValuesToSlots.viewModel.add(5);
 	var count = passValuesToSlots.querySelector(".count");
 
-	QUnit.equal(count.innerHTML, "10", "updated count value");
+	assert.equal(count.innerHTML, "10", "updated count value");
 });
 
-QUnit.test("slots are passed as variables", function() {
+QUnit.test("slots are passed as variables", function(assert) {
 	Component.extend({
 		tag: "pass-values-to-slots",
 		view: '<can-slot name="countDisplay" count:from="count"/>',
@@ -517,5 +517,5 @@ QUnit.test("slots are passed as variables", function() {
 	var passValuesToSlots = frag.firstElementChild || frag.firstChild;
 	var count = passValuesToSlots.querySelector(".count");
 
-	QUnit.equal(count.innerHTML, "0-1", "updated count value");
+	assert.equal(count.innerHTML, "0-1", "updated count value");
 });
