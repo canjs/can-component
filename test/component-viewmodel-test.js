@@ -586,7 +586,8 @@ helpers.makeTests("can-component viewModels", function(){
 			assert.equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
 		});
 
-		QUnit.test("connectedCallback without a disconnect calls stopListening", 1, function(assert) {
+		QUnit.test("connectedCallback without a disconnect calls stopListening", function(assert) {
+			assert.expect(1);
 			var done = assert.async();
 
 			var map = new SimpleMap();

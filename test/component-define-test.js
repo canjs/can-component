@@ -138,7 +138,7 @@ QUnit.test("helpers do leak when leakscope is true (#77)", function(assert) {
 
 if(System.env.indexOf("production") < 0) {
 	QUnit.test('warn if viewModel is assigned a DefineMap (#14)', function(assert) {
-		QUnit.expect(1);
+		assert.expect(1);
 		var oldwarn = canDev.warn;
 		canDev.warn = function(mesg) {
 			assert.equal(mesg, "can-component: Assigning a DefineMap or constructor type to the viewModel property may not be what you intended. Did you mean ViewModel instead? More info: https://canjs.com/doc/can-component.prototype.ViewModel.html", "Warning is expected message");

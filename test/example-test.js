@@ -631,7 +631,7 @@ helpers.makeTests("can-component examples", function(doc) {
 					assert.equal(innerHTML(panels[1]), "ice cream, candy", "the second content is shown");
 					undo();
 				}
-			]);
+			], done);
 		});
 
 

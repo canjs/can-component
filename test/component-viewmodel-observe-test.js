@@ -9,12 +9,12 @@ var domMutateNode = require('can-dom-mutate/node');
 var observe = require("can-observe");
 
 var classSupport = (function() {
-	try {
-		eval('"use strict"; class A{};');
-		return true;
-	} catch (e) {
-		return false;
-	}
+    try {
+        eval('"use strict"; class A{};');
+        return true;
+    } catch (e) {
+        return false;
+    }
 
 })();
 
@@ -75,7 +75,8 @@ helpers.makeTests("can-component viewModels with observe", function(){
 
         });
 
-        QUnit.test("connectedCallback and disconnectedCallback", 3, function(assert) {
+        QUnit.test("connectedCallback and disconnectedCallback", function(assert) {
+            assert.expect(3);
             var done = assert.async();
 
             Component.extend({

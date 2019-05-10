@@ -84,7 +84,8 @@ QUnit.test("wrapped in a conditional", function (assert) {
 	finishOn2();
 });
 
-QUnit.test("Component can be removed from the page", 3, function(assert) {
+QUnit.test("Component can be removed from the page", function(assert) {
+	assert.expect(3);
 
 	var ToBeRemoved = Component.extend({
 		tag: "to-be-removed",

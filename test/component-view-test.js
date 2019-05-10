@@ -381,7 +381,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 		equal(two.firstChild.nodeValue, "OTHER-EXPORT", "external content, external export");*/
 	});
 
-    runTestInOnlyDocument("custom renderer can provide setupBindings", function(){
+    runTestInOnlyDocument("custom renderer can provide setupBindings", function(assert){
 		var rendererFactory = function(tmpl){
 			var frag = getFragment(tmpl);
 			return function(scope, options){

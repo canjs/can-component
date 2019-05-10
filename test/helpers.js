@@ -7,14 +7,14 @@ var domMutateNode = require('can-dom-mutate/node');
 var globals = require('can-globals');
 
 var helpers = {
-    runTasks: function(tasks){
+    runTasks: function(tasks, done){
     	var nextTask = function(){
     		var next = tasks.shift();
     		next();
     		if(tasks.length) {
     			setTimeout(nextTask, 100);
     		} else {
-    			start();
+    			done();
     		}
     	};
     	setTimeout(nextTask, 100);
@@ -24,7 +24,7 @@ var helpers = {
         //var MUT_OBS = MUTATION_OBSERVER();
 
     	QUnit.module(name, {
-    		setup: function () {
+    		beforeEach: function (assert) {
     			DOCUMENT(doc);
                 if(!mutObs) {
                     globals.setKeyValue("MutationObserver", mutObs);
@@ -39,11 +39,11 @@ var helpers = {
     				this.fixture = doc.getElementById("qunit-fixture");
     			}
     		},
-    		teardown: function(){
+    		afterEach: function(assert){
     			doc.body.removeChild(this.fixture);
-    			stop();
+    			var done = assert.async();
     			setTimeout(function(){
-    				start();
+    				done();
     				DOCUMENT(DOC);
     				globals.deleteKeyValue("MutationObserver");
     			}, 100);

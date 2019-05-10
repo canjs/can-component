@@ -108,7 +108,8 @@ helpers.makeTests("can-component events", function(){
     });
 
 
-    QUnit.test('viewModel objects with Constructor functions as properties do not get converted (#1261)', 1, function(assert) {
+    QUnit.test('viewModel objects with Constructor functions as properties do not get converted (#1261)', function(assert) {
+		assert.expect(1);
         var done = assert.async();
         var HANDLER;
         var Test = SimpleMap.extend({
@@ -176,7 +177,8 @@ helpers.makeTests("can-component events", function(){
         });
     });
 
-    QUnit.test('changing viewModel property rebinds {viewModel.<...>} events (#1529)', 2, function(assert) {
+    QUnit.test('changing viewModel property rebinds {viewModel.<...>} events (#1529)', function(assert) {
+		assert.expect(2);
 		Component.extend({
 			tag: 'rebind-viewmodel',
 			events: {
@@ -230,7 +232,7 @@ helpers.makeTests("can-component events", function(){
             show: show,
             state: state
         }));
-
+		var done = assert.async();
         helpers.runTasks([function(){
             show.set(false);
         },function(){
@@ -245,9 +247,9 @@ helpers.makeTests("can-component events", function(){
         }, function(){
             assert.equal(removeCount, 2, 'internal removed twice');
 			undo();
-        }]);
+        }], done);
 
-        var done = assert.async();
+        
 
     });
 
