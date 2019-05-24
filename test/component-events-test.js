@@ -15,7 +15,7 @@ var removedEvent = domMutateDomEvents.removed;
 
 helpers.makeTests("can-component events", function(){
 
-    test("value observables formerly (#550)", function () {
+    QUnit.test("value observables formerly (#550)", function(assert) {
 
         var nameChanges = 0;
 
@@ -45,17 +45,17 @@ helpers.makeTests("can-component events", function(){
         n2.set("updated");
 
 
-        equal(nameChanges, 2);
+        assert.equal(nameChanges, 2);
     });
 
-    test("Component events bind to window", function(){
+    QUnit.test("Component events bind to window", function(assert) {
         window.tempMap = new SimpleMap();
 
         Component.extend({
             tag: "window-events",
             events: {
                 "{tempMap} prop": function(){
-                    ok(true, "called templated event");
+                    assert.ok(true, "called templated event");
                 }
             }
         });
@@ -75,8 +75,8 @@ helpers.makeTests("can-component events", function(){
 
     });
 
-    QUnit.test("stache conditionally nested components calls inserted once (#967)", function(){
-		expect(1);
+    QUnit.test("stache conditionally nested components calls inserted once (#967)", function(assert) {
+		assert.expect(1);
 		var undo = domEvents.addEvent(insertedEvent);
 
         Component.extend({
@@ -92,7 +92,7 @@ helpers.makeTests("can-component events", function(){
             tag: "can-child",
             events: {
                 inserted: function(){
-                    ok(true, "called inserted once");
+                    assert.ok(true, "called inserted once");
                 }
             }
         });
@@ -100,16 +100,17 @@ helpers.makeTests("can-component events", function(){
         var renderer = stache("<can-parent-stache></can-parent-stache>");
 
         domMutateNode.appendChild.call(this.fixture, renderer());
-        stop();
+        var done = assert.async();
         setTimeout(function () {
 			undo();
-			start();
+			done();
 		}, 100);
     });
 
 
-    QUnit.test('viewModel objects with Constructor functions as properties do not get converted (#1261)', 1, function(){
-        stop();
+    QUnit.test('viewModel objects with Constructor functions as properties do not get converted (#1261)', function(assert) {
+		assert.expect(1);
+        var done = assert.async();
         var HANDLER;
         var Test = SimpleMap.extend({
             addEventListener: function(ev, handler){
@@ -133,8 +134,8 @@ helpers.makeTests("can-component events", function(){
             }),
             events: {
                 '{MyConstruct} something': function() {
-                    ok(true, 'Event got triggered');
-                    start();
+                    assert.ok(true, 'Event got triggered');
+                    done();
                 }
             }
         });
@@ -146,7 +147,7 @@ helpers.makeTests("can-component events", function(){
         HANDLER.call(Test,{type:"something"});
     });
 
-    QUnit.test('removing bound viewModel properties on destroy #1415', function(){
+    QUnit.test('removing bound viewModel properties on destroy #1415', function(assert) {
         var state = new SimpleMap({
             product: new SimpleMap({
                 id: 1,
@@ -169,14 +170,15 @@ helpers.makeTests("can-component events", function(){
         domMutateNode.appendChild.call(this.fixture,frag);
 
         domMutateNode.removeChild.call(this.fixture, this.fixture.firstChild);
-        stop();
+        var done = assert.async();
         helpers.afterMutation(function(){
-            ok(state.attr('product') == null, 'product was removed');
-            start();
+            assert.ok(state.attr('product') == null, 'product was removed');
+            done();
         });
     });
 
-    test('changing viewModel property rebinds {viewModel.<...>} events (#1529)', 2, function(){
+    QUnit.test('changing viewModel property rebinds {viewModel.<...>} events (#1529)', function(assert) {
+		assert.expect(2);
 		Component.extend({
 			tag: 'rebind-viewmodel',
 			events: {
@@ -184,10 +186,10 @@ helpers.makeTests("can-component events", function(){
 					this.viewModel.set("anItem" , new SimpleMap({}) );
 				},
 				'{scope.anItem} name': function() {
-					ok(true, 'Change event on scope');
+					assert.ok(true, 'Change event on scope');
 				},
 				'{viewModel.anItem} name': function() {
-					ok(true, 'Change event on viewModel');
+					assert.ok(true, 'Change event on viewModel');
 				}
 			}
 		});
@@ -199,7 +201,7 @@ helpers.makeTests("can-component events", function(){
 	});
 
 
-    QUnit.test('DOM trees not releasing when referencing CanMap inside CanMap in view (#1593)', function() {
+    QUnit.test('DOM trees not releasing when referencing CanMap inside CanMap in view (#1593)', function(assert) {
 		var undo = domEvents.addEvent(removedEvent);
 
         var baseTemplate = stache('{{#if show}}<my-outside></my-outside>{{/if}}'),
@@ -230,24 +232,24 @@ helpers.makeTests("can-component events", function(){
             show: show,
             state: state
         }));
-
+		var done = assert.async();
         helpers.runTasks([function(){
             show.set(false);
         },function(){
             state.set('inner', null);
         }, function(){
-            equal(removeCount, 1, 'internal removed once');
+            assert.equal(removeCount, 1, 'internal removed once');
             show.set(true);
         }, function(){
             state.set('inner', 2);
         }, function(){
             state.set('inner', null);
         }, function(){
-            equal(removeCount, 2, 'internal removed twice');
+            assert.equal(removeCount, 2, 'internal removed twice');
 			undo();
-        }]);
+        }], done);
 
-        stop();
+        
 
     });
 

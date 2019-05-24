@@ -24,7 +24,7 @@ var innerHTML = function(el){
 
 helpers.makeTests("can-component viewModels", function(){
 
-	QUnit.test("a SimpleMap constructor as .ViewModel", function() {
+	QUnit.test("a SimpleMap constructor as .ViewModel", function(assert) {
 
 		var map = new SimpleMap({name: "Matthew"});
 
@@ -37,12 +37,12 @@ helpers.makeTests("can-component viewModels", function(){
 		});
 
 		var renderer = stache("<can-map-viewmodel></can-map-viewmodel>");
-		equal(renderer().firstChild.firstChild.nodeValue, "Matthew");
+		assert.equal(renderer().firstChild.firstChild.nodeValue, "Matthew");
 	});
 
 
 
-	QUnit.test("a SimpleMap as viewModel", function () {
+	QUnit.test("a SimpleMap as viewModel", function(assert) {
 
 		var me = new SimpleMap({
 		 name: "Justin"
@@ -55,11 +55,11 @@ helpers.makeTests("can-component viewModels", function(){
 	 });
 
 		var renderer = stache('<my-viewmodel></my-viewmodel>');
-		equal(renderer().firstChild.firstChild.nodeValue, "Justin");
+		assert.equal(renderer().firstChild.firstChild.nodeValue, "Justin");
 
 	});
 
-	QUnit.test("a SimpleMap constructor as viewModel", function() {
+	QUnit.test("a SimpleMap constructor as viewModel", function(assert) {
 		var MyMap = SimpleMap.extend({
 		 setup: function(props){
 			props.name = "Matthew";
@@ -74,10 +74,10 @@ helpers.makeTests("can-component viewModels", function(){
 	 });
 
 		var renderer = stache("<can-map-viewmodel></can-map-viewmodel>");
-		equal(renderer().firstChild.firstChild.nodeValue, "Matthew");
+		assert.equal(renderer().firstChild.firstChild.nodeValue, "Matthew");
 	});
 
-	QUnit.test("an object is turned into a SimpleMap as viewModel", function() {
+	QUnit.test("an object is turned into a SimpleMap as viewModel", function(assert) {
 		Component.extend({
 		 tag: "can-map-viewmodel",
 		 view: stache("{{name}}"),
@@ -95,11 +95,11 @@ helpers.makeTests("can-component viewModels", function(){
 
 		vmOne.set("name", "Wilbur");
 
-		equal(fragOne.firstChild.firstChild.nodeValue, "Wilbur", "The first map changed values");
-		equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
+		assert.equal(fragOne.firstChild.firstChild.nodeValue, "Wilbur", "The first map changed values");
+		assert.equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
 	});
 
-	test("Providing viewModel and ViewModel throws", function() {
+	QUnit.test("Providing viewModel and ViewModel throws", function(assert) {
 		try {
 		 Component.extend({
 			tag: "viewmodel-test",
@@ -108,13 +108,13 @@ helpers.makeTests("can-component viewModels", function(){
 			ViewModel: SimpleMap.extend({})
 		});
 
-		 ok(false, "Should have thrown because we provided both");
+		 assert.ok(false, "Should have thrown because we provided both");
 	 } catch(er) {
-		 ok(true, "It threw because we provided both viewModel and ViewModel");
+		 assert.ok(true, "It threw because we provided both viewModel and ViewModel");
 	 }
  });
 
-	test("canViewModel utility", function() {
+	QUnit.test("canViewModel utility", function(assert) {
 		Component({
 			tag: "my-taggy-tag",
 			view: stache("<h1>hello</h1>"),
@@ -130,13 +130,13 @@ helpers.makeTests("can-component viewModels", function(){
 
 		var el = frag.firstChild;
 
-		equal(canViewModel(el), el[canSymbol.for('can.viewModel')], "one argument grabs the viewModel object");
-		equal(canViewModel(el, "foo"), "bar", "two arguments fetches a value");
+		assert.equal(canViewModel(el), el[canSymbol.for('can.viewModel')], "one argument grabs the viewModel object");
+		assert.equal(canViewModel(el, "foo"), "bar", "two arguments fetches a value");
 		canViewModel(el, "foo", "baz");
-		equal(canViewModel(el, "foo"), "baz", "Three arguments sets the value");
+		assert.equal(canViewModel(el, "foo"), "baz", "Three arguments sets the value");
 	});
 
-	test('setting passed variables - two way binding', function () {
+	QUnit.test('setting passed variables - two way binding', function(assert) {
 		Component.extend({
 		 tag: "my-toggler",
 		 view: stache("{{#if visible}}<content/>{{/if}}"),
@@ -175,44 +175,44 @@ helpers.makeTests("can-component viewModels", function(){
 		var myApp = frag.firstChild,
 		buttons = myApp.getElementsByTagName("button");
 
-		equal( buttons.length, 1, "there is one button");
-		equal( innerHTML(buttons[0]) , "hide", "the button's text is hide");
+		assert.equal( buttons.length, 1, "there is one button");
+		assert.equal( innerHTML(buttons[0]) , "hide", "the button's text is hide");
 
 		domEvents.dispatch(buttons[0], "click");
 		buttons = myApp.getElementsByTagName("button");
 
-		equal(buttons.length, 1, "there is one button");
-		equal(innerHTML(buttons[0]), "show", "the button's text is show");
+		assert.equal(buttons.length, 1, "there is one button");
+		assert.equal(innerHTML(buttons[0]), "show", "the button's text is show");
 
 		domEvents.dispatch(buttons[0], "click");
 		buttons = myApp.getElementsByTagName("button");
 
-		equal(buttons.length, 1, "there is one button");
-		equal(innerHTML(buttons[0]), "hide", "the button's text is hide");
+		assert.equal(buttons.length, 1, "there is one button");
+		assert.equal(innerHTML(buttons[0]), "hide", "the button's text is hide");
 	});
 
 
-	test("don't update computes unnecessarily", function () {
+	QUnit.test("don't update computes unnecessarily", function(assert) {
 		var sourceAge = new SimpleObservable(30),
 		timesComputeIsCalled = 0;
 
 		var age = new SetterObservable(function () {
 		 timesComputeIsCalled++;
 		 if (timesComputeIsCalled === 1) {
-			ok(true, "reading initial value to set as years");
+			assert.ok(true, "reading initial value to set as years");
 		} else if (timesComputeIsCalled === 3) {
-			ok(true, "called back another time after set to get the value");
+			assert.ok(true, "called back another time after set to get the value");
 		} else {
-			ok(false, "(getter) You've called the callback " + timesComputeIsCalled + " times");
+			assert.ok(false, "(getter) You've called the callback " + timesComputeIsCalled + " times");
 		}
 		return sourceAge.get();
 
 	}, function(newVal){
 		timesComputeIsCalled++;
 		if (timesComputeIsCalled === 2) {
-			ok(true, "updating value to " + newVal);
+			assert.ok(true, "updating value to " + newVal);
 		} else {
-			ok(false, "(setter) You've called the callback " + timesComputeIsCalled + " times");
+			assert.ok(false, "(setter) You've called the callback " + timesComputeIsCalled + " times");
 		}
 		sourceAge.set(newVal);
 	});
@@ -231,7 +231,7 @@ helpers.makeTests("can-component viewModels", function(){
 
 	});
 
-	test("viewModel not rebound correctly (#550)", function () {
+	QUnit.test("viewModel not rebound correctly (#550)", function(assert) {
 
 		var nameChanges = 0;
 
@@ -261,7 +261,7 @@ helpers.makeTests("can-component viewModels", function(){
 		n2.set("updated");
 
 
-		equal(nameChanges, 2);
+		assert.equal(nameChanges, 2);
 	});
 
 		/*
@@ -287,11 +287,11 @@ helpers.makeTests("can-component viewModels", function(){
 
 		attr.set(attrFun, "first-name", "Brian");
 
-		stop();
+		var done = assert.async();
 
 		setTimeout(function () {
 			equal(attrFun.firstChild.firstChild.nodeValue, "Brian Meyer");
-			start();
+			done();
 		}, 100);
 
 	});
@@ -313,16 +313,16 @@ helpers.makeTests("can-component viewModels", function(){
 				// update the class
 				className.add.call(el,"foo");
 
-				stop();
+				var done = assert.async();
 				setTimeout(function(){
 						equal(viewModel.attr('class'),undefined, "the viewModel is not updated when the class attribute changes");
-						start();
+						done();
 				}, 100);
 
 		});
 		*/
 
-		test("id and class should work now (#694)", function () {
+		QUnit.test("id and class should work now (#694)", function(assert) {
 			Component.extend({
 			 tag: "stay-classy",
 			 ViewModel: SimpleMap.extend({
@@ -352,11 +352,11 @@ helpers.makeTests("can-component viewModels", function(){
 
 		 var viewModel = canViewModel(stayClassy);
 
-		 equal(viewModel.get("id"), "id-success");
-		 equal(viewModel.get("class"), "class-success");
+		 assert.equal(viewModel.get("id"), "id-success");
+		 assert.equal(viewModel.get("class"), "class-success");
 	 });
 
-		test("Construct are passed normally", function(){
+		QUnit.test("Construct are passed normally", function(assert) {
 			var Constructed = Construct.extend({foo:"bar"},{});
 
 			Component.extend({
@@ -370,12 +370,12 @@ helpers.makeTests("can-component viewModels", function(){
 				Constructed: Constructed
 			});
 
-			equal(innerHTML(res.firstChild), "bar");
+			assert.equal(innerHTML(res.firstChild), "bar");
 
 
 		});
 
-		test('Component two way binding loop (#1579)', function() {
+		QUnit.test('Component two way binding loop (#1579)', function(assert) {
 			var changeCount = 0;
 
 			Component.extend({
@@ -412,12 +412,12 @@ helpers.makeTests("can-component viewModels", function(){
 
 
 
-			ok(changeCount < 500, "more than 500 events");
+			assert.ok(changeCount < 500, "more than 500 events");
 		});
 
 
 
-		test('two-way binding syntax INTRODUCED in v2.3 ALLOWS a child property to initialize an undefined parent property', function(){
+		QUnit.test('two-way binding syntax INTRODUCED in v2.3 ALLOWS a child property to initialize an undefined parent property', function(assert) {
 			var renderer = stache('<pa-rent/>');
 
 			Component.extend({
@@ -437,22 +437,22 @@ helpers.makeTests("can-component viewModels", function(){
 			var parentVM = canViewModel(frag.firstChild);
 			var childVM = canViewModel(frag.firstChild.firstChild);
 
-			equal(parentVM.get("parentProp"), 'bar', 'parentProp is bar');
-			equal(childVM.get("childProp"), 'bar', 'childProp is bar');
+			assert.equal(parentVM.get("parentProp"), 'bar', 'parentProp is bar');
+			assert.equal(childVM.get("childProp"), 'bar', 'childProp is bar');
 
 			parentVM.set("parentProp",'foo');
 
-			equal(parentVM.get("parentProp"), 'foo', 'parentProp is foo');
-			equal(childVM.get("childProp"), 'foo', 'childProp is foo');
+			assert.equal(parentVM.get("parentProp"), 'foo', 'parentProp is foo');
+			assert.equal(childVM.get("childProp"), 'foo', 'childProp is foo');
 
 			childVM.set("childProp",'baz');
 
-			equal(parentVM.get("parentProp"), 'baz', 'parentProp is baz');
-			equal(childVM.get("childProp"), 'baz', 'childProp is baz');
+			assert.equal(parentVM.get("parentProp"), 'baz', 'parentProp is baz');
+			assert.equal(childVM.get("childProp"), 'baz', 'childProp is baz');
 		});
 
 
-		test("conditional attributes (#2077)", function(){
+		QUnit.test("conditional attributes (#2077)", function(assert) {
 
 			Component.extend({
 			 tag: 'some-comp',
@@ -476,34 +476,34 @@ helpers.makeTests("can-component viewModels", function(){
 			var threads = [
 			function(){
 
-				equal(vm.next, 2, "has binding initially");
-				equal(vm.swap, true, "swap - has binding");
+				assert.equal(vm.next, 2, "has binding initially");
+				assert.equal(vm.swap, true, "swap - has binding");
 				//equal(vm.get("checked"), "", "attr - has binding"); (commented out because we don't do this sort of binding)
 				map.attr("preview", false);
 			},
 			function(){
-				equal(vm.swap, false, "swap - updated binidng");
+				assert.equal(vm.swap, false, "swap - updated binidng");
 
 				//ok(vm.get("checked") === null, "attr - value set to null");
 
 				map.attr("nextPage", 3);
-				equal(vm.next, 2, "not updating after binding is torn down");
+				assert.equal(vm.next, 2, "not updating after binding is torn down");
 				map.attr("preview", true);
 
 			},
 			function(){
-				equal(vm.next, 3, "re-initialized with binding");
-				equal(vm.swap, true, "swap - updated binidng");
+				assert.equal(vm.next, 3, "re-initialized with binding");
+				assert.equal(vm.swap, true, "swap - updated binidng");
 				//equal(vm.get("checked"), "", "attr - has binding set again");
 				map.attr("swapName", "nextPage");
 			},
 			function(){
-				equal(vm.swap, 3, "swap - updated binding key");
+				assert.equal(vm.swap, 3, "swap - updated binding key");
 				map.attr("nextPage",4);
-				equal(vm.swap, 4, "swap - updated binding");
+				assert.equal(vm.swap, 4, "swap - updated binding");
 			}
 			];
-			stop();
+			var done = assert.async();
 			var index = 0;
 			var next = function(){
 			 if(index < threads.length) {
@@ -511,13 +511,13 @@ helpers.makeTests("can-component viewModels", function(){
 				index++;
 				setTimeout(next, 150);
 			} else {
-				start();
+				done();
 			}
 		};
 		setTimeout(next, 100);
 	});
 
-		QUnit.test("one-way - child to parent - parent that does not leak scope, but has no view", function(){
+		QUnit.test("one-way - child to parent - parent that does not leak scope, but has no view", function(assert) {
 
 			Component.extend({
 				tag: "outer-noleak",
@@ -538,11 +538,11 @@ helpers.makeTests("can-component viewModels", function(){
 			var renderer = stache("<outer-noleak><my-child this:to='myChild'/></outer-noleak>");
 			var frag = renderer();
 			var vm = canViewModel(frag.firstChild);
-			QUnit.equal(vm.myChild.name,"inner", "got instance");
+			assert.equal(vm.myChild.name,"inner", "got instance");
 
 		});
 
-		QUnit.test("Can be called on an element using preventDataBindings (#183)", function(){
+		QUnit.test("Can be called on an element using preventDataBindings (#183)", function(assert) {
 			Component.extend({
 			 tag: "prevent-data-bindings",
 			 ViewModel: {},
@@ -561,10 +561,10 @@ helpers.makeTests("can-component viewModels", function(){
 		 });
 			canData.set(el, "preventDataBindings", false);
 
-			QUnit.equal(el.firstChild.nodeValue, "it worked");
+			assert.equal(el.firstChild.nodeValue, "it worked");
 		});
 
-		QUnit.test("viewModel available as viewModel property (#282)", function() {
+		QUnit.test("viewModel available as viewModel property (#282)", function(assert) {
 			Component.extend({
 			 tag: "can-map-viewmodel",
 			 view: stache("{{name}}"),
@@ -582,12 +582,13 @@ helpers.makeTests("can-component viewModels", function(){
 
 			vmOne.set("name", "Wilbur");
 
-			equal(fragOne.firstChild.firstChild.nodeValue, "Wilbur", "The first map changed values");
-			equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
+			assert.equal(fragOne.firstChild.firstChild.nodeValue, "Wilbur", "The first map changed values");
+			assert.equal(fragTwo.firstChild.firstChild.nodeValue, "Matthew", "The second map did not change");
 		});
 
-		QUnit.test("connectedCallback without a disconnect calls stopListening", 1, function(){
-			QUnit.stop();
+		QUnit.test("connectedCallback without a disconnect calls stopListening", function(assert) {
+			assert.expect(1);
+			var done = assert.async();
 
 			var map = new SimpleMap();
 
@@ -609,8 +610,8 @@ helpers.makeTests("can-component viewModels", function(){
 
 				domMutateNode.removeChild.call(first.parentNode, first);
 				helpers.afterMutation(function(){
-					QUnit.notOk( canReflect.isBound(map), "stopListening no matter what on vm");
-					QUnit.start();
+					assert.notOk( canReflect.isBound(map), "stopListening no matter what on vm");
+					done();
 				});
 			});
 		});
