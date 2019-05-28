@@ -6,6 +6,8 @@ var DefineMap = require('can-define/map/map');
 var viewModel = require("can-view-model");
 var canSymbol = require("can-symbol");
 
+var helpers = require("./helpers");
+
 
 QUnit.module("can-components - can-slots");
 
@@ -204,11 +206,11 @@ QUnit.test("<can-slot> Context one-way binding works", function(assert) {
 	var frag = renderer();
 	var vm = viewModel(frag.firstChild);
 
-	assert.equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
+	assert.equal(helpers.cloneAndClean(frag).firstChild.firstChild.innerHTML, 'Hello World');
 
 	vm.subject = "Later Gator";
 
-	assert.equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
+	assert.equal(helpers.cloneAndClean(frag).firstChild.firstChild.innerHTML, 'Later Gator');
 });
 
 QUnit.test("<can-slot> Context two-way binding works", function(assert) {
@@ -244,13 +246,14 @@ QUnit.test("<can-slot> Context two-way binding works", function(assert) {
 
 	var frag = renderer();
 	var vm = viewModel(frag.firstChild);
-	var childVM = viewModel(frag.firstChild.firstChild);
 
-	assert.equal(frag.firstChild.firstChild.innerHTML, 'Hello World');
+	var childVM = viewModel(frag.firstChild.getElementsByTagName("my-subject")[0]);
+
+	assert.equal(helpers.cloneAndClean(frag).firstChild.firstChild.innerHTML, 'Hello World');
 
 	vm.subject = "Later Gator";
 
-	assert.equal(frag.firstChild.firstChild.innerHTML, 'Later Gator');
+	assert.equal(helpers.cloneAndClean(frag).firstChild.firstChild.innerHTML, 'Later Gator');
 
 	childVM.subject = "After a while crocodile";
 
@@ -294,13 +297,13 @@ QUnit.test("<can-slot> Context child-to-parent binding works", function(assert) 
 
 	var frag = renderer();
 	var vm = viewModel(frag.firstChild);
-	var childVM = viewModel(frag.firstChild.firstChild);
+	var childVM = viewModel(frag.firstChild.getElementsByTagName("my-subject")[0]);
 
-	assert.equal(frag.firstChild.firstChild.innerHTML, 'Yo');
+	assert.equal(helpers.cloneAndClean(frag.firstChild).firstChild.innerHTML, 'Yo');
 
 	childVM.subject = "bar";
 
-	assert.equal(frag.firstChild.firstChild.innerHTML, 'bar');
+	assert.equal(helpers.cloneAndClean(frag.firstChild).firstChild.innerHTML, 'bar');
 
 	assert.equal(vm.subject, "bar");
 });
@@ -407,7 +410,7 @@ QUnit.test("<can-slot> Can be used conditionally and will remove bindings", func
 
 	var testView = renderer();
 
-	assert.equal(testView.firstChild.firstChild.firstChild.nodeValue, 'Hello World');
+	assert.equal(helpers.cloneAndClean(testView.firstChild).firstChild.firstChild.nodeValue, 'Hello World');
 
 	var vm = viewModel(testView.firstChild);
 
@@ -415,13 +418,13 @@ QUnit.test("<can-slot> Can be used conditionally and will remove bindings", func
 
 	var done = assert.async();
 
-	assert.equal(testView.firstChild.children.length, 0);
+	assert.equal(helpers.cloneAndClean(testView.firstChild).children.length, 0, "items removed");
 	// vm.__bindings.subject.handlers
 
 	setTimeout(function() {
 
 		var handlers = vm[canSymbol.for('can.meta')].handlers;
-		assert.equal(handlers.get(['subject']).length, 0);
+		assert.equal(handlers.get(['subject']).length, 0, "no handlers");
 		done();
 	}, 50);
 });

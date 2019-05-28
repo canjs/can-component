@@ -61,10 +61,11 @@ var ComponentControl = Control.extend({
 			this._bindings.readyComputes = {};
 		},
 		destroy: function() {
-			Control.prototype.destroy.apply(this, arguments);
 			if (typeof this.options.destroy === 'function') {
 				this.options.destroy.apply(this, arguments);
 			}
+			Control.prototype.destroy.apply(this, arguments);
+
 		}
 	});
 

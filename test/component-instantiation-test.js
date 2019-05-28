@@ -5,6 +5,7 @@ var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var value = require("can-value");
 var globals = require("can-globals");
+var helpers = require("./helpers");
 
 QUnit.module("can-component instantiation");
 
@@ -233,7 +234,7 @@ QUnit.test("Components can be instantiated with all options", function(assert) {
 
 	// Basics look correct
 	assert.equal(
-		element.innerHTML,
+		helpers.cloneAndClean(element).innerHTML,
 		"Hello <em>friend</em> <ul> <li>eat</li> </ul>",
 		"element renders correctly"
 	);
@@ -242,7 +243,7 @@ QUnit.test("Components can be instantiated with all options", function(assert) {
 	// Changing the view model updates the element
 	viewModel.items.push("sleep");
 	assert.equal(
-		element.innerHTML,
+		helpers.cloneAndClean(element).innerHTML,
 		"Hello <em>friend</em> <ul> <li>eat</li>  <li>sleep</li> </ul>",
 		"element updates correctly"
 	);

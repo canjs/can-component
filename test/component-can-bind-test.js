@@ -4,6 +4,7 @@ var helpers = require("./helpers");
 var QUnit = require("steal-qunit");
 var SimpleMap = require("can-simple-map");
 var value = require("can-value");
+var domMutateNode = require("can-dom-mutate/node/node");
 
 QUnit.module("can-component integration with can-bind");
 
@@ -50,7 +51,7 @@ QUnit.test("Using can-bind in connectedCallback works as documented", function(a
 
 	// Insert the component into the page; connectedCallback will run
 	var fixture = document.getElementById("qunit-fixture");
-	fixture.appendChild(element);
+	domMutateNode.appendChild.call(fixture, element);
 	helpers.afterMutation(function() {
 
 		// Because this is a one-way parent-to-child binding, the child will be set
