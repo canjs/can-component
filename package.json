@@ -75,7 +75,7 @@
     "can-vdom": "^4.0.0",
     "detect-cyclic-packages": "^1.1.0",
     "docco": "^0.8.0",
-    "highlight.js": "9.12.0",
+    "highlight.js": "^9.15.7",
     "done-serve": "^2.0.0",
     "gh-pages": "^2.0.1",
     "jshint": "^2.9.1",
