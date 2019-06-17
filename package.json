@@ -60,7 +60,7 @@
     "can-simple-observable": "^2.0.0",
     "can-stache": "^4.10.0",
     "can-stache-bindings": "^4.9.0",
-    "can-stache-key": "^1.0.0",
+    "can-stache-key": "^1.4.3",
     "can-string": "<2.0.0",
     "can-symbol": "^1.4.1",
     "can-view-callbacks": "^4.2.0",
