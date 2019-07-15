@@ -11,7 +11,7 @@ var removePlaceholderNodes = function(node){
 	var children = Array.from(childNodes(node));
 	for(var i = 0; i < children.length; i++) {
 		if(children[i].nodeType === Node.COMMENT_NODE) {
-			node.removeChild(children[i])
+			node.removeChild(children[i]);
 		} else if(children[i].nodeType === Node.ELEMENT_NODE) {
 			removePlaceholderNodes(children[i]);
 		}

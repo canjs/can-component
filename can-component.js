@@ -27,7 +27,6 @@ var assign = require('can-assign');
 var ObservationRecorder = require("can-observation-recorder");
 var queues = require("can-queues");
 var domData = require('can-dom-data');
-var getChildNodes = require('can-child-nodes');
 var string = require("can-string");
 var domEvents = require('can-dom-events');
 var domMutate = require('can-dom-mutate');
@@ -56,7 +55,7 @@ var viewModelSymbol = canSymbol.for('can.viewModel');
 
 
 // ## Helpers
-var noop = function(){};
+
 // ### addContext
 // For replacement elements like `<can-slot>` and `<context>`, this is used to
 // figure out what data they should render with.  Slots can have bindings like
