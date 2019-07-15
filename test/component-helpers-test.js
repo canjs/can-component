@@ -1,18 +1,13 @@
 var QUnit = require("steal-qunit");
 
 var helpers = require("./helpers");
-var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
 
-var innerHTML = function(el){
-    return el && el.innerHTML;
-};
-
 helpers.makeTests("can-component helpers", function(){
 
-    QUnit.test("helpers reference the correct instance (#515)", function () {
-		expect(2);
+    QUnit.test("helpers reference the correct instance (#515)", function(assert) {
+		assert.expect(2);
 		Component({
 			tag: 'my-text',
 			view: stache('<p>{{valueHelper()}}</p>'),
@@ -27,7 +22,7 @@ helpers.makeTests("can-component helpers", function(){
 
 		var frag = renderer({});
 
-		equal(frag.firstChild.firstChild.firstChild.nodeValue, 'value1');
-		equal(frag.lastChild.firstChild.firstChild.nodeValue, 'value2');
+		assert.equal(frag.firstChild.firstChild.firstChild.nodeValue, 'value1');
+		assert.equal(frag.lastChild.firstChild.firstChild.nodeValue, 'value2');
 	});
 });

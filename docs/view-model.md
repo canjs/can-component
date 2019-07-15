@@ -1,7 +1,9 @@
 @function can-component.prototype.view-model viewModel
-@parent can-component.prototype
+@parent can-component.deprecated
 
-Return the view model instance or type with which the component’s [can-component.prototype.view]
+@deprecated {4.0} Use [can-component.prototype.ViewModel] instead.
+
+@description Return the view model instance or type with which the component’s [can-component.prototype.view]
 is rendered.  This is used when more fine grained control is needed over [can-component::ViewModel].
 
 @signature `function(properties, parentScope, element)`
@@ -17,7 +19,9 @@ need to be setup.
 
 ```js
 import Component from "can-component";
+import DefineMap from "can-define/map/map";
 import Scope from "can-view-scope";
+import stache from "can-stache";
 
 Component.extend( {
 	tag: "my-element",
@@ -93,5 +97,5 @@ This example should be done with the [can-component::events] object instead.
 
 @return {Map|Object} Returns one of the following.
 
-   - An observable map or list type.
-   - The prototype of an observable map or list type that will be used to render the component’s view.
+	 - An observable map or list type.
+	 - The prototype of an observable map or list type that will be used to render the component’s view.

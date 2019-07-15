@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 var QUnit = require("steal-qunit");
 
 var helpers = require("./helpers");
@@ -7,23 +8,19 @@ var domEvents = require('can-dom-events');
 var domMutateNode = require('can-dom-mutate/node');
 var observe = require("can-observe");
 
-var innerHTML = function(el){
-    return el && el.innerHTML;
-};
-
 var classSupport = (function() {
-	try {
-		eval('"use strict"; class A{};');
-		return true;
-	} catch (e) {
-		return false;
-	}
+    try {
+        eval('"use strict"; class A{};');
+        return true;
+    } catch (e) {
+        return false;
+    }
 
 })();
 
 helpers.makeTests("can-component viewModels with observe", function(){
 
-    QUnit.test("Basic can-observe type", function(){
+    QUnit.test("Basic can-observe type", function(assert) {
         Component.extend({
             tag: "observe-add",
             view: stache("<button on:click='add()'>+1</button><span>{{count}}</span>"),
@@ -39,20 +36,20 @@ helpers.makeTests("can-component viewModels with observe", function(){
         var buttons = frag.firstChild.getElementsByTagName("button");
         var spans = frag.firstChild.getElementsByTagName("span");
 
-        QUnit.equal(spans[0].innerHTML, "0", "first value");
+        assert.equal(spans[0].innerHTML, "0", "first value");
 
         domEvents.dispatch(buttons[0], "click");
 
-        QUnit.equal(spans[0].innerHTML, "1", "second value");
+        assert.equal(spans[0].innerHTML, "1", "second value");
 
     });
 
     if(classSupport) {
-        QUnit.test("ViewModel as observe(class)", function(){
+        QUnit.test("ViewModel as observe(class)", function(assert) {
 
             class Add extends observe.Object{
                 constructor(props) {
-                    super(props)
+                    super(props);
                     this.count = 0;
                 }
                 add(){
@@ -70,27 +67,28 @@ helpers.makeTests("can-component viewModels with observe", function(){
             var buttons = frag.firstChild.getElementsByTagName("button");
             var spans = frag.firstChild.getElementsByTagName("span");
 
-            QUnit.equal(spans[0].innerHTML, "0", "first value");
+            assert.equal(spans[0].innerHTML, "0", "first value");
 
             domEvents.dispatch(buttons[0], "click");
 
-            QUnit.equal(spans[0].innerHTML, "1", "second value");
+            assert.equal(spans[0].innerHTML, "1", "second value");
 
         });
 
-        QUnit.test("connectedCallback and disconnectedCallback", 3, function(){
-            QUnit.stop();
+        QUnit.test("connectedCallback and disconnectedCallback", function(assert) {
+            assert.expect(3);
+            var done = assert.async();
 
             Component.extend({
                 tag: "connected-component",
                 view: stache('rendered'),
                 ViewModel: class extends observe.Object {
                     connectedCallback(element) {
-                        QUnit.equal(element.innerHTML, "rendered", "rendered view");
-                        QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "connectedCallback");
+                        assert.equal(element.innerHTML, "rendered", "rendered view");
+                        assert.equal(element.nodeName, "CONNECTED-COMPONENT", "connectedCallback");
                         return function(){
-                            QUnit.equal(element.nodeName, "CONNECTED-COMPONENT", "disconnectedCallback");
-                        }
+                            assert.equal(element.nodeName, "CONNECTED-COMPONENT", "disconnectedCallback");
+                        };
                     }
                 }
             });
@@ -103,7 +101,7 @@ helpers.makeTests("can-component viewModels with observe", function(){
 
                 domMutateNode.removeChild.call(first.parentNode, first);
                 helpers.afterMutation(function(){
-                    QUnit.start();
+                    done();
                 });
             });
         });

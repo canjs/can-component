@@ -31,3 +31,4 @@ doc/
 dist/
 .idea/
 package-lock.json
+docco/

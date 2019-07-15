@@ -1,6 +1,6 @@
 var QUnit = require("steal-qunit");
 
-var helpers = require("./helpers")
+var helpers = require("./helpers");
 var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var Component = require("can-component");
@@ -23,13 +23,13 @@ helpers.makeTests("can-component examples", function(doc) {
 
 	var Paginate = DefineMap.extend({
 		count: {
-			value: Infinity
+			default: Infinity
 		},
 		offset: {
-			value: 0
+			default: 0
 		},
 		limit: {
-			value: 100
+			default: 100
 		},
 		// Prevent negative counts
 		setCount: function(newCount, success, error) {
@@ -71,17 +71,17 @@ helpers.makeTests("can-component examples", function(doc) {
 	});
 
 
-	test("treecombo", function() {
+	QUnit.test("treecombo", function(assert) {
 
-		var TreeComboViewModel = DefineMap.extend({
+		var TreeComboViewModel = DefineMap.extend("TreeComboViewModel",{
 			items: {
-				Value: DefineList
+				Default: DefineList
 			},
 			breadcrumb: {
-				Value: DefineList
+				Default: DefineList
 			},
 			selected: {
-				Value: DefineList
+				Default: DefineList
 			},
 			selectableItems: function() {
 				var breadcrumb = this.get("breadcrumb");
@@ -150,8 +150,8 @@ helpers.makeTests("can-component examples", function(doc) {
 		});
 
 		var renderer = stache("<treecombo items:bind='locations' title:from='\"Locations\"'></treecombo>");
-
-		var base = new DefineMap({});
+		var BaseViewModel = DefineMap.extend("BaseViewModel",{seal: false},{});
+		var base = new BaseViewModel({});
 
 		var frag = renderer(base);
 		var root = doc.createElement("div");
@@ -219,10 +219,9 @@ helpers.makeTests("can-component examples", function(doc) {
 			}]
 		}];
 
-		stop();
+		var done = assert.async();
 
 		setTimeout(function() {
-
 			base.set('locations', items);
 
 			var itemsList = base.get('locations');
@@ -238,57 +237,57 @@ helpers.makeTests("can-component examples", function(doc) {
 					return options.getElementsByTagName('li');
 				};
 
-			equal(breadcrumbLIs().length, 1, "Only the default title is shown");
+			assert.equal(breadcrumbLIs().length, 1, "Only the default title is shown");
 
-			equal(breadcrumbLIs()[0].innerHTML, "Locations", "The correct title from the attribute is shown");
+			assert.equal(breadcrumbLIs()[0].innerHTML, "Locations", "The correct title from the attribute is shown");
 
-			equal(itemsList.length, optionsLis().length, "first level items are displayed");
+			assert.equal(itemsList.length, optionsLis().length, "first level items are displayed");
 
 			// Test toggling selected, first by clicking
 			domEvents.dispatch(optionsLis()[0], "click");
 
-			equal(optionsLis()[0].className, "active", "toggling something not selected adds active");
+			assert.equal(optionsLis()[0].className, "active", "toggling something not selected adds active");
 
-			ok(optionsLis()[0].getElementsByTagName('input')[0].checked, "toggling something not selected checks checkbox");
-			equal(canViewModel(treecombo, "selected")
+			assert.ok(optionsLis()[0].getElementsByTagName('input')[0].checked, "toggling something not selected checks checkbox");
+			assert.equal(canViewModel(treecombo, "selected")
 				.length, 1, "there is one selected item");
 
-			equal(canViewModel(treecombo).selected[0], itemsList[0], "the midwest is in selected");
+			assert.equal(canViewModel(treecombo).selected[0], itemsList[0], "the midwest is in selected");
 
 			// adjust the state and everything should update
 			var selectedList = canViewModel(treecombo, "selected");
 			selectedList.pop();
-			equal(optionsLis()[0].className, "", "removing selected item in viewModel removes 'active' class");
+			assert.equal(optionsLis()[0].className, "", "removing selected item in viewModel removes 'active' class");
 
 			// Test going in a location
 			domEvents.dispatch(optionsLis()[0].getElementsByTagName('button')[0], "click");
-			equal(breadcrumbLIs().length, 2, "Only the default title is shown");
-			equal(breadcrumbLIs()[1].innerHTML, "Midwest", "The breadcrumb has an item in it");
-			ok(/Illinois/.test(optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
+			assert.equal(breadcrumbLIs().length, 2, "Only the default title is shown");
+			assert.equal(breadcrumbLIs()[1].innerHTML, "Midwest", "The breadcrumb has an item in it");
+			assert.ok(/Illinois/.test(optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
 
 			// Test going in a location without children
 			domEvents.dispatch(optionsLis()[0].getElementsByTagName('button')[0], "click");
-			ok(/Chicago/.test(optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
-			ok(!optionsLis()[0].getElementsByTagName('button')
+			assert.ok(/Chicago/.test(optionsLis()[0].innerHTML), "A child of the top breadcrumb is displayed");
+			assert.ok(!optionsLis()[0].getElementsByTagName('button')
 				.length, "no show children button");
 
 			// Test poping off breadcrumb
 			domEvents.dispatch(breadcrumbLIs()[1], "click");
-			equal(innerHTML(breadcrumbLIs()[1]), "Midwest", "The breadcrumb has an item in it");
-			ok(/Illinois/.test(innerHTML(optionsLis()[0])), "A child of the top breadcrumb is displayed");
+			assert.equal(innerHTML(breadcrumbLIs()[1]), "Midwest", "The breadcrumb has an item in it");
+			assert.ok(/Illinois/.test(innerHTML(optionsLis()[0])), "A child of the top breadcrumb is displayed");
 
 			// Test removing everything
 			domEvents.dispatch(breadcrumbLIs()[0], "click");
-			equal(breadcrumbLIs().length, 1, "Only the default title is shown");
-			equal(innerHTML(breadcrumbLIs()[0]), "Locations", "The correct title from the attribute is shown");
+			assert.equal(breadcrumbLIs().length, 1, "Only the default title is shown");
+			assert.equal(innerHTML(breadcrumbLIs()[0]), "Locations", "The correct title from the attribute is shown");
 
-			start();
+			done();
 
 		}, 100);
 
 	});
 
-	test("deferred grid", function() {
+	QUnit.test("deferred grid", function(assert) {
 
 		// This test simulates a grid that reads a `deferreddata` property for
 		// items and displays them.
@@ -297,10 +296,10 @@ helpers.makeTests("can-component examples", function(doc) {
 
 		var GridViewModel = DefineMap.extend({
 			items: {
-				Value: DefineList
+				Default: DefineList
 			},
 			waiting: {
-				value: true
+				default: true
 			}
 		});
 
@@ -339,7 +338,7 @@ helpers.makeTests("can-component examples", function(doc) {
 		// deferredData property that reads from it and returns a new deferred.
 		var SimulatedScope = DefineMap.extend({
 			set: {
-				value: 0
+				default: 0
 			},
 			deferredData: function() {
 				var deferred = {};
@@ -383,9 +382,9 @@ helpers.makeTests("can-component examples", function(doc) {
 
 		var gridScope = canViewModel(this.fixture.firstChild);
 
-		equal(gridScope.get("waiting"), true, "The grid is initially waiting on the deferreddata to resolve");
+		assert.equal(gridScope.get("waiting"), true, "The grid is initially waiting on the deferreddata to resolve");
 
-		stop();
+		var done = assert.async();
 		var self = this;
 
 		var waitingHandler = function() {
@@ -393,14 +392,14 @@ helpers.makeTests("can-component examples", function(doc) {
 
 			setTimeout(function() {
 				var tds = self.fixture.getElementsByTagName("td");
-				equal(tds.length, 2, "there are 2 tds");
+				assert.equal(tds.length, 2, "there are 2 tds");
 
 				gridScope.on("waiting", function(ev, newVal) {
 					if (newVal === false) {
 						setTimeout(function() {
 							tds = self.fixture.getElementsByTagName("td");
-							equal(innerHTML(tds[0]), "Brian", "td changed to brian");
-							start();
+							assert.equal(innerHTML(tds[0]), "Brian", "td changed to brian");
+							done();
 						}, 100);
 
 					}
@@ -415,7 +414,7 @@ helpers.makeTests("can-component examples", function(doc) {
 		gridScope.on('waiting', waitingHandler);
 	});
 
-	test("nextprev", function() {
+	QUnit.test("nextprev", function(assert) {
 
 		Component.extend({
 			tag: "next-prev",
@@ -441,14 +440,14 @@ helpers.makeTests("can-component examples", function(doc) {
 		var prev = nextPrev.firstChild,
 			next = nextPrev.lastChild;
 
-		ok(!/enabled/.test(prev.className), "prev is not enabled");
-		ok(/enabled/.test(next.className), "next is enabled");
+		assert.ok(!/enabled/.test(prev.className), "prev is not enabled");
+		assert.ok(/enabled/.test(next.className), "next is enabled");
 
 		domEvents.dispatch(next, "click");
-		ok(/enabled/.test(prev.getAttribute('class')), "prev is enabled"); // TODO: use .className when CSD is patched
+		assert.ok(/enabled/.test(prev.getAttribute('class')), "prev is enabled"); // TODO: use .className when CSD is patched
 	});
 
-	test("page-count", function() {
+	QUnit.test("page-count", function(assert) {
 
 		Component.extend({
 			tag: "page-count",
@@ -469,22 +468,22 @@ helpers.makeTests("can-component examples", function(doc) {
 
 		var span = frag.firstChild.getElementsByTagName("span")[0];
 
-		equal(span.firstChild.nodeValue, "1");
+		assert.equal(span.firstChild.nodeValue, "1");
 		paginator.next();
-		equal(span.firstChild.nodeValue, "2");
+		assert.equal(span.firstChild.nodeValue, "2");
 		paginator.next();
-		equal(span.firstChild.nodeValue, "3");
+		assert.equal(span.firstChild.nodeValue, "3");
 
 	});
 
 	if (System.env !== 'canjs-test') {
 		// Brittle in IE
-		QUnit.test("basic tabs", function() {
+		QUnit.test("basic tabs", function(assert) {
 			var undo = domEvents.addEvent(insertedEvent);
 
 			var TabsViewModel = DefineMap.extend({
                 active: "any",
-                panels: {Value: DefineList},
+                panels: {Default: DefineList},
 				addPanel: function(panel) {
 					if (this.panels.length === 0) {
 						this.makeActive(panel);
@@ -538,18 +537,20 @@ helpers.makeTests("can-component examples", function(doc) {
 				view: stache("{{#if active}}<content></content>{{/if}}"),
 				tag: "panel",
 				ViewModel: DefineMap.extend({
-					active: {value: false}
+					active: {default: false}
 				}),
 				events: {
 					" inserted": function() {
 						canViewModel(this.element.parentNode)
 							.addPanel(this.viewModel);
+						this.parent = this.element.parentNode.viewModel;
 
 					},
 
 					" beforeremove": function() {
-						canViewModel(this.element.parentNode)
-							.removePanel(this.viewModel);
+						console.log("beforeremove ... removePanel");
+
+						this.parent.removePanel(this.viewModel);
 					}
 				}
 			});
@@ -575,16 +576,16 @@ helpers.makeTests("can-component examples", function(doc) {
 
 			var testArea = this.fixture;
 
-			stop();
+			var done = assert.async();
 
 			helpers.runTasks([
 				function() {
 					var lis = testArea.getElementsByTagName("li");
 
-					equal(lis.length, 3, "three lis added");
+					assert.equal(lis.length, 3, "three lis added");
 
 					foodTypes.forEach(function(type, i) {
-						equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
+						assert.equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
 					});
 
 					foodTypes.push({
@@ -595,44 +596,44 @@ helpers.makeTests("can-component examples", function(doc) {
 				function() {
 					var lis = testArea.getElementsByTagName("li");
 
-					equal(lis.length, 4, "li added");
+					assert.equal(lis.length, 4, "li added");
 
 
 					foodTypes.forEach(function(type, i) {
-						equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
+						assert.equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
 					});
 
-					equal(testArea.getElementsByTagName("panel")
+					assert.equal(testArea.getElementsByTagName("panel")
 						.length, 4, "panel added");
 					canLog.log("SHIFTY");
 					foodTypes.shift();
 				},
 				function() {
 					var lis = testArea.getElementsByTagName("li");
-
-					equal(lis.length, 3, "removed li after shifting a foodType");
+					console.log("testing");
+					assert.equal(lis.length, 3, "removed li after shifting a foodType");
 					foodTypes.forEach(function(type, i) {
-						equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
+						assert.equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
 					});
 
 					// test changing the active element
 					var panels = testArea.getElementsByTagName("panel");
 
-					equal(lis[0].className, "active", "the first element is active");
-					equal(innerHTML(panels[0]), "pasta, cereal", "the first content is shown");
-					equal(innerHTML(panels[1]), "", "the second content is removed");
+					assert.equal(lis[0].className, "active", "the first element is active");
+					assert.equal(innerHTML( helpers.cloneAndClean(panels[0]) ), "pasta, cereal", "the first content is shown");
+					assert.equal(innerHTML( helpers.cloneAndClean(panels[1]) ), "", "the second content is removed");
 
 					domEvents.dispatch(lis[1], "click");
 					lis = testArea.getElementsByTagName("li");
 
-					equal(lis[1].className, "active", "the second element is active");
-					equal(lis[0].className, "", "the first element is not active");
+					assert.equal(lis[1].className, "active", "the second element is active");
+					assert.equal(lis[0].className, "", "the first element is not active");
 
-					equal(innerHTML(panels[0]), "", "the second content is removed");
-					equal(innerHTML(panels[1]), "ice cream, candy", "the second content is shown");
+					assert.equal(innerHTML( helpers.cloneAndClean(panels[0]) ), "", "the second content is removed");
+					assert.equal(innerHTML( helpers.cloneAndClean(panels[1]) ), "ice cream, candy", "the second content is shown");
 					undo();
 				}
-			]);
+			], done);
 		});
 
 

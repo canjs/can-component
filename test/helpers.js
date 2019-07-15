@@ -5,16 +5,34 @@ var makeDocument = require('can-vdom/make-document/make-document');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 var globals = require('can-globals');
+var childNodes = require("can-child-nodes");
+
+var removePlaceholderNodes = function(node){
+	var children = Array.from(childNodes(node));
+	for(var i = 0; i < children.length; i++) {
+		if(children[i].nodeType === Node.COMMENT_NODE) {
+			node.removeChild(children[i]);
+		} else if(children[i].nodeType === Node.ELEMENT_NODE) {
+			removePlaceholderNodes(children[i]);
+		}
+	}
+	return node;
+};
+
+function cloneAndClean(node) {
+	return removePlaceholderNodes( node.cloneNode(true) );
+}
+
 
 var helpers = {
-    runTasks: function(tasks){
+    runTasks: function(tasks, done){
     	var nextTask = function(){
     		var next = tasks.shift();
     		next();
     		if(tasks.length) {
     			setTimeout(nextTask, 100);
     		} else {
-    			start();
+    			done();
     		}
     	};
     	setTimeout(nextTask, 100);
@@ -24,7 +42,7 @@ var helpers = {
         //var MUT_OBS = MUTATION_OBSERVER();
 
     	QUnit.module(name, {
-    		setup: function () {
+    		beforeEach: function (assert) {
     			DOCUMENT(doc);
                 if(!mutObs) {
                     globals.setKeyValue("MutationObserver", mutObs);
@@ -39,11 +57,11 @@ var helpers = {
     				this.fixture = doc.getElementById("qunit-fixture");
     			}
     		},
-    		teardown: function(){
+    		afterEach: function(assert){
     			doc.body.removeChild(this.fixture);
-    			stop();
+    			var done = assert.async();
     			setTimeout(function(){
-    				start();
+    				done();
     				DOCUMENT(DOC);
     				globals.deleteKeyValue("MutationObserver");
     			}, 100);
@@ -67,6 +85,7 @@ var helpers = {
         setTimeout(function(){
             domMutateNode.appendChild.call(doc.body, div);
         }, 10);
-    }
+    },
+	cloneAndClean: cloneAndClean
 };
 module.exports = helpers;

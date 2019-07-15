@@ -14,15 +14,14 @@ var queues = require("can-queues");
 var getFragment = require("can-fragment");
 var viewCallbacks = require("can-view-callbacks");
 var Scope = require("can-view-scope");
-var observe = require("can-observe");
 
 var innerHTML = function(el){
-    return el && el.innerHTML;
+    return el && helpers.cloneAndClean(el).innerHTML;
 };
 
 helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
-    QUnit.test("lexical scoping", function() {
+    QUnit.test("lexical scoping", function(assert) {
 		Component.extend({
 			tag: "hello-world",
 			view: stache("{{greeting}} <content>World</content>{{exclamation}}"),
@@ -42,7 +41,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
 		var hello = frag.firstChild;
 
-		equal(hello.innerHTML.trim(), "Hello World");
+		assert.equal(hello.innerHTML.trim(), "Hello World");
 
 		Component.extend({
 			tag: "hello-world-no-template",
@@ -60,19 +59,19 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
 		hello = frag.firstChild;
 
-		equal(hello.innerHTML.trim(), "Hello",
+		assert.equal(hello.innerHTML.trim(), "Hello",
 			  "If no view is provided to Component, treat <content> bindings as dynamic.");
 	});
 
-	QUnit.test("dynamic scoping", function() {
+	QUnit.test("dynamic scoping", function(assert) {
 
 		Component.extend({
 			tag: "hello-world",
 			leakScope: true,
 			view: stache("{{greeting}} <content>World</content>{{../exclamation}}"),
 			viewModel: function(){
-                return new SimpleMap({greeting: "Hello"});
-            }
+				return new SimpleMap({greeting: "Hello"});
+			}
 		});
 
 		var renderer = stache("<hello-world>{{greeting}}</hello-world>");
@@ -83,11 +82,11 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
 		var hello = frag.firstChild;
 
-		equal( hello.innerHTML.trim() , "Hello Hello!");
+		assert.equal( hello.innerHTML.trim() , "Hello Hello!");
 
 	});
 
-    QUnit.test("hello-world and whitespace around custom elements", function () {
+    QUnit.test("hello-world and whitespace around custom elements", function(assert) {
 
         Component.extend({
             tag: "hello-world",
@@ -112,11 +111,11 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
         domEvents.dispatch(helloWorld, "click");
 
-        equal( helloWorld.innerHTML , "Hello There!");
+        assert.equal( helpers.cloneAndClean(helloWorld).innerHTML , "Hello There!");
 
     });
 
-    QUnit.test("self closing content tags", function () {
+    QUnit.test("self closing content tags", function(assert) {
 
         Component.extend({
             "tag": "my-greeting",
@@ -134,11 +133,11 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
             site: "CanJS"
         });
 
-        equal(frag.firstChild.getElementsByTagName("span")
+        assert.equal(frag.firstChild.getElementsByTagName("span")
             .length, 1, "there is an h1");
     });
 
-    QUnit.test("content extension stack overflow error", function () {
+    QUnit.test("content extension stack overflow error", function(assert) {
 
         Component({
             tag: 'outer-tag',
@@ -157,11 +156,11 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
         var frag = renderer();
 
-        equal( innerHTML(frag.firstChild.firstChild), 'inner-tag TEMPLATE inner-tag CONTENT outer-tag CONTENT');
+        assert.equal( innerHTML(frag.firstChild.firstChild), 'inner-tag TEMPLATE inner-tag CONTENT outer-tag CONTENT');
 
     });
 
-    QUnit.test("inserted event fires twice if component inside live binding block", function () {
+    QUnit.test("inserted event fires twice if component inside live binding block", function(assert) {
 		var undo = domEvents.addEvent(insertedEvent);
 
         var inited = 0,
@@ -170,7 +169,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         Component.extend({
             tag: 'child-tag',
 
-            ViewModel: SimpleMap.extend({
+            ViewModel: DefineMap.extend({
                 init: function () {
                     inited++;
                 }
@@ -187,8 +186,8 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
             view: stache('{{#shown}}<child-tag></child-tag>{{/shown}}'),
 
-            viewModel: observe.Object.extend("ParentTag",{},{
-                shown: false
+            viewModel: DefineMap.extend("ParentTag",{},{
+                shown: { default: false }
             }),
             events: {
                 ' inserted': function () {
@@ -200,15 +199,15 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         var frag = stache("<parent-tag id='pt'></parent-tag>")({});
 
         domMutateNode.appendChild.call(this.fixture, frag);
-        stop();
+        var done = assert.async();
 
         var attempts = 0;
         function checkCount(){
             if(inserted >= 1 || attempts > 100) {
-                equal(inited, 1, "inited");
-				equal(inserted, 1, "inserted");
+                assert.equal(inited, 1, "inited");
+				assert.equal(inserted, 1, "inserted");
 				undo();
-                start();
+                done();
             } else {
                 attempts += 1;
                 setTimeout(checkCount,30);
@@ -218,7 +217,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         checkCount();
     });
 
-    QUnit.test('Same component tag nested', function () {
+    QUnit.test('Same component tag nested', function(assert) {
         Component({
             'tag': 'my-tag',
             view: stache('<p><content/></p>')
@@ -231,15 +230,15 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         var renderer3 = stache('<div><my-tag>First</my-tag><my-tag>Second</my-tag></div>');
 
 
-        equal( renderer({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
+        assert.equal( renderer({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
 
-        equal( renderer2({}).firstChild.getElementsByTagName('p').length, 4, 'proper number of p tags');
+        assert.equal( renderer2({}).firstChild.getElementsByTagName('p').length, 4, 'proper number of p tags');
 
-        equal( renderer3({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
+        assert.equal( renderer3({}).firstChild.getElementsByTagName('p').length, 2, 'proper number of p tags');
 
     });
 
-    QUnit.test('nested component within an #if is not live bound(#1025)', function() {
+    QUnit.test('nested component within an #if is not live bound(#1025)', function(assert) {
         Component.extend({
             tag: 'parent-component',
             view: stache('{{#if shown}}<child-component></child-component>{{/if}}'),
@@ -258,18 +257,16 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         var renderer = stache('<parent-component></parent-component>');
         var frag = renderer({});
 
-        equal( innerHTML(frag.firstChild), '', 'child component is not inserted');
+        assert.equal( innerHTML(frag.firstChild), '', 'child component is not inserted');
         canViewModel(frag.firstChild).attr('shown', true);
 
-        equal( innerHTML(frag.firstChild.firstChild), 'Hello world.', 'child component is inserted');
+        assert.equal( innerHTML(helpers.cloneAndClean(frag).firstChild.firstChild), 'Hello world.', 'child component is inserted');
         canViewModel(frag.firstChild).attr('shown', false);
 
-        equal( innerHTML(frag.firstChild), '', 'child component is removed');
+        assert.equal( innerHTML(frag.firstChild), '', 'child component is removed');
     });
 
-    var queues = require("can-queues");
-
-    QUnit.test("references scopes are available to bindings nested in components (#2029)", function(){
+    QUnit.test("references scopes are available to bindings nested in components (#2029)", function(assert) {
 
         var renderer = stache('<export-er value:to="scope.vars.reference" />'+
             '<wrap-er><simple-example key:from="scope.vars.reference"/></wrap-er>');
@@ -282,14 +279,14 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
             events : {
                 "init" : function() {
                     var self = this.viewModel;
-                    stop();
+                    var done = assert.async();
                     setTimeout(function() {
                         self.set("value" , 100);
                         var wrapper = frag.lastChild,
                             simpleExample = wrapper.firstChild,
                             textNode = simpleExample.firstChild;
-                        equal(textNode.nodeValue, "100", "updated value with reference");
-                        start();
+                        assert.equal(textNode.nodeValue, "100", "updated value with reference");
+                        done();
                     }, 100);
 
                 }
@@ -304,7 +301,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
     });
 
-    test("<content> (#2151)", function(){
+    QUnit.test("<content> (#2151)", function(assert) {
 		var mapInstance = new DefineMap({
 			items:[{
 				id : 1,
@@ -346,12 +343,12 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 		queues.batch.stop();
 
 		var lis = frag.firstChild.getElementsByTagName("li");
-		ok( innerHTML(lis[0]).indexOf("Item 1") >= 0, "Item 1 written out");
-		ok( innerHTML(lis[1]).indexOf("Item 2") >= 0, "Item 2 written out");
+		assert.ok( innerHTML(lis[0]).indexOf("Item 1") >= 0, "Item 1 written out");
+		assert.ok( innerHTML(lis[1]).indexOf("Item 2") >= 0, "Item 2 written out");
 
 	});
 
-    QUnit.test('two-way - reference - with <content> tag', function(){
+    QUnit.test('two-way - reference - with <content> tag', function(assert) {
 		Component.extend({
 			tag: "other-export",
 			viewModel: function(){
@@ -373,8 +370,8 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 		//var t2 = stache("<form><other-export *other/><ref-export><b>{{*otherExport.name}}</b><label>{{*other.name}}</label></ref-export></form>");
 
 		var f1 = t1();
-		equal(canViewModel( f1.firstChild.firstChild ).get("name"), "OTHER-EXPORT", "viewModel set correctly");
-		equal(f1.firstChild.lastChild.nodeValue, "OTHER-EXPORT", "content");
+		assert.equal(canViewModel( f1.firstChild.firstChild ).get("name"), "OTHER-EXPORT", "viewModel set correctly");
+		assert.equal(f1.firstChild.lastChild.nodeValue, "OTHER-EXPORT", "content");
 
 		/*var f2 = t2();
 		var one = f2.firstChild.getElementsByTagName('b')[0];
@@ -384,7 +381,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 		equal(two.firstChild.nodeValue, "OTHER-EXPORT", "external content, external export");*/
 	});
 
-    runTestInOnlyDocument("custom renderer can provide setupBindings", function(){
+    runTestInOnlyDocument("custom renderer can provide setupBindings", function(assert){
 		var rendererFactory = function(tmpl){
 			var frag = getFragment(tmpl);
 			return function(scope, options){
@@ -421,10 +418,10 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 		var frag = renderer();
 
 		var tn = frag.firstChild.firstChild.firstChild;
-		equal(tn.nodeValue, "qux", "was bound!");
+		assert.equal(tn.nodeValue, "qux", "was bound!");
 	});
 
-	QUnit.test("view defaults to stache if set to a string", function() {
+	QUnit.test("view defaults to stache if set to a string", function(assert) {
 
 		Component.extend({
 			tag: "hello-world",
@@ -442,7 +439,29 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
 		var hello = frag.firstChild;
 
-		equal( hello.innerHTML.trim() , "Hello World!");
+		assert.equal( hello.innerHTML.trim() , "Hello World!");
+
+	});
+
+    QUnit.test("content tag available (#279)", function(assert) {
+        var template = stache("<ct-outer>CT-OUTER-LIGHT-DOM</ct-outer>");
+
+        Component.extend({
+            tag: "ct-outer",
+            view: "CT-OUTER-SHADOW-START <ct-inner/> <span><content/></span> CT-OUTER-SHADOW-END"
+        });
+
+        Component.extend({
+            tag: "ct-inner",
+            leakScope: true,
+            view: stache("")
+        });
+
+        var frag = template();
+
+		var span = frag.firstChild.getElementsByTagName("span")[0];
+        assert.equal(span.innerHTML, "CT-OUTER-LIGHT-DOM");
+
 
 	});
 

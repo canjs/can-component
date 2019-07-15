@@ -7,3 +7,6 @@ require("./component-events-test");
 require("./example-test");
 require('./component-slot-test');
 require('./component-define-test');
+require("./component-instantiation-test");
+require("./component-in-stache-test");
+require("./component-can-bind-test");
