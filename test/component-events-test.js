@@ -98,8 +98,9 @@ helpers.makeTests("can-component events", function(){
         });
 
         var renderer = stache("<can-parent-stache></can-parent-stache>");
-
-        domMutateNode.appendChild.call(this.fixture, renderer());
+		var frag = renderer();
+		console.log("APPENDED!!");
+        domMutateNode.appendChild.call(this.fixture, frag);
         var done = assert.async();
         setTimeout(function () {
 			undo();
