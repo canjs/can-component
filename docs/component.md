@@ -2,7 +2,7 @@
 @download can/component
 @test can/component/test.html
 @parent can-views
-@collection can-core
+@collection can-legacy
 @release 2.0
 @link ../docco/component/component.html docco
 @group can-component.define 0 define
