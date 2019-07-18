@@ -246,7 +246,8 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 				var canBinding = new Bind({
 					child: child,
 					parent: parent,
-					queue: "domUI",
+					queue: "dom",
+					element: el,
 
 					//!steal-remove-start
 					// For debugging: the names that will be assigned to the updateChild
