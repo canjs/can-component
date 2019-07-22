@@ -548,8 +548,6 @@ helpers.makeTests("can-component examples", function(doc) {
 					},
 
 					" beforeremove": function() {
-						console.log("beforeremove ... removePanel");
-
 						this.parent.removePanel(this.viewModel);
 					}
 				}
@@ -610,7 +608,6 @@ helpers.makeTests("can-component examples", function(doc) {
 				},
 				function() {
 					var lis = testArea.getElementsByTagName("li");
-					console.log("testing");
 					assert.equal(lis.length, 3, "removed li after shifting a foodType");
 					foodTypes.forEach(function(type, i) {
 						assert.equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");

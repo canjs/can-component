@@ -1,5 +1,4 @@
 "use strict";
-/* jshint -W079 */
 
 // # can-component.js
 // This implements the `Component` which allows you to create widgets
@@ -550,8 +549,6 @@ var Component = Construct.extend(
 					removedDisposal = null;
 				}
 				component._torndown = true;
-				console.log("dispatching beforeremove");
-				//debugger;
 				domEvents.dispatch(el, "beforeremove", false);
 				if(teardownBindings) {
 					teardownBindings();
