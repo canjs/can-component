@@ -77,7 +77,7 @@
     "docco": "^0.8.0",
     "highlight.js": "^9.15.7",
     "done-serve": "^2.0.0",
-    "gh-pages": "^2.0.1",
+    "gh-pages": "^2.1.1",
     "jshint": "^2.9.1",
     "steal": "^1.0.0",
     "steal-qunit": "^2.0.0",
