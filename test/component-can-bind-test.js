@@ -4,6 +4,8 @@ var helpers = require("./helpers");
 var QUnit = require("steal-qunit");
 var SimpleMap = require("can-simple-map");
 var value = require("can-value");
+var queues = require("can-queues");
+var testHelpers = require("can-test-helpers");
 
 QUnit.module("can-component integration with can-bind");
 
@@ -68,5 +70,25 @@ QUnit.test("Using can-bind in connectedCallback works as documented", function(a
 		fixture.removeChild(element);
 
 		done();
+	});
+});
+
+testHelpers.dev.devOnlyTest("logStack should include `new Component()` mutations", function(assert) {
+	var ComponentConstructor = Component.extend({
+		tag: "a-tag",
+		view: '{{foo}}',
+		ViewModel: {
+			setup: function () {
+				var expected = queues.stack().length > 0;
+				assert.ok(expected, "At least one task on the stack");
+			},
+			foo: 'string'
+		}
+	});
+
+	new ComponentConstructor({
+		viewModel : {
+			foo: value.bind(this,"bar")
+		}
 	});
 });

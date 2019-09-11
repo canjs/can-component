@@ -492,9 +492,24 @@ var Component = Construct.extend(
 				} else if (componentTagData.viewModel) {
 					// Component is being instantiated with a viewModel
 					setupFn = getSetupFunctionForComponentVM(componentTagData.viewModel);
+
+					//!steal-remove-start
+					if (process.env.NODE_ENV !== 'production') {
+						Object.defineProperty(setupFn, "name",{
+							value: "render <"+this.tag+">",
+							configurable: true
+						});
+
+						setupFn = queues.runAsTask(setupFn, function(el, componentTagData) {
+							return ["Rendering", el, "with",el, componentTagData.viewModel];
+						});
+					}
+					//!steal-remove-end
 				} else {
 					setupFn = stacheBindings.behaviors.viewModel;
 				}
+
+
 				teardownBindings = setupFn(el, componentTagData, function(initialViewModelData) {
 
 					var ViewModel = component.constructor.ViewModel,
