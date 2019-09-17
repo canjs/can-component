@@ -88,7 +88,7 @@ testHelpers.dev.devOnlyTest("logStack should include `new Component()` mutations
 
 	new ComponentConstructor({
 		viewModel : {
-			foo: value.bind(this,"bar")
+			foo: "bar"
 		}
 	});
 });

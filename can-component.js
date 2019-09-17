@@ -495,13 +495,8 @@ var Component = Construct.extend(
 
 					//!steal-remove-start
 					if (process.env.NODE_ENV !== 'production') {
-						Object.defineProperty(setupFn, "name",{
-							value: "render <"+this.tag+">",
-							configurable: true
-						});
-
 						setupFn = queues.runAsTask(setupFn, function(el, componentTagData) {
-							return ["Rendering", el, "with",el, componentTagData.viewModel];
+							return ["Constructing", el, "with viewModel",componentTagData.viewModel];
 						});
 					}
 					//!steal-remove-end
