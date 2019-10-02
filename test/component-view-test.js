@@ -16,7 +16,7 @@ var viewCallbacks = require("can-view-callbacks");
 var Scope = require("can-view-scope");
 
 var innerHTML = function(el){
-    return el && el.innerHTML;
+    return el && helpers.cloneAndClean(el).innerHTML;
 };
 
 helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
@@ -111,7 +111,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
         domEvents.dispatch(helloWorld, "click");
 
-        assert.equal( helloWorld.innerHTML , "Hello There!");
+        assert.equal( helpers.cloneAndClean(helloWorld).innerHTML , "Hello There!");
 
     });
 
@@ -260,7 +260,7 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
         assert.equal( innerHTML(frag.firstChild), '', 'child component is not inserted');
         canViewModel(frag.firstChild).attr('shown', true);
 
-        assert.equal( innerHTML(frag.firstChild.firstChild), 'Hello world.', 'child component is inserted');
+        assert.equal( innerHTML(helpers.cloneAndClean(frag).firstChild.firstChild), 'Hello world.', 'child component is inserted');
         canViewModel(frag.firstChild).attr('shown', false);
 
         assert.equal( innerHTML(frag.firstChild), '', 'child component is removed');

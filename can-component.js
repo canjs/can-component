@@ -1,5 +1,4 @@
 "use strict";
-/* jshint -W079 */
 
 // # can-component.js
 // This implements the `Component` which allows you to create widgets
@@ -17,7 +16,6 @@ var stache = require("can-stache");
 var stacheBindings = require("can-stache-bindings");
 var Scope = require("can-view-scope");
 var viewCallbacks = require("can-view-callbacks");
-var nodeLists = require("can-view-nodelist");
 var canReflect = require("can-reflect");
 var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
@@ -28,7 +26,6 @@ var assign = require('can-assign');
 var ObservationRecorder = require("can-observation-recorder");
 var queues = require("can-queues");
 var domData = require('can-dom-data');
-var getChildNodes = require('can-child-nodes');
 var string = require("can-string");
 var domEvents = require('can-dom-events');
 var domMutate = require('can-dom-mutate');
@@ -57,7 +54,7 @@ var viewModelSymbol = canSymbol.for('can.viewModel');
 
 
 // ## Helpers
-var noop = function(){};
+
 // ### addContext
 // For replacement elements like `<can-slot>` and `<context>`, this is used to
 // figure out what data they should render with.  Slots can have bindings like
@@ -176,19 +173,31 @@ function makeReplacementTagCallback(tagName, componentTagData, shadowTagData, le
 			// Now we need to render the right template and insert its result in the page.
 			// We need to teardown any bindings created too so we create a nodeList
 			// to do this.
+			var fragment = template(tagData.scope, tagData.options);
+			if(tagData.teardown) {
 
+				var placeholder = el.ownerDocument.createComment(tagName);
+				fragment.insertBefore(placeholder, fragment.firstChild);
+				domMutate.onNodeRemoved(placeholder, tagData.teardown);
+			}
 
-
+			el.parentNode.replaceChild(
+				fragment,
+				el
+			);
+			/*
 			var nodeList = nodeLists.register([el], tagData.teardown || noop,
 				insertionElementTagData.parentNodeList || true,
 				insertionElementTagData.directlyNested);
 
 			nodeList.expression = "<can-slot name='"+el.getAttribute('name')+"'/>";
 
-			var frag = template(tagData.scope, tagData.options, nodeList);
+			var frag = template(tagData.scope, tagData.options);
+
+
 			var newNodes = canReflect.toArray( getChildNodes(frag) );
 			var oldNodes = nodeLists.update(nodeList, newNodes);
-			nodeLists.replace(oldNodes, frag);
+			nodeLists.replace(oldNodes, frag);*/
 
 			// Restore the proper tag function so it could potentially be used again (as in lists)
 			options.tags[tagName] = replacementTag;
@@ -236,7 +245,8 @@ function getSetupFunctionForComponentVM(componentInitVM) {
 				var canBinding = new Bind({
 					child: child,
 					parent: parent,
-					queue: "domUI",
+					queue: "dom",
+					element: el,
 
 					//!steal-remove-start
 					// For debugging: the names that will be assigned to the updateChild
@@ -539,13 +549,30 @@ var Component = Construct.extend(
 			el.viewModel = viewModel;
 			domData.set(el, "preventDataBindings", true);
 
-			// an array of teardown stuff that should happen when the element is removed
-			var teardownFunctions = [];
-			var callTeardownFunctions = function() {
-					for (var i = 0, len = teardownFunctions.length; i < len; i++) {
-						teardownFunctions[i]();
-					}
-				};
+			// TEARDOWN SETUP
+			var removedDisposal,
+				connectedDisposal,
+				viewModelDisconnectedCallback;
+			function teardownComponent(){
+				if(removedDisposal) {
+					removedDisposal();
+					removedDisposal = null;
+				}
+				component._torndown = true;
+				domEvents.dispatch(el, "beforeremove", false);
+				if(teardownBindings) {
+					teardownBindings();
+				}
+				if(viewModelDisconnectedCallback) {
+					viewModelDisconnectedCallback(el);
+				} else if(typeof viewModel.stopListening === "function"){
+					viewModel.stopListening();
+				}
+				if(connectedDisposal) {
+					connectedDisposal();
+					connectedDisposal = null;
+				}
+			}
 
 			// #### Helpers
 			// TODO: remove in next release
@@ -558,7 +585,6 @@ var Component = Construct.extend(
 				});
 			}
 
-
 			// #### `events` control
 			// TODO: remove in next release
 			// Create a control to listen to events
@@ -566,24 +592,17 @@ var Component = Construct.extend(
 				this._control = new this.constructor.Control(el, {
 					// Pass the viewModel to the control so we can listen to it's changes from the controller.
 					scope: this.viewModel,
-					viewModel: this.viewModel,
-					destroy: callTeardownFunctions
-				});
-			} else {
-				var removalDisposal = domMutate.onNodeRemoval(el, function () {
-					var doc = el.ownerDocument;
-					var rootNode = doc.contains ? doc : doc.documentElement;
-					if (!rootNode || !rootNode.contains(el)) {
-						if(removalDisposal) {
-							nodeRemoved = true;
-							removalDisposal();
-							callTeardownFunctions();
-							removalDisposal = null;
-							callTeardownFunctions = null;
-						}
-					}
+					viewModel: this.viewModel
 				});
 			}
+
+			removedDisposal = domMutate.onNodeRemoved(el, function () {
+				var doc = el.ownerDocument;
+				var rootNode = doc.contains ? doc : doc.documentElement;
+				if (!rootNode || !rootNode.contains(el)) {
+					teardownComponent();
+				}
+			});
 
 			// #### Rendering
 
@@ -644,61 +663,32 @@ var Component = Construct.extend(
 				betweenTagsTagData = lightTemplateTagData;
 				betweenTagsView = componentTagData.subtemplate || el.ownerDocument.createDocumentFragment.bind(el.ownerDocument);
 			}
-			var viewModelDisconnectedCallback,
-				insertionDisposal,
-				componentInPage,
-				nodeRemoved;
+
+
+
 
 			// Keep a nodeList so we can kill any directly nested nodeLists within this component
-			var nodeList = nodeLists.register([], function() {
-				if(removalDisposal && !nodeRemoved) {
-					removalDisposal();
-					callTeardownFunctions();
-					removalDisposal = null;
-					callTeardownFunctions = null;
-				}
-				component._torndown = true;
-				domEvents.dispatch(el, "beforeremove", false);
-				if(teardownBindings) {
-					teardownBindings();
-				}
-				if(viewModelDisconnectedCallback) {
-					viewModelDisconnectedCallback(el);
-				} else if(typeof viewModel.stopListening === "function"){
-					viewModel.stopListening();
-				}
-				if(insertionDisposal) {
-					insertionDisposal();
-					insertionDisposal = null;
-				}
-			}, componentTagData.parentNodeList || true, false);
-			nodeList.expression = "<" + this.tag + ">";
-			teardownFunctions.push(function() {
-				nodeLists.unregister(nodeList);
-			});
-			this.nodeList = nodeList;
 
-			shadowFragment = betweenTagsView(betweenTagsTagData.scope, betweenTagsTagData.options, nodeList);
+
+
+			shadowFragment = betweenTagsView(betweenTagsTagData.scope, betweenTagsTagData.options);
 
 			// TODO: afterRender
 
 			// Append the resulting document fragment to the element
 			domMutateNode.appendChild.call(el, shadowFragment);
 
-			// update the nodeList with the new children so the mapping gets applied
-			nodeLists.update(nodeList, getChildNodes(el));
-
 			// Call connectedCallback
 			if(viewModel && viewModel.connectedCallback) {
 				var body = DOCUMENT().body;
-				componentInPage = body && body.contains(el);
+				var componentInPage = body && body.contains(el);
 
 				if(componentInPage) {
 					viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 				} else {
-					insertionDisposal = domMutate.onNodeInsertion(el, function () {
-						insertionDisposal();
-						insertionDisposal = null;
+					connectedDisposal = domMutate.onNodeConnected(el, function () {
+						connectedDisposal();
+						connectedDisposal = null;
 						viewModelDisconnectedCallback = viewModel.connectedCallback(el);
 					});
 				}
@@ -713,7 +703,6 @@ Component.prototype[viewInsertSymbol] = function(viewData) {
 	if(this._torndown) {
 		this.setup.apply(this,this._initialArgs);
 	}
-	viewData.nodeList.newDeepChildren.push(this.nodeList);
 	return this.element;
 };
 

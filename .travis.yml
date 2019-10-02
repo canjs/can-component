@@ -1,7 +1,7 @@
 language: node_js
 node_js: node
 addons:
-  firefox: '57.0'
+  firefox: latest
 dist: xenial
 services:
   - xvfb

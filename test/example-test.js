@@ -543,12 +543,12 @@ helpers.makeTests("can-component examples", function(doc) {
 					" inserted": function() {
 						canViewModel(this.element.parentNode)
 							.addPanel(this.viewModel);
+						this.parent = this.element.parentNode.viewModel;
 
 					},
 
 					" beforeremove": function() {
-						canViewModel(this.element.parentNode)
-							.removePanel(this.viewModel);
+						this.parent.removePanel(this.viewModel);
 					}
 				}
 			});
@@ -608,7 +608,6 @@ helpers.makeTests("can-component examples", function(doc) {
 				},
 				function() {
 					var lis = testArea.getElementsByTagName("li");
-
 					assert.equal(lis.length, 3, "removed li after shifting a foodType");
 					foodTypes.forEach(function(type, i) {
 						assert.equal(innerHTML(lis[i]), type.title, "li " + i + " has the right content");
@@ -618,8 +617,8 @@ helpers.makeTests("can-component examples", function(doc) {
 					var panels = testArea.getElementsByTagName("panel");
 
 					assert.equal(lis[0].className, "active", "the first element is active");
-					assert.equal(innerHTML(panels[0]), "pasta, cereal", "the first content is shown");
-					assert.equal(innerHTML(panels[1]), "", "the second content is removed");
+					assert.equal(innerHTML( helpers.cloneAndClean(panels[0]) ), "pasta, cereal", "the first content is shown");
+					assert.equal(innerHTML( helpers.cloneAndClean(panels[1]) ), "", "the second content is removed");
 
 					domEvents.dispatch(lis[1], "click");
 					lis = testArea.getElementsByTagName("li");
@@ -627,8 +626,8 @@ helpers.makeTests("can-component examples", function(doc) {
 					assert.equal(lis[1].className, "active", "the second element is active");
 					assert.equal(lis[0].className, "", "the first element is not active");
 
-					assert.equal(innerHTML(panels[0]), "", "the second content is removed");
-					assert.equal(innerHTML(panels[1]), "ice cream, candy", "the second content is shown");
+					assert.equal(innerHTML( helpers.cloneAndClean(panels[0]) ), "", "the second content is removed");
+					assert.equal(innerHTML( helpers.cloneAndClean(panels[1]) ), "ice cream, candy", "the second content is shown");
 					undo();
 				}
 			], done);

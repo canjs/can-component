@@ -6,6 +6,7 @@ var canReflect = require("can-reflect");
 var QUnit = require("steal-qunit");
 
 var domMutate = require("can-dom-mutate");
+var domMutateNode = require("can-dom-mutate/node/node");
 var globals = require("can-globals");
 
 QUnit.module("can-component can be rendered by can-stache");
@@ -123,7 +124,7 @@ QUnit.test("Component can be removed from the page", function(assert) {
 	show.set(true);
 
 	prop.set(4);
-	assert.equal(frag.firstChild.getElementsByTagName("to-be-removed")[0].innerHTML, "4");
+	assert.equal(frag.firstChild.getElementsByTagName("to-be-removed")[0].innerHTML, "4", "innerHTML is 4");
 });
 
 QUnit.test("Cleans up itself on the documentElement removal", function(assert) {
@@ -140,7 +141,7 @@ QUnit.test("Cleans up itself on the documentElement removal", function(assert) {
 	var frag = stache("<ssr-cleanup />")({});
 	doc.body.appendChild(frag);
 
-	domMutate.onNodeRemoval(doc.body.firstChild, function() {
+	domMutate.onNodeDisconnected(doc.body.firstChild, function() {
 		globals.setKeyValue("document", realDoc);
 		assert.ok(true, "Called back without throwing");
 		done();
@@ -148,5 +149,5 @@ QUnit.test("Cleans up itself on the documentElement removal", function(assert) {
 
 	var done = assert.async();
 
-	doc.removeChild(doc.documentElement);
+	domMutateNode.removeChild.call(doc, doc.documentElement);
 });

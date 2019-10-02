@@ -98,8 +98,8 @@ helpers.makeTests("can-component events", function(){
         });
 
         var renderer = stache("<can-parent-stache></can-parent-stache>");
-
-        domMutateNode.appendChild.call(this.fixture, renderer());
+		var frag = renderer();
+        domMutateNode.appendChild.call(this.fixture, frag);
         var done = assert.async();
         setTimeout(function () {
 			undo();
@@ -147,7 +147,7 @@ helpers.makeTests("can-component events", function(){
         HANDLER.call(Test,{type:"something"});
     });
 
-    QUnit.test('removing bound viewModel properties on destroy #1415', function(assert) {
+    QUnit.test('removing bound viewModel properties on connectedCallback #1415', function(assert) {
         var state = new SimpleMap({
             product: new SimpleMap({
                 id: 1,
@@ -157,9 +157,9 @@ helpers.makeTests("can-component events", function(){
 
         Component.extend({
             tag: 'destroyable-component',
-            events: {
-                destroy: function(){
-                    this.viewModel.set("product" , null);
+            ViewModel: {
+                connectedCallback: function(){
+                    this.set("product" , null);
                 }
             }
         });
@@ -249,7 +249,7 @@ helpers.makeTests("can-component events", function(){
 			undo();
         }], done);
 
-        
+
 
     });
 
