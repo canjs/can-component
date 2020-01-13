@@ -79,7 +79,7 @@
     "done-serve": "^2.0.0",
     "gh-pages": "^2.0.1",
     "highlight.js": "^9.15.7",
-    "jshint": "^2.9.1",
+    "jshint": "2.10.3",
     "steal": "^1.0.0",
     "steal-qunit": "^2.0.0",
     "steal-tools": "^1.0.1",
