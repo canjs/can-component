@@ -158,16 +158,16 @@ QUnit.test("raw bindings work on Components (#367)", function(assert){
 	Component.extend({
 		tag: "raw-bindings",
 		view: "Raw Bindings",
-		viewModel: function(){
+		viewModel: function() {
 			return new SimpleMap({});
 		}
 	});
 
 	var renderer = stache("<raw-bindings thing:raw='no'></ raw-bindings>");
 	var frag = renderer();
-	var viewModel = canViewModel(frag.firstChild)
+	var viewModel = canViewModel(frag.firstChild);
 
-	viewModel.set("thing", "yes")
+	viewModel.set("thing", "yes");
 
 	assert.equal(viewModel.attr("thing"), "no", "able to set raw values");
-})
+});
