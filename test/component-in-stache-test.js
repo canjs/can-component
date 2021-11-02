@@ -52,9 +52,9 @@ QUnit.test("wrapped in a conditional", function (assert) {
 		componentInstance: componentInstance,
 		showComponent: false
 	});
-	console.log("templateVM", templateVM);
+
 	var componentVM = componentInstance.viewModel;
-console.log("componentVM", componentVM)
+
 	var fragment = stache("<div>{{#if(showComponent)}}{{{componentInstance}}}{{/if}}</div>")(templateVM);
 
 	// Template starts off empty
