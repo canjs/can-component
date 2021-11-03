@@ -155,19 +155,22 @@ QUnit.test("Cleans up itself on the documentElement removal", function(assert) {
 });
 
 QUnit.test("raw bindings work on Components (#367)", function(assert){
-	Component.extend({
+	var ComponentConstructor = Component.extend({
 		tag: "raw-bindings",
 		view: "Raw Bindings",
-		viewModel: function() {
-			return new SimpleMap({});
+		ViewModel: {
+			thing: "string",
 		}
 	});
 
-	var renderer = stache("<raw-bindings thing:raw='no'></ raw-bindings>");
-	var frag = renderer();
-	var viewModel = canViewModel(frag.firstChild);
+	var componentInstance = new ComponentConstructor();
 
-	viewModel.set("thing", "yes");
+	var templateVM = new SimpleMap({
+		componentInstance: componentInstance,
+	});
 
-	assert.equal(viewModel.attr("thing"), "no", "able to set raw values");
+	var renderer = stache("<raw-bindings thing:raw='no'></ raw-bindings>")(templateVM);
+	var viewModel = canViewModel(renderer.firstChild, "thing");
+
+	assert.equal(viewModel, "no", "able to set raw values");
 });
