@@ -467,8 +467,15 @@ var Component = Construct.extend(
 			}
 
 			var componentScope = componentTagData.scope;
-			if (componentScope !== undefined && componentScope instanceof Scope === false) {
-				componentTagData.scope = new Scope(componentScope);
+			if (componentScope !== undefined &&
+				componentScope instanceof Scope === false
+			) {
+				if(canReflect.isScopeLike(componentScope)) {
+					// replace foreign scope-like with native scope to ensure consistent behavior.
+					componentTagData.scope = new Scope(componentScope._context, componentScope._parent, componentScope._meta);
+				} else {
+					componentTagData.scope = new Scope(componentScope);
+				}
 			}
 
 			// Hook up any templates with which the component was instantiated

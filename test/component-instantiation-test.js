@@ -5,6 +5,7 @@ var SimpleMap = require("can-simple-map");
 var stache = require("can-stache");
 var value = require("can-value");
 var globals = require("can-globals");
+var Scope = require("can-view-scope");
 var helpers = require("./helpers");
 
 QUnit.module("can-component instantiation");
@@ -379,4 +380,42 @@ QUnit.test("{initializeBindings: false} prevents setting up bindings until inser
 
 	assert.equal(inst.viewModel.color, "red", "is red");
 	assert.equal(frag.firstChild.firstChild.data, "red", "Now it is setup");
+});
+
+QUnit.test("passing a scope-like as the component scope results in a new Scope with scope-like's context, parent, meta", function(assert) {
+	var context = new DefineMap();
+	var parentScope = new Scope();
+	var meta = {};
+	var tagData = {
+		scope: {
+			get: function() {},
+			set: function() {},
+			peek: function() {},
+			computeData: function() {},
+			getScope: function() {},
+			add: function() {},
+			getHelperOrPartial: function() {},
+			getTemplateContext: function() {},
+			cloneFromRef: function() {},
+			_context: context,
+			_parent: parentScope,
+			_meta: meta
+		}
+	};
+
+	var ComponentConstructor = Component.extend({
+		tag: "some-random-tag",
+		view: "{{color}}",
+		ViewModel: {
+			color: { default: "red" }
+		}
+	});
+
+	new ComponentConstructor(tagData);
+
+	assert.ok(tagData.scope instanceof Scope, "scope-like is replaced with native scope");
+
+	assert.equal(tagData.scope._context, context, "new scope has same context");
+	assert.equal(tagData.scope._parent, parentScope, "new scope has same parent");
+	assert.equal(tagData.scope._meta, meta, "new scope has same meta");
 });
