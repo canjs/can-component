@@ -380,9 +380,9 @@ var Component = Construct.extend(
 				}
 				
 				var viewName = string.capitalize( string.camelize(this.prototype.tag) )+"View";
-				this.view = typeof this.view === "function" ?
-					this.view :
-					stache(viewName, this.view || "");
+				if(this.view !== undefined && typeof this.view !== "function"){
+					this.view = stache(viewName, this.view || "");
+				}
 
 				var renderComponent = function(el, tagData) {
 					// Check if a symbol already exists on the element; if it does, then
