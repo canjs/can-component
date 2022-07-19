@@ -379,8 +379,9 @@ var Component = Construct.extend(
 					this.view = this.prototype.view;
 				}
 				
-				var viewName = string.capitalize( string.camelize(this.prototype.tag) )+"View";
+				var viewName;
 				if(this.view !== undefined && typeof this.view !== "function"){
+					viewName = string.capitalize( string.camelize(this.prototype.tag) )+"View";
 					this.view = stache(viewName, this.view || "");
 				}
 
