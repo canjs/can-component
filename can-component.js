@@ -378,15 +378,12 @@ var Component = Construct.extend(
 				if (this.prototype.view) {
 					this.view = this.prototype.view;
 				}
-
-				// default to stache if renderer is a string
-				if (typeof this.view === "string") {
-					var viewName = string.capitalize( string.camelize(this.prototype.tag) )+"View";
-					this.view = stache(viewName, this.view);
+				
+				var viewName;
+				if(this.view !== undefined && typeof this.view !== "function"){
+					viewName = string.capitalize( string.camelize(this.prototype.tag) )+"View";
+					this.view = stache(viewName, this.view || "");
 				}
-
-				// TODO: Remove in next release.
-				this.renderer = this.view;
 
 				var renderComponent = function(el, tagData) {
 					// Check if a symbol already exists on the element; if it does, then
