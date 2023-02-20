@@ -14,6 +14,7 @@ var queues = require("can-queues");
 var getFragment = require("can-fragment");
 var viewCallbacks = require("can-view-callbacks");
 var Scope = require("can-view-scope");
+var stacheAST = require("can-stache-ast");
 
 var innerHTML = function(el){
     return el && helpers.cloneAndClean(el).innerHTML;
@@ -461,8 +462,22 @@ helpers.makeTests("can-component views", function(doc, runTestInOnlyDocument){
 
 		var span = frag.firstChild.getElementsByTagName("span")[0];
         assert.equal(span.innerHTML, "CT-OUTER-LIGHT-DOM");
-
-
 	});
 
+	QUnit.test("passing a stache AST into view", function(assert) {
+
+		var ast = stacheAST.parse("Hello World!");
+		Component.extend({
+			tag: "hello-world",
+			view: ast.intermediate,
+			ViewModel: SimpleMap.extend({})
+		});
+
+		var renderer = stache("<hello-world />");
+		var frag = renderer({});
+
+		var hello = frag.firstChild;
+
+		assert.equal( hello.innerHTML.trim() , "Hello World!");
+	});
 });
